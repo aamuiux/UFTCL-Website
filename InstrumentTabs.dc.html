@@ -11,8 +11,8 @@
 <link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
 <script src="uftcl-data.js"></script>
 </helmet>
-<nav data-screen-label="Instrument tabs" style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink); align-self: flex-start; max-width: 100%; font-family: var(--font-sans); font-size: 13px;">
-  <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5"><a href="{{ t.href }}" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border-right: 1px solid var(--ink); margin-right: -1px; font-weight: 700; white-space: nowrap; text-decoration: none; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</a></sc-for>
+<nav data-screen-label="Instrument tabs" style="display: flex; flex-wrap: wrap; gap: 4px; align-self: flex-start; max-width: 100%; font-family: var(--font-sans); font-size: 13px;">
+  <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5"><a href="{{ t.href }}" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border: 1px solid {{ t.bd }}; font-weight: 700; white-space: nowrap; text-decoration: none; background: {{ t.bg }}; color: {{ t.fg }};" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);">{{ t.label }}</a></sc-for>
 </nav>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:60},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chart&quot;,&quot;vpa&quot;,&quot;archive&quot;,&quot;depth&quot;,&quot;effect&quot;],&quot;default&quot;:&quot;chart&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
@@ -25,7 +25,7 @@ class Component extends DCLogic {
     const active = this.props.active || 'chart';
     const code = U.param('symbol', 'BRACBANK').toUpperCase();
     const T = [['chart', 'Stock Chart', 'Chart'], ['vpa', '1 Minute VPA', 'VPA'], ['archive', 'VPA Archive', 'VPA Archive'], ['depth', 'Market Depth Monitor', 'Depth Monitor'], ['effect', 'News Effect Chart', 'News Effect Chart']];
-    return { tabs: T.map(([k, label, page]) => ({ label, href: U.href(page, { symbol: code }), bg: k === active ? 'var(--ink)' : 'var(--paper)', fg: k === active ? 'var(--paper)' : 'var(--ink)' })) };
+    return { tabs: T.map(([k, label, page]) => ({ label, href: U.href(page, { symbol: code }), bd: k === active ? 'var(--ink)' : 'var(--neutral-300)', bg: k === active ? 'var(--ink)' : 'var(--paper)', fg: k === active ? 'var(--paper)' : 'var(--ink)' })) };
   }
 }
 </script>
