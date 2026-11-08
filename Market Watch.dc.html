@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Market Watch — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <nav aria-label="Breadcrumb" style="font-size: 13px; color: var(--text-muted); display: flex; gap: 6px;"><a href="Home.dc.html">Home</a><span>/</span><span>VPA</span><span>/</span><span style="color: var(--ink);">Market watch</span></nav>
+
+  <section data-screen-label="Instrument strip" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: stretch;">
+    <label style="display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 12px 16px; border-right: 1px solid var(--ink); min-width: 200px;">
+      <select onChange="{{ onPick }}" value="{{ pickValue }}" style="font: inherit; font-size: 18px; font-weight: 700; border: 0; background: transparent; color: var(--ink); padding: 0; outline: none; cursor: pointer;">
+        <sc-for list="{{ pickOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+      </select>
+      <span style="font-size: 12px; color: var(--text-muted);">{{ name }}</span>
+    </label>
+    <div style="display: flex; flex-direction: column; justify-content: center; padding: 12px 16px; border-right: 1px solid var(--ink);">
+      <span style="font-family: var(--font-mono); font-size: 28px; line-height: 32px; font-weight: 700;">{{ ltp }}</span>
+      <span style="font-family: var(--font-mono); font-size: 13px; color: {{ chgColor }};">{{ chg }}</span>
+    </div>
+    <div style="flex: 1 1 520px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); align-content: center; gap: 10px 20px; padding: 12px 16px;">
+      <sc-for list="{{ quote }}" as="q" hint-placeholder-count="6"><div style="display: flex; flex-direction: column;"><span style="font-size: 12px; color: var(--text-muted);">{{ q.label }}</span><span style="font-family: var(--font-mono); font-size: 13px; font-weight: 700;">{{ q.value }}</span></div></sc-for>
+    </div>
+    <sc-if value="{{ isStock }}"><div style="display: flex; align-items: stretch; border-left: 1px solid var(--ink);"><sc-for list="{{ links }}" as="l" hint-placeholder-count="4"><a href="{{ l.href }}" title="{{ l.title }}" style="width: 44px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--neutral-200);" style-hover="background: var(--ink); color: var(--paper);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ l.d }}"></path></svg></a></sc-for></div></sc-if>
+  </section>
+
+  <section style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+    <aside data-screen-label="Depth and VPA" style="flex: 1 1 280px; max-width: 360px; min-width: 260px; display: flex; flex-direction: column; gap: 24px;">
+      <div style="border: 1px solid var(--ink);">
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Market Depth</div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px 12px; font-size: 11px; color: var(--text-muted); border-bottom: 1px solid var(--neutral-200); text-transform: uppercase;"><span>Volume</span><span style="text-align: right;">Price</span><span style="padding-left: 12px;">Price</span><span style="text-align: right;">Volume</span></div>
+        <sc-if value="{{ isStock }}">
+          <sc-for list="{{ dp.rows }}" as="r" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); padding: 0 12px; font-family: var(--font-mono); font-size: 12px; border-bottom: 1px solid var(--neutral-200); position: relative; height: 30px; align-items: center;">
+              <div style="position: absolute; right: 50%; top: 0; bottom: 0; width: {{ r.bw }}; background: oklch(52.7% 0.154 150 / 0.14);"></div><div style="position: absolute; left: 50%; top: 0; bottom: 0; width: {{ r.aw }}; background: oklch(50.5% 0.213 27.5 / 0.14);"></div>
+              <span style="position: relative;">{{ r.bq }}</span><span style="position: relative; text-align: right; color: var(--green-700); font-weight: 700;">{{ r.bp }}</span><span style="position: relative; padding-left: 12px; color: var(--red-700); font-weight: 700;">{{ r.ap }}</span><span style="position: relative; text-align: right;">{{ r.aq }}</span>
+            </div>
+          </sc-for>
+          <div style="display: flex; font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--paper);"><div style="width: {{ dp.buyPct }}; background: var(--green-700); padding: 6px 12px;">{{ dp.buyPct }}</div><div style="flex: 1; background: var(--red-700); padding: 6px 12px; text-align: right;">{{ dp.sellPct }}</div></div>
+        </sc-if>
+        <sc-if value="{{ isIndex }}"><div style="padding: 40px 16px; text-align: center; color: var(--text-muted);">Not available for indices</div></sc-if>
+      </div>
+
+      <div style="border: 1px solid var(--ink);">
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">1 Minute Volume Price Analysis</div>
+        <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) 44px; padding: 10px 8px 0;">
+          <div style="position: relative; height: 170px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);"><sc-for list="{{ vc.volAxis }}" as="g"><span style="position: absolute; right: 4px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+          <div style="position: relative; height: 170px; border-bottom: 1px solid var(--ink);">
+            <svg viewBox="0 0 400 170" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;"><sc-for list="{{ vc.bars }}" as="b"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.color }}"></rect></sc-for><path d="{{ vc.line }}" fill="none" stroke="var(--ink)" stroke-width="1.25" vector-effect="non-scaling-stroke"></path></svg>
+            <svg viewBox="0 0 40 40" width="34" height="34" style="position: absolute; left: 6px; top: 6px;" aria-label="Volume split"><sc-for list="{{ pie }}" as="s"><path d="{{ s.d }}" fill="{{ s.c }}"></path></sc-for></svg>
+          </div>
+          <div style="position: relative; height: 170px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);"><sc-for list="{{ vc.priceAxis }}" as="g"><span style="position: absolute; left: 6px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+        </div>
+        <div style="position: relative; height: 22px; margin: 0 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);"><sc-for list="{{ vc.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%);">{{ x.label }}</span></sc-for></div>
+        <div style="display: flex; justify-content: space-around; padding: 8px; border-top: 1px solid var(--neutral-200); font-size: 11px;"><sc-for list="{{ legend }}" as="l" hint-placeholder-count="3"><span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 9px; background: {{ l.c }};"></span>{{ l.label }}</span></sc-for></div>
+      </div>
+    </aside>
+
+    <div data-screen-label="Chart and details" style="flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px;">
+      <div style="border: 1px solid var(--ink);">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px; border-bottom: 1px solid var(--ink);">
+          <div style="display: flex; border: 1px solid var(--ink);"><sc-for list="{{ intervalTabs }}" as="t" hint-placeholder-count="7"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; height: 30px; min-width: 38px; padding: 0 8px; border: 0; border-right: {{ t.br }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+          <div style="display: flex; border: 1px solid var(--ink);"><sc-for list="{{ typeTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; height: 30px; padding: 0 12px; border: 0; border-right: {{ t.br }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+          <div style="display: flex; gap: 6px; align-items: center;"><span style="font-size: 12px; color: var(--text-muted);">Indicators</span><sc-for list="{{ indToggles }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 12px; height: 28px; padding: 0 8px; border: 1px solid var(--ink); background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+          <button onClick="{{ saveLayout }}" style="margin-left: auto; font: inherit; font-size: 12px; height: 28px; padding: 0 12px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer;">{{ saveLabel }}</button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; padding: 8px 12px; border-bottom: 1px solid var(--neutral-200); font-family: var(--font-mono); font-size: 12px;">
+          <span style="font-family: var(--font-sans); font-weight: 700; font-size: 14px;">{{ name }} · {{ intervalLabel }}</span><span>O {{ ohlc.o }}</span><span>H {{ ohlc.h }}</span><span>L {{ ohlc.l }}</span><span>C {{ ohlc.c }}</span><span style="color: {{ ohlc.color }};">{{ ohlc.chg }}</span><span style="color: var(--text-muted);">{{ ohlc.date }}</span>
+        </div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 64px; padding-left: 12px;">
+          <div ref="{{ chartRef }}" onMouseMove="{{ onMove }}" onMouseLeave="{{ onLeave }}" style="position: relative; height: 340px; cursor: crosshair;">
+            <svg viewBox="0 0 1000 340" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+              <sc-for list="{{ px.grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" vector-effect="non-scaling-stroke"></line></sc-for>
+              <sc-if value="{{ show.vol }}"><sc-for list="{{ px.vol }}" as="b"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.color }}"></rect></sc-for></sc-if>
+              <sc-if value="{{ isCandle }}"><sc-for list="{{ px.candles }}" as="c"><line x1="{{ c.cx }}" x2="{{ c.cx }}" y1="{{ c.hy }}" y2="{{ c.ly }}" stroke="{{ c.color }}" vector-effect="non-scaling-stroke"></line><rect x="{{ c.x }}" y="{{ c.y }}" width="{{ c.w }}" height="{{ c.h }}" fill="{{ c.color }}"></rect></sc-for></sc-if>
+              <sc-if value="{{ isLine }}"><path d="{{ px.area }}" fill="oklch(14.5% 0 0 / 0.05)"></path><path d="{{ px.line }}" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"></path></sc-if>
+              <sc-if value="{{ show.sma }}"><path d="{{ px.sma }}" fill="none" stroke="var(--blue-700)" stroke-width="1.25" vector-effect="non-scaling-stroke"></path></sc-if>
+              <line x1="0" x2="1000" y1="{{ px.lastY }}" y2="{{ px.lastY }}" stroke="{{ px.lastColor }}" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></line>
+            </svg>
+            <sc-if value="{{ hv.show }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hv.left }}; width: 1px; background: var(--ink); pointer-events: none;"></div></sc-if>
+            <sc-if value="{{ show.vol }}"><div style="position: absolute; left: 8px; bottom: 6px; font-size: 12px; color: var(--text-muted); pointer-events: none;">Volume <span style="font-family: var(--font-mono); color: {{ ohlc.color }};">{{ ohlc.v }}</span></div></sc-if>
+          </div>
+          <div style="position: relative; height: 340px; border-left: 1px solid var(--neutral-200); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+            <sc-for list="{{ px.grid }}" as="g"><span style="position: absolute; left: 6px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for>
+            <span style="position: absolute; left: 0; top: {{ px.lastPct }}; transform: translateY(-50%); background: {{ px.lastColor }}; color: var(--paper); padding: 1px 5px;">{{ px.last }}</span>
+          </div>
+          <div style="position: relative; height: 22px; border-top: 1px solid var(--ink); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ px.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%); white-space: nowrap;">{{ x.label }}</span></sc-for></div><div style="border-top: 1px solid var(--ink); border-left: 1px solid var(--neutral-200);"></div>
+        </div>
+      </div>
+
+      <div data-screen-label="Details tabs" style="border: 1px solid var(--ink);">
+        <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--ink);"><sc-for list="{{ detailTabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; height: 40px; padding: 0 18px; border: 0; border-right: 1px solid var(--ink); background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+
+        <sc-if value="{{ tab.fund }}"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));"><sc-for list="{{ fund }}" as="f" hint-placeholder-count="21"><div style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--neutral-200); border-right: 1px solid var(--neutral-200); font-size: 13px;"><span style="color: var(--text-muted);">{{ f.label }}</span><span style="font-family: var(--font-mono); font-weight: 700; text-align: right;">{{ f.value }}</span></div></sc-for></div></sc-if>
+
+        <sc-if value="{{ tab.hold }}"><div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;"><sc-for list="{{ holding }}" as="h" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: 150px minmax(0, 1fr) 70px 70px; gap: 12px; align-items: center; font-size: 13px;"><span>{{ h.label }}</span><div style="height: 10px; background: var(--neutral-100);"><div style="height: 10px; width: {{ h.w }}; background: var(--ink);"></div></div><span style="font-family: var(--font-mono); text-align: right;">{{ h.now }}%</span><span style="font-family: var(--font-mono); text-align: right; color: {{ h.color }};">{{ h.chg }}</span></div></sc-for></div></sc-if>
+
+        <sc-if value="{{ tab.news }}"><div><sc-for list="{{ news }}" as="n" hint-placeholder-count="6"><div style="display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--neutral-200); font-size: 13px;"><span style="font-family: var(--font-mono); color: var(--text-muted);">{{ n.date }}</span><span>{{ n.title }}</span></div></sc-for></div></sc-if>
+
+        <sc-if value="{{ tab.block }}"><div style="overflow-x: auto;"><div style="min-width: 520px;"><div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr; padding: 8px 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink);"><span>Date</span><span style="text-align: right;">Quantity</span><span style="text-align: right;">Price</span><span style="text-align: right;">Value (mn)</span><span style="text-align: right;">Trades</span></div><sc-for list="{{ blocks }}" as="b" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr; padding: 9px 16px; font-family: var(--font-mono); font-size: 13px; border-bottom: 1px solid var(--neutral-200);"><span style="font-family: var(--font-sans);">{{ b.date }}</span><span style="text-align: right;">{{ b.qty }}</span><span style="text-align: right;">{{ b.price }}</span><span style="text-align: right;">{{ b.value }}</span><span style="text-align: right;">{{ b.trades }}</span></div></sc-for></div></div></sc-if>
+
+        <sc-if value="{{ tab.hist }}"><div style="overflow-x: auto;"><div style="min-width: 640px;"><div style="display: grid; grid-template-columns: 1.2fr repeat(6, 1fr); padding: 8px 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink);"><span>Date</span><span style="text-align: right;">Open</span><span style="text-align: right;">High</span><span style="text-align: right;">Low</span><span style="text-align: right;">Close</span><span style="text-align: right;">Change %</span><span style="text-align: right;">Volume</span></div><sc-for list="{{ history }}" as="h" hint-placeholder-count="10"><div style="display: grid; grid-template-columns: 1.2fr repeat(6, 1fr); padding: 9px 16px; font-family: var(--font-mono); font-size: 13px; border-bottom: 1px solid var(--neutral-200);"><span style="font-family: var(--font-sans);">{{ h.date }}</span><span style="text-align: right;">{{ h.o }}</span><span style="text-align: right;">{{ h.h }}</span><span style="text-align: right;">{{ h.l }}</span><span style="text-align: right;">{{ h.c }}</span><span style="text-align: right; color: {{ h.color }};">{{ h.pct }}</span><span style="text-align: right;">{{ h.v }}</span></div></sc-for></div></div></sc-if>
+
+        <sc-if value="{{ noData }}"><div style="padding: 40px 16px; text-align: center; color: var(--text-muted);">This section is available for individual securities. Select a symbol from the list.</div></sc-if>
+      </div>
+    </div>
+
+    <aside data-screen-label="Symbol list" style="flex: 1 1 300px; max-width: 380px; min-width: 280px; border: 1px solid var(--ink); position: relative;">
+      <div style="display: flex; border-bottom: 1px solid var(--ink);">
+        <button onClick="{{ toggleMenu }}" aria-haspopup="listbox" style="font: inherit; font-size: 15px; flex: 1; height: 48px; padding: 0 16px; border: 0; border-right: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; text-align: left;"><span>{{ filterLabel }}</span><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 4l4 4 4-4z"></path></svg></button>
+        <button onClick="{{ toggleMenu }}" title="Filters" style="width: 48px; height: 48px; border: 0; background: {{ menuBg }}; color: {{ menuFg }}; cursor: pointer; display: flex; align-items: center; justify-content: center;"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 4h12M2 8h12M2 12h12"></path><circle cx="10" cy="4" r="1.6" fill="var(--paper)"></circle><circle cx="5" cy="8" r="1.6" fill="var(--paper)"></circle><circle cx="11" cy="12" r="1.6" fill="var(--paper)"></circle></svg></button>
+      </div>
+
+      <sc-if value="{{ menuOpen }}">
+        <div data-screen-label="Filter menu" style="position: absolute; z-index: 10; top: 48px; left: 0; right: 0; max-height: 520px; overflow-y: auto; background: var(--paper); border: 1px solid var(--ink); border-top: 0; box-shadow: 0 8px 24px oklch(14.5% 0 0 / 0.18);">
+          <sc-for list="{{ menu }}" as="m" hint-placeholder-count="30">
+            <sc-if value="{{ m.isGroup }}"><div style="padding: 10px 16px 4px; font-size: 12px; font-weight: 700; font-style: italic; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">{{ m.label }}</div></sc-if>
+            <sc-if value="{{ m.isItem }}"><button onClick="{{ m.onClick }}" style="font: inherit; font-size: 14px; display: block; width: 100%; text-align: left; padding: 8px 16px 8px {{ m.pad }}; border: 0; border-left: 3px solid {{ m.bar }}; background: {{ m.bg }}; color: {{ m.fg }}; cursor: pointer;" style-hover="background: var(--neutral-100);">{{ m.label }}</button></sc-if>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) 64px 70px; padding: 8px 12px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink);"><span></span><span>Symbol</span><span style="text-align: right;">Last</span><span style="text-align: right;">Chg %</span></div>
+      <div style="max-height: 560px; overflow-y: auto;">
+        <sc-for list="{{ list }}" as="s" hint-placeholder-count="14">
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) 64px 70px; align-items: center; padding: 0 12px; height: 38px; border-bottom: 1px solid var(--neutral-200); font-size: 13px; background: {{ s.bg }};" style-hover="background: var(--neutral-100);">
+            <button onClick="{{ s.toggleWatch }}" title="Watchlist" style="border: 0; background: transparent; cursor: pointer; padding: 0; display: flex; color: {{ s.heartColor }};"><svg width="16" height="16" viewBox="0 0 16 16" fill="{{ s.heartFill }}" stroke="currentColor" stroke-width="1.3"><path d="M8 13.5S2 9.8 2 6a3 3 0 015.5-1.7h1A3 3 0 0114 6c0 3.800-6 7.500-6 7.500z"></path></svg></button>
+            <button onClick="{{ s.onPick }}" style="font: inherit; font-weight: 700; border: 0; background: transparent; color: {{ s.color }}; text-align: left; cursor: pointer; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ s.code }}</button>
+            <span style="text-align: right; font-family: var(--font-mono);">{{ s.ltp }}</span><span style="text-align: right; font-family: var(--font-mono); color: {{ s.color }};">{{ s.pct }}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ listEmpty }}"><div style="padding: 32px 16px; text-align: center; color: var(--text-muted);">{{ emptyText }}</div></sc-if>
+      </div>
+      <div style="padding: 8px 12px; border-top: 1px solid var(--ink); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between;"><span>{{ listCount }} symbols</span><span>Updated 2:10 PM</span></div>
+    </aside>
+  </section>
+
+  <dc-import name="SymbolIndex" page="Market Watch" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, sel: null, interval: 'D', ctype: 'candle', sma: false, vol: true, tab: 'fund', filter: 'all', menuOpen: false, watch: ['GP', 'BRACBANK', 'RENATA'], hover: null, saved: false };
+  chartRef = React.createRef();
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt, fmtInt, sign, tone } = U;
+    const sel = st.sel || U.param('symbol', 'DSEX').toUpperCase();
+    const isIndex = !!U.indices[sel]; const IX = U.indices[sel]; const S = isIndex ? null : (U.bySym[sel] || U.stocks[0]);
+    const code = isIndex ? sel : S.code;
+
+    // ---- daily series
+    const dailyKey = code;
+    if (this._dk !== dailyKey) {
+      this._dk = dailyKey;
+      if (isIndex) { const r = U.rng(U.hash(code) + 11); const out = []; let p = IX.value * (0.82 + r() * 0.1); for (let i = 259; i >= 0; i--) { const o = p; const c = o * (1 + (r() - 0.49) * 0.012); const h = Math.max(o, c) * (1 + r() * 0.004); const l = Math.min(o, c) * (1 - r() * 0.004); const d = new Date(2026, 10, 5); d.setDate(d.getDate() - Math.round(i * 7 / 5)); out.push({ date: d, o, h, l, c, v: Math.round(4e8 * (0.5 + r())) }); p = c; } const k = IX.value / out[out.length - 1].c; out.forEach((b, i) => { b.o = U.round(b.o * k, 2); b.h = U.round(b.h * k, 2); b.l = U.round(b.l * k, 2); b.c = U.round(b.c * k, 2); b.chg = U.round(b.c - (i ? out[i - 1].c : b.o), 2); b.chgPct = U.round(b.chg / (i ? out[i - 1].c : b.o) * 100, 2); }); this._daily = out; }
+      else this._daily = U.daily(code, 260);
+    }
+    const daily = this._daily;
+    // ---- intraday points
+    let pts; if (isIndex) { pts = IX.series.map((v, i) => ({ price: v, vol: IX.vols[i], time: U.times[i] })); } else { pts = U.vpa(code, 120); }
+    const agg = (arr, n) => { const out = []; for (let i = 0; i < arr.length; i += n) { const g = arr.slice(i, i + n); out.push({ o: g[0].o, c: g[g.length - 1].c, h: Math.max(...g.map(b => b.h)), l: Math.min(...g.map(b => b.l)), v: g.reduce((a, b) => a + b.v, 0), date: g[g.length - 1].date, time: g[0].time }); } return out; };
+    const intra = n => { const rr = U.rng(U.hash(code) + 77); const out = []; for (let i = 0; i < pts.length; i += n) { const g = pts.slice(i, i + n); const ps = g.map(q => q.price); const o = i ? pts[i - 1].price : g[0].price, c = g[g.length - 1].price; const sp = Math.max(...ps) * 0.0012; out.push({ o, c, h: Math.max(o, c, ...ps) + rr() * sp, l: Math.min(o, c, ...ps) - rr() * sp, v: g.reduce((a, q) => a + q.vol, 0), time: g[0].time, date: new Date(2026, 10, 8) }); } out.forEach((b, i) => { b.chg = U.round(b.c - b.o, 2); b.chgPct = U.round(b.chg / b.o * 100, 2); }); return out; };
+    const iv = st.interval; const IVL = { '1m': 1, '5m': 2, '15m': 7, '1h': 27 };
+    let bars; if (IVL[iv]) bars = intra(IVL[iv]); else if (iv === 'W') bars = agg(daily.slice(-200), 5); else if (iv === 'M') bars = agg(daily, 22); else bars = daily.slice(-120);
+    if (iv === 'W' || iv === 'M') bars.forEach((b, i) => { const pv = i ? bars[i - 1].c : b.o; b.chg = U.round(b.c - pv, 2); b.chgPct = U.round(b.chg / pv * 100, 2); });
+    const N = bars.length; const W = 1000, H = 340, volH = 70; const dp2 = isIndex ? 2 : 1;
+    const closes = bars.map(b => b.c); const sma = U.sma(closes, Math.min(20, Math.max(3, Math.floor(N / 4))));
+    const sc = U.scaleY([...bars.map(b => b.h), ...bars.map(b => b.l)], H - (st.vol ? volH : 0) - 4, 10);
+    const lp = U.linePath(closes, W, H, { scale: sc });
+    const grid = [0, 0.2, 0.4, 0.6, 0.8, 1].map(f => { const v = sc.max - (sc.max - sc.min) * f; const y = sc.y(v); return { y: y.toFixed(1), pct: (y / H * 100) + '%', label: fmt(v, dp2) }; });
+    const vb = U.bars(bars.map(b => b.v), W, volH, 0.25).map((b, i) => ({ ...b, y: (H - volH + +b.y).toFixed(2), color: bars[i].c >= bars[i].o ? 'oklch(52.7% 0.154 150 / 0.45)' : 'oklch(50.5% 0.213 27.5 / 0.45)' }));
+    const lab = b => IVL[iv] ? b.time : b.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+    const step = Math.max(1, Math.ceil(N / 9)); const xs = bars.map((b, i) => i).filter(i => i % step === Math.floor(step / 2)).map(i => ({ left: ((i + 0.5) / N * 100) + '%', label: lab(bars[i]) }));
+    const last = bars[N - 1]; const lastColor = last.c >= last.o ? 'var(--green-700)' : 'var(--red-700)';
+    const px = { grid, candles: U.candles(bars, W, H, sc), line: lp.line, area: lp.area, sma: U.linePath(sma, W, H, { scale: sc }).line, lastY: sc.y(last.c).toFixed(1), lastPct: (sc.y(last.c) / H * 100) + '%', last: fmt(last.c, dp2), lastColor, vol: vb, x: xs };
+    const hi = st.hover != null && st.hover < N ? st.hover : N - 1; const hb = bars[hi];
+    const ohlc = { date: IVL[iv] ? hb.time : U.dateStr(hb.date), o: fmt(hb.o, dp2), h: fmt(hb.h, dp2), l: fmt(hb.l, dp2), c: fmt(hb.c, dp2), chg: `${sign(hb.chg || 0, dp2)} (${sign(hb.chgPct || 0)}%)`, color: tone(hb.chg || 0), v: fmtInt(hb.v) };
+    const hv = st.hover != null && st.hover < N ? { show: true, left: ((st.hover + 0.5) / N * 100) + '%' } : { show: false };
+    const onMove = e => { const el = this.chartRef.current; if (!el) return; const r = el.getBoundingClientRect(); const i = Math.max(0, Math.min(N - 1, Math.floor((e.clientX - r.left) / r.width * N))); if (i !== st.hover) this.setState({ hover: i }); };
+    const tabBtn = (key, v, label, i, n) => ({ label, br: i === n - 1 ? '0' : '1px solid var(--neutral-300)', bg: st[key] === v ? 'var(--ink)' : 'var(--paper)', fg: st[key] === v ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ [key]: v, hover: null }) });
+    const IV = [['1m', '1m'], ['5m', '5m'], ['15m', '15m'], ['1h', '1h'], ['D', 'D'], ['W', 'W'], ['M', 'M']];
+    const intervalTabs = IV.map(([v, l], i) => tabBtn('interval', v, l, i, IV.length));
+    const typeTabs = [['candle', 'Candles'], ['line', 'Line']].map(([v, l], i) => tabBtn('ctype', v, l, i, 2));
+    const tog = (key, label) => ({ label, bg: st[key] ? 'var(--ink)' : 'var(--paper)', fg: st[key] ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState(s => ({ [key]: !s[key] })) });
+
+    // ---- quote strip
+    const T = U.totals;
+    const quote = isIndex ? [['Open', fmt(IX.open)], ['High', fmt(IX.high)], ['Low', fmt(IX.low)], ['Trade', fmtInt(T.trades)], ['Volume', fmtInt(T.volume)], ['Value (mn)', fmt(T.value)]] : [['Open', fmt(S.open, 1)], ['High', fmt(S.high, 1)], ['Low', fmt(S.low, 1)], ['Trade', fmtInt(S.trades)], ['Volume', fmtInt(S.volume)], ['Value (mn)', fmt(S.value)], ['YCP', fmt(S.ycp, 1)]];
+    const quoteArr = quote.map(([label, value]) => ({ label, value }));
+    const price = isIndex ? IX.value : S.ltp, chg = isIndex ? IX.change : S.change, chgPct = isIndex ? IX.pct : S.changePct;
+    const pickOptions = [...Object.keys(U.indices).map(k => ({ value: k, label: k })), ...U.symbols.map(c => ({ value: c, label: c }))];
+    const A = isIndex ? null : U.actions(code);
+    const links = isIndex ? [] : [['Stock chart', A.chart, 'M2 12l4-4 3 3 5-6'], ['1 Minute VPA', A.vpa, 'M3 13V8M6.5 13V4M10 13V9M13.5 13V6'], ['VPA archive', A.archive, 'M2.5 3h11v3h-11zM3.5 6v7h9V6M6.5 9h3'], ['Depth monitor', A.depth, 'M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6']].map(([title, href, d]) => ({ title, href, d }));
+
+    // ---- depth
+    let dpv = { rows: [], buyPct: '0%', sellPct: '0%' };
+    if (!isIndex) { const D = U.depth(code, 5); const mq = Math.max(...D.bids.map(b => b.qty), ...D.asks.map(a => a.qty)); dpv = { buyPct: fmt(D.buyPct) + '%', sellPct: fmt(D.sellPct) + '%', rows: D.bids.map((b, i) => ({ bq: fmtInt(b.qty), bp: fmt(b.price, 1), bw: (b.qty / mq * 48) + '%', ap: fmt(D.asks[i].price, 1), aq: fmtInt(D.asks[i].qty), aw: (D.asks[i].qty / mq * 48) + '%' })) }; }
+
+    // ---- 1 minute VPA mini
+    const COL = ['var(--green-700)', 'var(--blue-700)', 'var(--red-700)'];
+    const kind = (q, i) => isIndex ? (pts[i].price >= (i ? pts[i - 1].price : pts[i].price) ? 0 : 2) : (q.buy / q.vol > 0.58 ? 0 : q.buy / q.vol < 0.42 ? 2 : 1);
+    const NV = pts.length; const sums = [0, 0, 0]; pts.forEach((q, i) => { sums[kind(q, i)] += q.vol; }); const tot = sums.reduce((a, b) => a + b, 0) || 1;
+    const vTop = Math.max(...pts.map(q => q.vol)) * 1.05; const vsc = U.scaleY(pts.map(q => q.price), 140, 14); const bw = 400 / NV;
+    const vAxis = v => v >= 1e6 ? Math.round(v / 1e6) + 'M' : v >= 1e3 ? Math.round(v / 1e3) + 'k' : Math.round(v);
+    const vc = { bars: pts.map((q, i) => { const h = q.vol / vTop * 160; return { x: (i * bw + bw * 0.15).toFixed(2), w: Math.max(bw * 0.7, 0.8).toFixed(2), y: (170 - h).toFixed(2), h: h.toFixed(2), color: COL[kind(q, i)] }; }),
+      line: pts.map((q, i) => (i ? 'L' : 'M') + ((i + 0.5) * bw).toFixed(2) + ' ' + (vsc.y(q.price) + 8).toFixed(2)).join(''),
+      volAxis: [1, 0.66, 0.33, 0].map(f => ({ pct: ((1 - f) * 100) + '%', label: f === 0 ? '0' : vAxis(vTop * f) })), priceAxis: [1, 0.66, 0.33, 0].map(f => ({ pct: ((1 - f) * 100) + '%', label: fmt(vsc.min + (vsc.max - vsc.min) * f, isIndex ? 0 : 1) })),
+      x: pts.map((q, i) => i).filter(i => i % Math.ceil(NV / 4) === 0).map(i => ({ left: ((i + 0.5) / NV * 100) + '%', label: pts[i].time })) };
+    const pie = (() => { const cx = 20, cy = 20, R = 19; let a0 = -Math.PI / 2; return sums.map((v, i) => { const a1 = a0 + v / tot * 2 * Math.PI; const P = a => [cx + R * Math.cos(a), cy + R * Math.sin(a)]; const [x0, y0] = P(a0), [x1, y1] = P(a1); const d = `M${cx} ${cy}L${x0.toFixed(2)} ${y0.toFixed(2)}A${R} ${R} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z`; a0 = a1; return { d, c: COL[i] }; }); })();
+
+    // ---- details tabs
+    const pf = isIndex ? null : U.profile(code);
+    const fund = isIndex ? [['Open', fmt(IX.open)], ['High', fmt(IX.high)], ['Low', fmt(IX.low)], ['Previous close', fmt(IX.prev)], ['52 weeks’ low', fmt(IX.w52l)], ['52 weeks’ high', fmt(IX.w52h)], ['6-month return', sign(IX.ret6m) + '%'], ['1-year return', sign(IX.ret1y) + '%'], ['Advancers', fmtInt(U.breadth.adv ?? U.stocks.filter(s => s.change > 0).length)]] : (() => { const y = pf.years; const dv = y.slice().reverse().find(v => v.cash || v.stock); return [["Day’s range", fmt(S.low, 1) + ' – ' + fmt(S.high, 1)], ['Authorized cap (mn)', fmt(pf.auth)], ['Beta', fmt(S.beta)], ['Electronic share', fmt(100 - U.round(S.director * 0.02, 2)) + '%'], ['Free float', fmt(pf.freeFloat) + '%'], ['EPS', fmt(S.eps)], ['Listing year', pf.listed], ['Latest dividend status (%)', dv ? (dv.cash ? dv.cash + '% C ' : '') + (dv.stock ? dv.stock + '% B' : '') : '–'], ['PE (audited)', fmt(S.pe)], ['Market category', S.cat], ['Last AGM held', U.dateStr(pf.lastAgm)], ['PE (un-audited)', fmt(S.ltp / (S.eps * 1.06))], ['NAV', fmt(S.nav)], ['Market cap (mn)', fmt(S.mcap, 1)], ['Q1 EPS (3 months)', fmt(S.eps * 0.22)], ['NAV / price', fmt(S.navPrice)], ['Paid-up cap (mn)', fmt(pf.paid)], ['Q2 EPS (6 months)', fmt(S.eps * 0.49)], ["52 weeks’ range", fmt(S.w52l, 1) + ' – ' + fmt(S.w52h, 1)], ['Reserve & surplus (mn)', fmt(pf.reserve)], ['Q3 EPS (9 months)', fmt(S.eps * 0.76)]]; })().map(([label, value]) => ({ label, value }));
+    const holding = isIndex ? [] : pf.holding.map(h => { const d = h.now - h.prev; return { label: h.label, w: h.now + '%', now: fmt(h.now), chg: Math.abs(d) < 0.005 ? '0.00' : sign(d), color: tone(d) }; });
+    const news = isIndex ? [] : pf.news.map(n => ({ date: U.dateStr(n.date), title: n.title }));
+    const rb = U.rng(U.hash(code) + 31); const blocks = isIndex ? [] : Array.from({ length: 5 }, (_, i) => { const q = Math.round((20 + rb() * 300) * 1000); const p = S.ycp * (0.99 + rb() * 0.02); return { date: U.dateStr(new Date(2026, 10, 5 - i * 4)), qty: fmtInt(q), price: fmt(p, 1), value: fmt(q * p / 1e6, 2), trades: 1 + Math.round(rb() * 5) }; });
+    const history = daily.slice(-10).reverse().map(b => ({ date: U.dateStr(b.date), o: fmt(b.o, dp2), h: fmt(b.h, dp2), l: fmt(b.l, dp2), c: fmt(b.c, dp2), pct: sign(b.chgPct) + '%', color: tone(b.chg), v: fmtInt(b.v) }));
+    const DT = [['fund', 'Fundamental'], ['hold', 'Share holding'], ['news', 'News'], ['block', 'Block trade'], ['hist', 'History']];
+    const detailTabs = DT.map(([k, label]) => ({ label, bg: st.tab === k ? 'var(--ink)' : 'var(--paper)', fg: st.tab === k ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ tab: k }) }));
+    const tab = { fund: st.tab === 'fund', hold: st.tab === 'hold' && !isIndex, news: st.tab === 'news' && !isIndex, block: st.tab === 'block' && !isIndex, hist: st.tab === 'hist' };
+
+    // ---- symbol list + filter
+    const SECT = [...new Set(U.stocks.map(s => s.sector))];
+    const F = st.filter; const pfCache = this._pf || (this._pf = {}); const paid = s => (pfCache[s.code] || (pfCache[s.code] = U.profile(s.code))).paid;
+    let rows = U.stocks.slice().sort((a, b) => a.code.localeCompare(b.code));
+    let label = 'All Symbols', emptyText = 'No symbols match this filter.';
+    if (F === 'watch') { rows = rows.filter(s => st.watch.includes(s.code)); label = 'Watchlist'; emptyText = 'Your watchlist is empty. Tap the heart next to a symbol to add it.'; }
+    else if (F === 'gainers') { rows = U.stocks.slice().sort((a, b) => b.changePct - a.changePct).slice(0, 30); label = 'Top gainers'; }
+    else if (F === 'losers') { rows = U.stocks.slice().sort((a, b) => a.changePct - b.changePct).slice(0, 30); label = 'Top losers'; }
+    else if (F === 'trades') { rows = U.stocks.slice().sort((a, b) => b.trades - a.trades).slice(0, 30); label = 'Top trades'; }
+    else if (F === 'volume') { rows = U.stocks.slice().sort((a, b) => b.volume - a.volume).slice(0, 30); label = 'Top volume'; }
+    else if (F.startsWith('cat:')) { const c = F.slice(4); rows = rows.filter(s => (c === '-' ? !['A', 'B', 'N', 'Z', 'Y'].includes(s.cat) : s.cat === c)); label = 'Category ' + c; }
+    else if (F.startsWith('sec:')) { const c = F.slice(4); rows = rows.filter(s => s.sector === c); label = c; }
+    else if (F.startsWith('cap:')) { const c = +F.slice(4); rows = rows.filter(s => paid(s) < c); label = 'Paid-up cap below ' + c + ' mn'; }
+    const list = rows.map(s => { const w = st.watch.includes(s.code); return { code: s.code, ltp: fmt(s.ltp, 2), pct: sign(s.changePct) + '%', color: s.changePct === 0 ? 'var(--ink)' : tone(s.change), bg: s.code === code ? 'var(--neutral-100)' : 'transparent', heartFill: w ? 'currentColor' : 'none', heartColor: w ? 'var(--red-700)' : 'var(--neutral-500)', onPick: () => this.setState({ sel: s.code, hover: null, tab: st.tab }), toggleWatch: () => this.setState(x => ({ watch: x.watch.includes(s.code) ? x.watch.filter(c => c !== s.code) : [...x.watch, s.code] })) }; });
+    const item = (id, text, pad = '32px') => ({ isItem: true, isGroup: false, label: text, pad, bar: F === id ? 'var(--ink)' : 'transparent', bg: F === id ? 'var(--neutral-100)' : 'var(--paper)', fg: 'var(--ink)', onClick: () => this.setState({ filter: id, menuOpen: false }) });
+    const grp = text => ({ isGroup: true, isItem: false, label: text });
+    const menu = [item('all', 'All Symbols', '16px'), grp('Watchlist'), item('watch', 'Watchlist'), grp('Top'), item('gainers', 'Gainers'), item('losers', 'Losers'), item('trades', 'Trades'), item('volume', 'Volume'), grp('Category'), ...['A', 'Z', 'Y', 'B', '-'].map(c => item('cat:' + c, c)), grp('Sector'), ...SECT.map(s => item('sec:' + s, s)), grp('Paid up cap'), ...[100, 300, 500].map(c => item('cap:' + c, 'Below ' + c + ' mn'))];
+    const leg = ['Bull', 'Neutral', 'Bear'].map((l, i) => ({ label: l, c: COL[i] }));
+    return { name: isIndex ? 'Dhaka Stock Exchange Broad Index' : U.company(code), ltp: fmt(price, isIndex ? 3 : 1), chg: `${sign(chg, isIndex ? 3 : 2)} (${sign(chgPct, 3)}%)`, chgColor: tone(chg), quote: quoteArr, links, isStock: !isIndex, isIndex,
+      pickValue: code, pickOptions, onPick: e => { this.setState({ sel: e.target.value, hover: null }); },
+      dp: dpv, vc, pie, legend: leg,
+      px, ohlc, hv, onMove, onLeave: () => this.setState({ hover: null }), chartRef: this.chartRef, intervalTabs, typeTabs, intervalLabel: iv, isCandle: st.ctype === 'candle', isLine: st.ctype === 'line', show: { vol: st.vol, sma: st.sma },
+      indToggles: [tog('sma', 'SMA'), tog('vol', 'Volume')], saveLayout: () => this.setState({ saved: true }), saveLabel: st.saved ? 'Layout saved' : 'Save',
+      detailTabs, tab, fund, holding, news, blocks, history, noData: !isIndex ? false : (st.tab === 'hold' || st.tab === 'news' || st.tab === 'block'),
+      list, listEmpty: list.length === 0, emptyText, listCount: list.length, filterLabel: label, menu, menuOpen: st.menuOpen, toggleMenu: () => this.setState(s => ({ menuOpen: !s.menuOpen })), menuBg: st.menuOpen ? 'var(--ink)' : 'var(--paper)', menuFg: st.menuOpen ? 'var(--paper)' : 'var(--ink)' };
+  }
+}
+</script>
+</body>
+</html>
