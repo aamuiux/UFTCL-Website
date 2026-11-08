@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>News Effect Chart — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <nav aria-label="Breadcrumb" style="font-size: 13px; color: var(--text-muted); display: flex; gap: 6px;"><a href="Home.dc.html">Home</a><span>/</span><span>Research &amp; News</span><span>/</span><span style="color: var(--ink);">News effect chart</span></nav>
+
+  <section data-screen-label="News effect chart" style="border: 1px solid var(--ink);">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+      <div style="display: flex; flex-direction: column;"><b style="font-size: 18px;">{{ code }} – News &amp; News Effect Chart</b><span style="font-size: 12px; color: var(--text-muted);">{{ name }} · see how each announcement moved the price</span></div>
+      <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; font-weight: 700; height: 36px; min-width: 220px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
+        <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.code }}</option></sc-for>
+      </select>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--neutral-200);">
+      <div style="display: flex; align-items: center; gap: 10px;"><span style="font-size: 12px; color: var(--text-muted);">Zoom</span>
+        <div style="display: flex; border: 1px solid var(--ink);"><sc-for list="{{ rangeTabs }}" as="t" hint-placeholder-count="6"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; height: 28px; min-width: 40px; padding: 0 10px; border: 0; border-right: {{ t.br }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+      </div>
+      <span style="font-family: var(--font-mono); font-size: 12px; color: var(--blue-700);">{{ rangeLabel }}</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 56px; padding: 8px 0 0 12px;">
+      <div ref="{{ chartRef }}" onMouseMove="{{ onMove }}" onMouseLeave="{{ onLeave }}" style="position: relative; height: 320px; cursor: crosshair;">
+        <svg viewBox="0 0 1000 320" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          <sc-for list="{{ px.grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" vector-effect="non-scaling-stroke"></line></sc-for>
+          <sc-for list="{{ px.candles }}" as="c"><line x1="{{ c.cx }}" x2="{{ c.cx }}" y1="{{ c.hy }}" y2="{{ c.ly }}" stroke="{{ c.color }}" vector-effect="non-scaling-stroke"></line><rect x="{{ c.x }}" y="{{ c.y }}" width="{{ c.w }}" height="{{ c.h }}" fill="{{ c.color }}"></rect></sc-for>
+        </svg>
+        <sc-for list="{{ tags }}" as="t"><div title="{{ t.title }}" style="position: absolute; left: {{ t.left }}; top: {{ t.top }}; transform: translate(-50%, -100%); background: var(--ink); color: var(--paper); font-size: 11px; font-weight: 700; padding: 2px 6px; white-space: nowrap; pointer-events: none;">{{ t.label }}</div></sc-for>
+        <sc-if value="{{ hv.show }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hv.left }}; width: 1px; background: var(--ink); pointer-events: none;"></div><div style="position: absolute; top: 6px; {{ hv.side }}: 8px; background: var(--paper); border: 1px solid var(--ink); font-family: var(--font-mono); font-size: 11px; padding: 6px 8px; pointer-events: none; display: flex; flex-direction: column; gap: 2px;"><b style="font-family: var(--font-sans);">{{ ohlc.date }}</b><span>O {{ ohlc.o }} · H {{ ohlc.h }}</span><span>L {{ ohlc.l }} · C {{ ohlc.c }}</span><span style="color: {{ ohlc.color }};">{{ ohlc.chg }}</span></div></sc-if>
+      </div>
+      <div style="position: relative; height: 320px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ px.grid }}" as="g"><span style="position: absolute; left: 6px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+
+      <div style="position: relative; height: 40px; border-top: 1px solid var(--neutral-200);">
+        <sc-for list="{{ marks }}" as="m"><a href="{{ m.href }}" title="{{ m.title }}" style="position: absolute; left: {{ m.left }}; top: 8px; transform: translateX(-50%); width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--ink); background: {{ m.bg }}; color: {{ m.fg }}; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">N</a></sc-for>
+      </div>
+      <div></div>
+
+      <div style="position: relative; height: 90px; border-top: 1px solid var(--ink);">
+        <svg viewBox="0 0 1000 90" preserveAspectRatio="none" style="width: 100%; height: 90px; display: block;"><sc-for list="{{ px.vol }}" as="b"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.color }}"></rect></sc-for></svg>
+        <span style="position: absolute; left: 8px; top: 4px; font-size: 11px; color: var(--text-muted);">Volume</span>
+      </div>
+      <div style="height: 90px; border-top: 1px solid var(--ink);"></div>
+      <div style="position: relative; height: 22px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--ink);"><sc-for list="{{ px.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%); white-space: nowrap;">{{ x.label }}</span></sc-for></div>
+      <div></div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--ink);" data-screen-label="News filters">
+      <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6"><button onClick="{{ f.onClick }}" style="font: inherit; font-size: 13px; flex: 1 1 140px; height: 36px; padding: 0 14px; border: 1px solid var(--ink); background: {{ f.bg }}; color: {{ f.fg }}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"><span style="width: 14px; height: 14px; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1;">{{ f.check }}</span>{{ f.label }}<span style="font-family: var(--font-mono); font-size: 11px; opacity: 0.7;">{{ f.count }}</span></button></sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="News list" style="border: 1px solid var(--ink);">
+    <div style="display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--ink);">
+      <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6"><button onClick="{{ f.onClick }}" style="font: inherit; font-weight: 700; font-size: 13px; height: 44px; padding: 0 18px; border: 0; border-right: 1px solid var(--ink); background: {{ f.bg }}; color: {{ f.fg }}; cursor: pointer; text-transform: uppercase;">{{ f.label }}</button></sc-for>
+    </div>
+    <sc-for list="{{ items }}" as="n" hint-placeholder-count="8">
+      <article style="display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 8px 24px; padding: 16px; border-bottom: 1px solid var(--neutral-200);">
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><span style="font-weight: 700;">{{ n.date }}</span><span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">{{ n.time }}</span><span style="font-size: 11px; padding: 1px 6px; border: 1px solid var(--ink);">{{ n.cat }}</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;"><b>{{ n.title }}</b><span style="font-size: 14px; line-height: 22px; text-wrap: pretty; color: var(--text-muted);">{{ n.body }}</span><span style="font-family: var(--font-mono); font-size: 12px; color: {{ n.color }};">Price effect on the day: {{ n.effect }}</span></div>
+      </article>
+    </sc-for>
+    <sc-if value="{{ noItems }}"><div style="padding: 32px 16px; text-align: center; color: var(--text-muted);">No news in this category for the selected period.</div></sc-if>
+  </section>
+
+  <dc-import name="SymbolIndex" page="News Effect Chart" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, range: 63, cat: 'All news', hover: null };
+  chartRef = React.createRef();
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt, fmtInt, sign, tone } = U;
+    const sym = U.param('symbol', 'BRACBANK').toUpperCase(); const S = U.bySym[sym] || U.stocks[0];
+    if (!this._d || this._sym !== S.code) { this._sym = S.code; this._d = U.daily(S.code, 320); }
+    const all = this._d; const L = all.length;
+    // synthetic announcements, pinned to real trading days so each one has a price effect
+    const CATS = ['Financials', 'Dividend', 'Buy/Sell', 'Board Meeting', 'Query'];
+    const TXT = { Financials: ['Earnings disclosure program on Q3 financial statements', 'Un-audited Q3 EPS announced against the same period last year', 'Approval of audited financial statements for the year'], Dividend: ['Declared cash dividend; record date fixed', 'Dividend disbursement completed through BEFTN'], 'Buy/Sell': ['Sponsor director expressed intention to buy shares', 'Sale of shares by a sponsor director at prevailing market price'], 'Board Meeting': ['Board meeting to consider financial statements and dividend recommendation', 'Board meeting to approve the notice of the annual general meeting'], Query: ['Reply to DSE query on unusual price movement', 'Clarification on recent price hike provided to the exchange'] };
+    const r = U.rng(U.hash(S.code) + 4242); const used = new Set(); const items = [];
+    while (items.length < 14) { const idx = L - 1 - Math.floor(r() * 120); if (used.has(idx)) continue; used.add(idx); const cat = CATS[Math.floor(r() * 5)]; const t = TXT[cat][Math.floor(r() * TXT[cat].length)]; const hh = 9 + Math.floor(r() * 6); items.push({ idx, cat, title: t, time: `${hh}:${String(Math.floor(r() * 60)).padStart(2, '0')} ${hh < 12 ? 'am' : 'pm'}`, bar: all[idx] }); }
+    items.sort((a, b) => b.idx - a.idx);
+    const N = Math.min(st.range, L); const off = L - N; const view = all.slice(off);
+    const W = 1000, H = 320;
+    const sc = U.scaleY([...view.map(b => b.h), ...view.map(b => b.l)], H, 34);
+    const grid = [0, 0.2, 0.4, 0.6, 0.8, 1].map(f => { const v = sc.max - (sc.max - sc.min) * f; const y = sc.y(v); return { y: y.toFixed(1), pct: (y / H * 100) + '%', label: fmt(v, 1) }; });
+    const vb = U.bars(view.map(b => b.v), W, 82, 0.25).map((b, i) => ({ ...b, color: view[i].c >= view[i].o ? 'oklch(52.7% 0.154 150 / 0.6)' : 'oklch(50.5% 0.213 27.5 / 0.6)' }));
+    const step = Math.ceil(N / 8); const x = view.map((b, i) => i).filter(i => i % step === Math.floor(step / 2)).map(i => ({ left: ((i + 0.5) / N * 100) + '%', label: view[i].date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) }));
+    const px = { grid, candles: U.candles(view, W, H, sc), vol: vb, x };
+    const inView = items.filter(n => n.idx >= off && (st.cat === 'All news' || n.cat === st.cat));
+    const marks = inView.map(n => ({ left: ((n.idx - off + 0.5) / N * 100) + '%', title: n.cat + ' · ' + U.dateStr(n.bar.date), href: '#news', bg: 'var(--paper)', fg: 'var(--ink)' }));
+    const tags = inView.filter(n => n.cat !== 'Query').slice(0, 6).map(n => ({ left: ((n.idx - off + 0.5) / N * 100) + '%', top: Math.max(18, sc.y(n.bar.h) - 6) + 'px', label: n.cat, title: n.title }));
+    const eff = n => { const v = n.bar.chgPct; return { effect: sign(v) + '%', color: tone(v) }; };
+    const list = items.filter(n => st.cat === 'All news' || n.cat === st.cat).map(n => ({ date: n.bar.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' }), time: n.time, cat: n.cat, title: n.title, body: `${U.company(S.code)} has informed the exchange: ${n.title.charAt(0).toLowerCase() + n.title.slice(1)}. Shareholders and analysts are advised to follow the Dhaka Stock Exchange disclosure for the full notice.`, ...eff(n) }));
+    const F = ['All news', ...CATS];
+    const filters = F.map(f => ({ label: f, check: st.cat === f ? '✓' : '', count: items.filter(n => f === 'All news' || n.cat === f).length, bg: st.cat === f ? 'var(--ink)' : 'var(--paper)', fg: st.cat === f ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ cat: f }) }));
+    const RT = [[22, '1m'], [63, '3m'], [126, '6m'], [218, 'YTD'], [250, '1y'], [320, 'All']];
+    const rangeTabs = RT.map(([v, label], i) => ({ label, br: i === RT.length - 1 ? '0' : '1px solid var(--neutral-300)', bg: st.range === v ? 'var(--ink)' : 'var(--paper)', fg: st.range === v ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ range: v, hover: null }) }));
+    const hi = st.hover != null ? st.hover : N - 1; const hb = view[hi];
+    const ohlc = { date: U.dateStr(hb.date), o: fmt(hb.o, 1), h: fmt(hb.h, 1), l: fmt(hb.l, 1), c: fmt(hb.c, 1), chg: `${sign(hb.chg)} (${sign(hb.chgPct)}%)`, color: tone(hb.chg) };
+    const hv = st.hover != null ? { show: true, left: ((st.hover + 0.5) / N * 100) + '%', side: st.hover > N / 2 ? 'left' : 'right' } : { show: false };
+    const onMove = e => { const el = this.chartRef.current; if (!el) return; const rc = el.getBoundingClientRect(); const i = Math.max(0, Math.min(N - 1, Math.floor((e.clientX - rc.left) / rc.width * N))); if (i !== st.hover) this.setState({ hover: i }); };
+    return { code: S.code, name: U.company(S.code), px, marks, tags, items: list, noItems: list.length === 0, filters, rangeTabs, ohlc, hv, onMove, onLeave: () => this.setState({ hover: null }), chartRef: this.chartRef,
+      rangeLabel: U.dateStr(view[0].date) + '  →  ' + U.dateStr(view[N - 1].date),
+      symbolOptions: U.symbols.map(code => ({ code })), onSymbol: e => { location.href = U.href('News Effect Chart', { symbol: e.target.value }); } };
+  }
+}
+</script>
+</body>
+</html>
