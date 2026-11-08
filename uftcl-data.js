@@ -151,7 +151,7 @@
 
   const param = (k, d) => { try { return new URLSearchParams(location.search).get(k) || d; } catch (e) { return d; } };
   const href = (page, q) => encodeURI(page + '.dc.html') + (q ? '?' + new URLSearchParams(q).toString() : '');
-  const actions = code => ({ chart: href('Stock Chart', { symbol: code }), vpa: href('VPA', { symbol: code }), archive: href('VPA Archive', { symbol: code }), depth: href('Depth Monitor', { symbol: code }), effect: href('News Effect Chart', { symbol: code }) });
+  const actions = code => ({ stock: href('Stock Chart', { symbol: code }), chart: href('Chart', { symbol: code }), vpa: href('VPA', { symbol: code }), archive: href('VPA Archive', { symbol: code }), depth: href('Depth Monitor', { symbol: code }), effect: href('News Effect Chart', { symbol: code }) });
   const dateStr = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   window.UFT = { rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, symbols: stocks.map(s => s.code).sort() };
