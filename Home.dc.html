@@ -376,7 +376,7 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, idx: 'DSEX', top: 'value', sector: 'value', mover: 'index', cb: 'upper', news: 'today', ev: 'month', ipo: 'open', ind: 'rsiLow', hover: null };
+  state = { ready: !!window.UFT, idx: 'DSEX', top: 'value', sector: 'value', mover: 'index', cb: 'upper', news: 'today', ev: 'today', ipo: 'open', ind: 'rsiLow', hover: null };
   chartRef = React.createRef();
   componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
   componentWillUnmount() { clearInterval(this.p); }
