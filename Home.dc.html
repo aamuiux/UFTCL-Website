@@ -325,15 +325,20 @@ a:hover { color: var(--blue-700); }
   </section>
 
   <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px;">
-    <div data-screen-label="Event calendar" style="border: 1px solid var(--ink); min-width: 0;">
+    <div data-screen-label="Event calendar" style="border: 1px solid var(--ink); min-width: 0; display: flex; flex-direction: column;">
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--ink);"><span style="font-weight: 700;">Events calendar</span><a href="Event%20Calendar.dc.html" style="font-size: 13px; text-decoration: underline;">Open calendar</a></div>
       <div style="display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--ink);">
-        <sc-for list="{{ evTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.onClick }}" style="font: inherit; border: 0; border-right: 1px solid var(--ink); padding: 10px 4px; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;"><span style="font-family: var(--font-mono); font-size: 21px; line-height: 26px;">{{ t.count }}</span><span style="font-size: 12px;">{{ t.label }}</span></button></sc-for>
+        <sc-for list="{{ evTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.onClick }}" style="font: inherit; border: 0; border-right: {{ t.br }}; padding: 10px 4px; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;"><span style="font-family: var(--font-mono); font-size: 21px; line-height: 26px;">{{ t.count }}</span><span style="font-size: 12px;">{{ t.label }}</span></button></sc-for>
       </div>
-      <div style="max-height: 300px; overflow: auto;">
+      <div style="flex: 1; min-height: 300px; position: relative;"><div style="position: absolute; inset: 0; overflow: auto;">
         <sc-for list="{{ evRows }}" as="e" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--neutral-200); align-items: center;"><div style="display: flex; flex-direction: column; align-items: center; border: 1px solid var(--ink); padding: 2px 0;"><span style="font-family: var(--font-mono); font-size: 16px; line-height: 20px;">{{ e.day }}</span><span style="font-size: 10px;">{{ e.mon }}</span></div><div style="display: flex; flex-direction: column; min-width: 0;"><span><b>{{ e.code }}</b> · {{ e.type }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ e.time }} · {{ e.venue }}</span></div></div></sc-for>
-        <sc-if value="{{ evEmpty }}"><div style="padding: 24px 16px; color: var(--text-muted);">No events in this range.</div></sc-if>
-      </div>
+        <sc-if value="{{ evEmpty }}"><div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 32px 24px; min-height: 100%; box-sizing: border-box;">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted);" aria-hidden="true"><rect x="6" y="9" width="36" height="33" rx="2"></rect><path d="M6 19h36M15 4v9M33 4v9" stroke-linecap="square"></path><path d="M18 30h12" stroke-linecap="square" opacity="0.6"></path></svg>
+          <b style="font-size: 16px;">{{ evEmptyTitle }}</b>
+          <span style="font-size: 13px; color: var(--text-muted); text-wrap: pretty;">{{ evEmptyText }}</span>
+          <button onClick="{{ evEmptyAction.onClick }}" style="font: inherit; font-size: 13px; height: 32px; padding: 0 16px; margin-top: 8px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">{{ evEmptyAction.label }}</button>
+        </div></sc-if>
+      </div></div>
     </div>
 
     <div data-screen-label="IPO" style="border: 1px solid var(--ink); min-width: 0;">
@@ -351,8 +356,8 @@ a:hover { color: var(--blue-700); }
 
     <div data-screen-label="News and announcements" style="min-width: 0; border: 1px solid var(--ink); display: flex; flex-direction: column;">
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 16px; height: 44px; border-bottom: 1px solid var(--ink);"><span style="font-weight: 700;">News & announcements</span><a href="News%20Effect%20Chart.dc.html" style="font-size: 13px; text-decoration: underline;">All news</a></div>
-      <div style="display: flex; border-bottom: 1px solid var(--neutral-300);">
-        <sc-for list="{{ newsTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; height: 32px; padding: 0 12px; border: 0; border-right: 1px solid var(--neutral-300); background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for>
+      <div style="display: flex; border-bottom: 1px solid var(--ink);">
+        <sc-for list="{{ newsTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; flex: 1; height: 36px; border: 0; border-right: {{ t.br }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for>
       </div>
       <div style="flex: 1; overflow: auto; max-height: 560px;">
         <sc-for list="{{ newsRows }}" as="n" hint-placeholder-count="8">
@@ -439,7 +444,7 @@ class Component extends DCLogic {
     // events
     const inR = (d, a, b) => d >= new Date(2026, 10, a) && d <= new Date(2026, 10, b, 23);
     const EVR = { today: [6, 6], week: [1, 7], next: [8, 14], month: [1, 30] };
-    const evTabs = this.tabs('ev', [['today', 'Today'], ['week', 'This week'], ['next', 'Upcoming week'], ['month', 'This month']]).map((t, i) => { const k = ['today', 'week', 'next', 'month'][i]; return { ...t, count: U.events.filter(e => inR(e.date, ...EVR[k])).length }; });
+    const evTabs = this.tabs('ev', [['today', 'Today'], ['week', 'This week'], ['next', 'Upcoming week'], ['month', 'This month']]).map((t, i) => { const br = i === 3 ? '0' : '1px solid var(--ink)'; const k = ['today', 'week', 'next', 'month'][i]; return { ...t, br, count: U.events.filter(e => inR(e.date, ...EVR[k])).length }; });
     const evRows = U.events.filter(e => inR(e.date, ...EVR[st.ev])).map(e => ({ ...e, day: String(e.date.getDate()).padStart(2, '0'), mon: e.date.toLocaleDateString('en-GB', { month: 'short' }) }));
     const ipoRows = U.ipos.filter(i => i.status === st.ipo).slice(0, 3).map(i => ({ ...i, sub: `${i.subStart.slice(0, 6)} – ${i.subEnd}`, price: 'Tk ' + fmt(i.price, 0) }));
     return {
@@ -447,13 +452,16 @@ class Component extends DCLogic {
       indexTabs: this.tabs('idx', [['DSEX', 'DSEX'], ['DSES', 'DSES'], ['DS30', 'DS30']]),
       breadth, sentiment, projected,
       topTabs: this.tabs('top', [['value', 'Top value'], ['gainer', 'Top gainer'], ['loser', 'Top loser'], ['volume', 'Top volume'], ['trade', 'Top trade']]), topRows, topMetric: TOP[1], topTitle: TOP[2],
-      newsTabs: this.tabs('news', [['today', "Today's news"], ['week', 'Last 7 days'], ['psi', 'PSI only']]), newsRows,
+      newsTabs: this.tabs('news', [['today', "Today's news"], ['week', 'Last 7 days'], ['psi', 'PSI only']]).map((t, i, a) => ({ ...t, br: i === a.length - 1 ? '0' : '1px solid var(--ink)' })), newsRows,
       sectorTabs: this.tabs('sector', [['value', "Today's value"], ['gl', 'Gainer / loser'], ['pe', 'Sector PE']]), sectorRows, showSectorValue: st.sector === 'value', showSectorGL: st.sector === 'gl', showSectorPE: st.sector === 'pe', sectorTitle: { value: 'Sector trade value (mn)', gl: 'Sector wise gainer / loser', pe: 'Sector wise PE' }[st.sector], marketPE: '11.84',
       moverTabs: this.tabs('mover', [['index', 'Index'], ['beta', 'Beta']]), movers, moverNote, moverTitle,
       legend, heatSectors, blocks, blockPct: U.blockPct + '%',
       cbTabs: this.tabs('cb', [['upper', 'Upper'], ['lower', 'Lower']]), cbRows,
       indItems: Object.entries(IND).map(([value, v]) => ({ value, label: v[0] })), indKey: st.ind, setInd: v => this.setState({ ind: v }), indLabel: ind[0].replace(/^(Lowest|Highest) /, ''), indRows,
       evTabs, evRows, evEmpty: evRows.length === 0,
+      evEmptyTitle: { today: 'No events today', week: 'No events this week', next: 'No events next week', month: 'No events this month' }[st.ev],
+      evEmptyText: { today: 'Nothing is scheduled for today. Check the rest of the week for upcoming record dates, AGMs and disclosures.', week: 'Nothing is scheduled for this week.', next: 'Nothing is scheduled for the upcoming week.', month: 'Nothing is scheduled for this month.' }[st.ev],
+      evEmptyAction: st.ev === 'today' ? { label: 'View this week', onClick: () => this.setState({ ev: 'week' }) } : { label: 'View this month', onClick: () => this.setState({ ev: 'month' }) },
       ipoTabs: this.tabs('ipo', [['open', 'Subscription open'], ['upcoming', 'Forthcoming'], ['past', 'Archive']]).map((t, i, a) => ({ ...t, br: i === a.length - 1 ? '0' : '1px solid var(--ink)' })), ipoRows
     };
   }
