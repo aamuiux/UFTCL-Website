@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>VPA Archive — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <nav data-screen-label="VPA sections" style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink); align-self: flex-start; max-width: 100%;">
+    <sc-for list="{{ sections }}" as="s" hint-placeholder-count="3"><a href="{{ s.href }}" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border-right: 1px solid var(--ink); font-size: 13px; font-weight: 700; background: {{ s.bg }}; color: {{ s.fg }};">{{ s.label }}</a></sc-for>
+  </nav>
+
+  <section data-screen-label="Archive header" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px;">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <span style="font-weight: 700; font-size: 18px;">VPA archive</span>
+      <span style="font-size: 12px; color: var(--text-muted);">One-minute volume price analysis for the last {{ dayCount }} trading days · {{ name }}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px;"><sc-for list="{{ legend }}" as="l" hint-placeholder-count="3"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: {{ l.c }};"></span>{{ l.label }}</span></sc-for></div>
+      <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; font-weight: 700; height: 36px; min-width: 200px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
+        <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.code }}</option></sc-for>
+      </select>
+    </div>
+  </section>
+
+  <sc-for list="{{ days }}" as="d" hint-placeholder-count="9">
+    <section data-screen-label="VPA day" style="border: 1px solid var(--ink);">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--ink);">
+        <div style="display: flex; flex-direction: column;"><b>Date: {{ d.date }}</b><span style="font-size: 12px; color: var(--text-muted);">{{ code }} · Close {{ d.close }} · Range {{ d.range }}</span></div>
+        <a href="{{ chartHref }}" style="font-size: 13px; text-decoration: underline;">Stock chart</a>
+      </div>
+      <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; padding: 10px 12px 0;">
+        <div style="position: relative; height: 220px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ d.volAxis }}" as="g"><span style="position: absolute; right: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+        <div style="position: relative; height: 220px; border-bottom: 1px solid var(--ink);">
+          <svg viewBox="0 0 1000 220" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+            <sc-for list="{{ d.grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" vector-effect="non-scaling-stroke"></line></sc-for>
+            <sc-for list="{{ d.bars }}" as="b"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.color }}"></rect></sc-for>
+            <path d="{{ d.line }}" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+          </svg>
+          <svg viewBox="0 0 40 40" width="40" height="40" style="position: absolute; left: 8px; top: 8px;" aria-label="Volume split"><sc-for list="{{ d.pie }}" as="s"><path d="{{ s.d }}" fill="{{ s.c }}"></path></sc-for></svg>
+        </div>
+        <div style="position: relative; height: 220px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ d.priceAxis }}" as="g"><span style="position: absolute; left: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; padding: 0 12px;"><span></span><div style="position: relative; height: 22px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ d.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%);">{{ x.label }}</span></sc-for></div><span></span></div>
+      <div style="display: flex; height: 8px;"><sc-for list="{{ d.split }}" as="s"><div style="width: {{ s.w }}; background: {{ s.c }};"></div></sc-for></div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); font-size: 12px; border-top: 1px solid var(--ink);">
+        <sc-for list="{{ d.totals }}" as="t"><div style="padding: 8px 16px; display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--neutral-200);"><span style="width: 10px; height: 10px; background: {{ t.c }};"></span><span>{{ t.label }}: <b style="font-family: var(--font-mono);">{{ t.value }}</b> {{ t.pct }}</span></div></sc-for>
+      </div>
+    </section>
+  </sc-for>
+
+  <dc-import name="SymbolIndex" page="VPA Archive" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const { fmt, fmtInt } = U;
+    const sym = U.param('symbol', 'BRACBANK').toUpperCase(); const S = U.bySym[sym] || U.stocks[0];
+    const COL = ['var(--green-700)', 'var(--blue-700)', 'var(--red-700)'], NAMES = ['Bull', 'Neutral', 'Bear'];
+    // last trading days (Sun-Thu) counting back from 8 Nov 2026
+    const dates = []; const d0 = new Date(2026, 10, 8); while (dates.length < 9) { if (d0.getDay() <= 4) dates.push(new Date(d0)); d0.setDate(d0.getDate() - 1); }
+    const W = 1000, H = 220, N = 110;
+    const days = dates.map((date, k) => {
+      const r = U.rng(U.hash(S.code) + 1000 + k * 131); let p = S.ycp * (0.97 + r() * 0.06); const tick = S.ltp > 100 ? 0.5 : 0.1;
+      const pts = []; for (let i = 0; i < N; i++) { p = Math.max(S.ycp * 0.9, p + (r() - 0.48) * S.ycp * 0.005); const vol = Math.round(S.volume / N * (0.15 + r() * 2.4) * (i < 12 ? 2.2 : 1)); const buy = Math.round(vol * (0.2 + r() * 0.6)); const m = 600 + Math.round(i * 270 / N); pts.push({ price: Math.round(p / tick) * tick, vol, buy, time: String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0') }); }
+      const kind = q => { const x = q.buy / q.vol; return x > 0.58 ? 0 : x < 0.42 ? 2 : 1; };
+      const sums = [0, 0, 0]; pts.forEach(q => { sums[kind(q)] += q.vol; }); const tot = sums.reduce((a, b) => a + b, 0) || 1;
+      const vTop = Math.ceil(Math.max(...pts.map(q => q.vol)) / 10000) * 10000 || 10000;
+      const sc = U.scaleY(pts.map(q => q.price), H - 30, 20); const bw = W / N;
+      const bars = pts.map((q, i) => { const h = q.vol / vTop * (H - 16); return { x: (i * bw + bw * 0.2).toFixed(2), w: Math.max(bw * 0.6, 1).toFixed(2), y: (H - h).toFixed(2), h: h.toFixed(2), color: COL[kind(q)] }; });
+      // step line like the exchange archive charts
+      let line = ''; pts.forEach((q, i) => { const y = (sc.y(q.price) + 8).toFixed(2); const x = (i * bw).toFixed(2); line += (i ? 'H' + x + 'V' + y : 'M' + x + ' ' + y); });
+      const pie = (() => { const cx = 20, cy = 20, R = 19; let a0 = -Math.PI / 2; return sums.map((v, i) => { const a1 = a0 + v / tot * 2 * Math.PI; const P = a => [cx + R * Math.cos(a), cy + R * Math.sin(a)]; const [x0, y0] = P(a0), [x1, y1] = P(a1); const dd = `M${cx} ${cy}L${x0.toFixed(2)} ${y0.toFixed(2)}A${R} ${R} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z`; a0 = a1; return { d: dd, c: COL[i] }; }); })();
+      const lo = sc.min, hi = sc.max;
+      const totals = [{ label: 'Total volume', value: fmtInt(tot), pct: '', c: 'var(--neutral-500)' }, ...NAMES.map((n, i) => ({ label: n + ' vol', value: fmtInt(sums[i]), pct: '(' + fmt(sums[i] / tot * 100, 1) + '%)', c: COL[i] }))];
+      return { date: date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }), close: fmt(pts[N - 1].price, 1), range: fmt(lo, 1) + ' – ' + fmt(hi, 1), bars, line, pie, totals,
+        split: sums.map((v, i) => ({ w: (v / tot * 100) + '%', c: COL[i] })),
+        grid: [0, 0.25, 0.5, 0.75, 1].map(f => ({ y: (f * (H - 1)).toFixed(1) })),
+        volAxis: [1, 0.75, 0.5, 0.25, 0].map(f => ({ pct: ((1 - f) * 100) + '%', label: f === 0 ? '0' : Math.round(vTop * f / 1000) + 'k' })),
+        priceAxis: [1, 0.75, 0.5, 0.25, 0].map(f => ({ pct: ((1 - f) * 100) + '%', label: fmt(lo + (hi - lo) * f, 1) })),
+        x: pts.map((q, i) => i).filter(i => i % 11 === 0).map(i => ({ left: ((i + 0.5) / N * 100) + '%', label: pts[i].time })) };
+    });
+    const sections = [['1 Minute VPA', 'VPA'], ['VPA Archive', 'VPA Archive'], ['Market Depth Monitor', 'Depth Monitor']].map(([label, page]) => ({ label, href: U.href(page, { symbol: S.code }), bg: page === 'VPA Archive' ? 'var(--ink)' : 'var(--paper)', fg: page === 'VPA Archive' ? 'var(--paper)' : 'var(--ink)' }));
+    return { code: S.code, name: U.company(S.code), days, dayCount: days.length, sections, legend: NAMES.map((label, i) => ({ label, c: COL[i] })), chartHref: U.actions(S.code).chart,
+      symbolOptions: U.symbols.map(code => ({ code })), onSymbol: e => { location.href = U.href('VPA Archive', { symbol: e.target.value }); } };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>1 Minute VPA — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <nav data-screen-label="VPA sections" style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink); align-self: flex-start; max-width: 100%;">
+    <sc-for list="{{ sections }}" as="s" hint-placeholder-count="3"><a href="{{ s.href }}" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border-right: 1px solid var(--ink); font-size: 13px; font-weight: 700; background: {{ s.bg }}; color: {{ s.fg }};">{{ s.label }}</a></sc-for>
+  </nav>
+
+  <section data-screen-label="Instrument strip" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: stretch;">
+    <label style="display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 12px 16px; border-right: 1px solid var(--ink); min-width: 220px;">
+      <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; font-size: 18px; font-weight: 700; border: 0; background: transparent; color: var(--ink); padding: 0; outline: none; cursor: pointer;">
+        <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.code }}</option></sc-for>
+      </select>
+      <span style="font-size: 12px; color: var(--text-muted);">{{ name }}</span>
+    </label>
+    <div style="display: flex; flex-direction: column; justify-content: center; padding: 12px 16px; border-right: 1px solid var(--ink);">
+      <span style="font-family: var(--font-mono); font-size: 32px; line-height: 36px; font-weight: 700;">{{ ltp }}</span>
+      <span style="font-family: var(--font-mono); font-size: 13px; color: {{ chgColor }};">{{ chg }}</span>
+    </div>
+    <div style="flex: 1 1 480px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); align-content: center; gap: 10px 20px; padding: 12px 16px;">
+      <sc-for list="{{ quote }}" as="q" hint-placeholder-count="10"><div style="display: flex; flex-direction: column;"><span style="font-size: 12px; color: var(--text-muted);">{{ q.label }}</span><span style="font-family: var(--font-mono); font-size: 13px; font-weight: 700;">{{ q.value }}</span></div></sc-for>
+    </div>
+    <div style="display: flex; align-items: stretch; border-left: 1px solid var(--ink);">
+      <sc-for list="{{ links }}" as="l" hint-placeholder-count="3"><a href="{{ l.href }}" title="{{ l.title }}" style="width: 44px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--neutral-200);" style-hover="background: var(--ink); color: var(--paper);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ l.d }}"></path></svg></a></sc-for>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+    <div style="flex: 3 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 24px;">
+
+      <div data-screen-label="1 minute VPA chart" style="border: 1px solid var(--ink);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+          <span style="font-weight: 700; font-size: 16px;">1 Minute Volume Price Analysis</span>
+          <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px;">
+            <sc-for list="{{ legend }}" as="l" hint-placeholder-count="3"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: {{ l.c }};"></span>{{ l.label }}</span></sc-for>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; padding: 12px 12px 0;">
+          <div style="position: relative; height: 300px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ vc.volAxis }}" as="g"><span style="position: absolute; right: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+          <div ref="{{ chartRef }}" onMouseMove="{{ onMove }}" onMouseLeave="{{ onLeave }}" style="position: relative; height: 300px; cursor: crosshair; border-bottom: 1px solid var(--ink);">
+            <svg viewBox="0 0 1000 300" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+              <sc-for list="{{ vc.grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" vector-effect="non-scaling-stroke"></line></sc-for>
+              <sc-for list="{{ vc.bars }}" as="b"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.color }}"></rect></sc-for>
+              <path d="{{ vc.line }}" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+            </svg>
+            <svg viewBox="0 0 40 40" width="44" height="44" style="position: absolute; left: 8px; top: 8px;" aria-label="Volume split"><sc-for list="{{ pie }}" as="s"><path d="{{ s.d }}" fill="{{ s.c }}"></path></sc-for></svg>
+            <sc-if value="{{ hv.show }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hv.left }}; width: 1px; background: var(--ink); pointer-events: none;"></div><div style="position: absolute; top: 8px; left: {{ hv.tipLeft }}; background: var(--ink); color: var(--paper); font-size: 12px; font-family: var(--font-mono); padding: 6px 8px; pointer-events: none; white-space: nowrap; display: flex; flex-direction: column; gap: 2px;"><b style="font-family: var(--font-sans);">{{ hv.time }}</b><span>Price {{ hv.price }}</span><span>Vol {{ hv.vol }}</span><span>Buy {{ hv.buy }} · Sell {{ hv.sell }}</span></div></sc-if>
+          </div>
+          <div style="position: relative; height: 300px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ vc.priceAxis }}" as="g"><span style="position: absolute; left: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; padding: 0 12px;"><span></span>
+          <div style="position: relative; height: 22px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ vc.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%);">{{ x.label }}</span></sc-for></div><span></span></div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--ink); font-size: 12px;">
+          <sc-for list="{{ totals }}" as="t" hint-placeholder-count="3"><div style="padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--neutral-200);"><span style="width: 10px; height: 10px; background: {{ t.c }};"></span><span>{{ t.label }}: <b style="font-family: var(--font-mono);">{{ t.value }}</b> ({{ t.pct }})</span></div></sc-for>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); border: 1px solid var(--ink);" data-screen-label="Ranges">
+        <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="2"><div style="padding: 12px 16px; border-right: 1px solid var(--neutral-200);"><div style="text-align: center; font-weight: 700; margin-bottom: 8px;">{{ r.title }}</div><div style="display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 13px;"><span>{{ r.low }}</span><div style="position: relative; flex: 1; height: 6px; background: var(--neutral-200);"><div style="position: absolute; left: 0; width: {{ r.pos }}; height: 6px; background: var(--ink);"></div><div style="position: absolute; left: {{ r.pos }}; top: -5px; width: 2px; height: 16px; background: var(--ink); transform: translateX(-1px);"></div></div><span>{{ r.high }}</span></div><div style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 8px;">LTP {{ r.ltp }}</div></div></sc-for>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+        <div data-screen-label="Market depth" style="flex: 3 1 440px; min-width: 0; border: 1px solid var(--ink);">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Market Depth</div>
+          <div style="display: flex; justify-content: space-between; padding: 10px 16px; font-size: 13px;"><span>Buy Vol <b style="font-family: var(--font-mono);">{{ dp.buyVol }}</b></span><span>Sell Vol <b style="font-family: var(--font-mono);">{{ dp.sellVol }}</b></span></div>
+          <div style="display: flex; font-family: var(--font-mono); font-weight: 700; color: var(--paper);"><div style="width: {{ dp.buyPct }}; background: var(--green-700); padding: 10px 16px;">{{ dp.buyPct }}</div><div style="flex: 1; background: var(--red-700); padding: 10px 16px; text-align: right;">{{ dp.sellPct }}</div></div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 8px 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink);"><span>Bid qty</span><span style="text-align: right;">Bid</span><span style="padding-left: 16px;">Ask</span><span style="text-align: right;">Ask qty</span></div>
+          <sc-for list="{{ dp.rows }}" as="r" hint-placeholder-count="10">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 0 16px; font-family: var(--font-mono); font-size: 14px; border-bottom: 1px solid var(--neutral-200); position: relative; height: 36px; align-items: center;">
+              <div style="position: absolute; right: 50%; top: 0; bottom: 0; width: {{ r.bw }}; background: oklch(52.7% 0.154 150 / 0.14);"></div>
+              <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: {{ r.aw }}; background: oklch(50.5% 0.213 27.5 / 0.14);"></div>
+              <span style="position: relative;">{{ r.bq }}</span><span style="position: relative; text-align: right; color: var(--green-700); font-weight: 700;">{{ r.bp }}</span><span style="position: relative; padding-left: 16px; color: var(--red-700); font-weight: 700;">{{ r.ap }}</span><span style="position: relative; text-align: right;">{{ r.aq }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div data-screen-label="Projected volume" style="flex: 2 1 300px; min-width: 0; border: 1px solid var(--ink);">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Today's Projected Volume</div>
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+            <sc-for list="{{ proj }}" as="p" hint-placeholder-count="3"><div style="display: grid; grid-template-columns: 84px minmax(0, 1fr) 80px; align-items: center; gap: 12px; font-size: 13px;"><span>{{ p.label }}</span><div style="height: 14px; background: var(--neutral-100);"><div style="height: 14px; width: {{ p.w }}; background: {{ p.c }};"></div></div><span style="font-family: var(--font-mono); text-align: right;">{{ p.value }}</span></div></sc-for>
+            <div style="display: flex; gap: 16px; justify-content: center; font-size: 12px; padding-top: 6px;"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: var(--blue-700);"></span>Projected</span><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: var(--green-700);"></span>Real</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside data-screen-label="Watchlist" style="flex: 1 1 280px; min-width: 0; border: 1px solid var(--ink);">
+      <div style="display: flex; border-bottom: 1px solid var(--ink);"><sc-for list="{{ wlTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; flex: 1; height: 40px; border: 0; border-right: {{ t.br }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 64px 64px; padding: 8px 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink);"><span>Symbol</span><span style="text-align: right;">Last</span><span style="text-align: right;">Chg %</span></div>
+      <sc-for list="{{ wl }}" as="w" hint-placeholder-count="10"><a href="{{ w.href }}" style="display: grid; grid-template-columns: minmax(0, 1fr) 64px 64px; padding: 9px 16px; border-bottom: 1px solid var(--neutral-200); font-size: 13px; background: {{ w.bg }};" style-hover="background: var(--neutral-100);"><b>{{ w.code }}</b><span style="text-align: right; font-family: var(--font-mono);">{{ w.ltp }}</span><span style="text-align: right; font-family: var(--font-mono); color: {{ w.color }};">{{ w.pct }}</span></a></sc-for>
+    </aside>
+  </section>
+
+  <dc-import name="SymbolIndex" page="VPA" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, wl: 'watch', hover: null };
+  chartRef = React.createRef();
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt, fmtInt, sign, tone } = U;
+    const sym = U.param('symbol', 'BRACBANK').toUpperCase(); const S = U.bySym[sym] || U.stocks[0];
+    const data = U.vpa(S.code, 120); const N = data.length;
+    const BULL = 'var(--green-700)', NEUT = 'var(--blue-700)', BEAR = 'var(--red-700)';
+    const kind = d => { const r = d.buy / d.vol; return r > 0.58 ? 0 : r < 0.42 ? 2 : 1; };
+    const COL = [BULL, NEUT, BEAR];
+    const sums = [0, 0, 0]; data.forEach(d => { sums[kind(d)] += d.vol; }); const tot = sums.reduce((a, b) => a + b, 0) || 1;
+    const W = 1000, H = 300;
+    const maxV = Math.max(...data.map(d => d.vol)); const vTop = Math.ceil(maxV / 10000) * 10000 || 10000;
+    const sc = U.scaleY(data.map(d => d.price), H - 40, 24); const lo = sc.min, hi = sc.max;
+    const bw = W / N;
+    const bars = data.map((d, i) => { const h = d.vol / vTop * (H - 20); return { x: (i * bw + bw * 0.2).toFixed(2), w: Math.max(bw * 0.6, 1).toFixed(2), y: (H - h).toFixed(2), h: h.toFixed(2), color: COL[kind(d)] }; });
+    const line = data.map((d, i) => (i ? 'L' : 'M') + ((i + 0.5) * bw).toFixed(2) + ' ' + (sc.y(d.price) + 10).toFixed(2)).join('');
+    const grid = [0, 0.2, 0.4, 0.6, 0.8, 1].map(f => ({ y: (f * (H - 1)).toFixed(1), pct: (f * 100) + '%' }));
+    const volAxis = [1, 0.8, 0.6, 0.4, 0.2, 0].map(f => ({ pct: ((1 - f) * 100) + '%', label: f === 0 ? '0' : (vTop * f >= 1000 ? Math.round(vTop * f / 1000) + 'k' : fmtInt(vTop * f)) }));
+    const priceAxis = [1, 0.8, 0.6, 0.4, 0.2, 0].map(f => ({ pct: ((1 - f) * 100) + '%', label: fmt(lo + (hi - lo) * f, 1) }));
+    const step = Math.ceil(N / 10); const x = data.map((d, i) => i).filter(i => i % step === 0).map(i => ({ left: ((i + 0.5) / N * 100) + '%', label: data[i].time }));
+    const vc = { bars, line, grid, volAxis, priceAxis, x };
+    const pie = (() => { const cx = 20, cy = 20, R = 19; let a0 = -Math.PI / 2; return sums.map((v, i) => { const a1 = a0 + v / tot * 2 * Math.PI; const P = a => [cx + R * Math.cos(a), cy + R * Math.sin(a)]; const [x0, y0] = P(a0), [x1, y1] = P(a1); const d = `M${cx} ${cy}L${x0.toFixed(2)} ${y0.toFixed(2)}A${R} ${R} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z`; a0 = a1; return { d, c: COL[i] }; }); })();
+    const names = ['Bull', 'Neutral', 'Bear'];
+    const totals = names.map((label, i) => ({ label: label + ' vol', value: fmtInt(sums[i]), pct: fmt(sums[i] / tot * 100, 1) + '%', c: COL[i] }));
+    const hb = st.hover != null ? data[st.hover] : null;
+    const hv = hb ? { show: true, left: ((st.hover + 0.5) / N * 100) + '%', tipLeft: st.hover > N * 0.7 ? 'auto' : ((st.hover + 0.5) / N * 100 + 1) + '%', time: hb.time, price: fmt(hb.price, 1), vol: fmtInt(hb.vol), buy: fmtInt(hb.buy), sell: fmtInt(hb.sell) } : { show: false };
+    const onMove = e => { const el = this.chartRef.current; if (!el) return; const r = el.getBoundingClientRect(); const i = Math.max(0, Math.min(N - 1, Math.floor((e.clientX - r.left) / r.width * N))); if (i !== st.hover) this.setState({ hover: i }); };
+    const quote = [['Open', fmt(S.open, 1)], ['High', fmt(S.high, 1)], ['Low', fmt(S.low, 1)], ['Trade', fmtInt(S.trades)], ['Volume', fmtInt(S.volume)], ['YCP', fmt(S.ycp, 1)], ['P/E', fmt(S.pe)], ['EPS', fmt(S.eps)], ['Mkt cap (mn)', fmt(S.mcap, 1)], ['52W range', fmt(S.w52l, 1) + ' – ' + fmt(S.w52h, 1)]].map(([label, value]) => ({ label, value }));
+    const ranges = [['Day’s Range', S.low, S.high], ['52 Week Range', S.w52l, S.w52h]].map(([title, l, h]) => ({ title, low: fmt(l, 1), high: fmt(h, 1), ltp: fmt(S.ltp, 1), pos: Math.max(0, Math.min(100, (S.ltp - l) / ((h - l) || 1) * 100)) + '%' }));
+    const D = U.depth(S.code, 10); const mq = Math.max(...D.bids.map(b => b.qty), ...D.asks.map(a => a.qty));
+    const dp = { buyVol: fmtInt(D.totalBid), sellVol: fmtInt(D.totalAsk), buyPct: fmt(D.buyPct) + '%', sellPct: fmt(D.sellPct) + '%', rows: D.bids.map((b, i) => ({ bq: fmtInt(b.qty), bp: fmt(b.price, 1), bw: (b.qty / mq * 48) + '%', ap: fmt(D.asks[i].price, 1), aq: fmtInt(D.asks[i].qty), aw: (D.asks[i].qty / mq * 48) + '%' })) };
+    const real = S.volume; const prevDay = Math.round(real * (1.1 + (U.hash(S.code) % 40) / 100)); const proj = Math.round(real * 1.35); const mx = Math.max(real, prevDay, proj);
+    const projRows = [['Today’s', proj, 'var(--blue-700)'], ['Yesterday’s', prevDay, 'var(--blue-700)'], ['Matured', real, 'var(--green-700)']].map(([label, v, c]) => ({ label, value: fmtInt(v), w: (v / mx * 100) + '%', c }));
+    const WL = { watch: U.stocks.slice(0, 12), today: U.top('value', 12), minute: U.top('volume', 12), hot: U.stocks.slice().sort((a, b) => b.changePct - a.changePct).slice(0, 12) };
+    const wlTabs = [['watch', 'Watchlist'], ['today', 'Today'], ['minute', 'Minute'], ['hot', 'Hot list']].map(([k, label], i, a) => ({ label, br: i === a.length - 1 ? '0' : '1px solid var(--ink)', bg: st.wl === k ? 'var(--ink)' : 'var(--paper)', fg: st.wl === k ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ wl: k }) }));
+    const wl = WL[st.wl].map(s => ({ code: s.code, href: U.href('VPA', { symbol: s.code }), ltp: fmt(s.ltp, 1), pct: sign(s.changePct) + '%', color: tone(s.change), bg: s.code === S.code ? 'var(--neutral-100)' : 'transparent' }));
+    const A = U.actions(S.code);
+    const links = [['Stock chart', A.chart, 'M2 12l4-4 3 3 5-6'], ['VPA archive', A.archive, 'M2.5 3h11v3h-11zM3.5 6v7h9V6M6.5 9h3'], ['Depth monitor', A.depth, 'M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6']].map(([title, href, d]) => ({ title, href, d }));
+    const sections = [['1 Minute VPA', 'VPA'], ['VPA Archive', 'VPA Archive'], ['Market Depth Monitor', 'Depth Monitor']].map(([label, page]) => ({ label, href: U.href(page, { symbol: S.code }), bg: page === 'VPA' ? 'var(--ink)' : 'var(--paper)', fg: page === 'VPA' ? 'var(--paper)' : 'var(--ink)' }));
+    return { code: S.code, name: U.company(S.code), ltp: fmt(S.ltp, 1), chg: `${sign(S.change)} (${sign(S.changePct)}%)`, chgColor: tone(S.change), quote, links, sections,
+      symbolOptions: U.symbols.map(code => ({ code })), onSymbol: e => { location.href = U.href('VPA', { symbol: e.target.value }); },
+      vc, pie, totals, legend: names.map((label, i) => ({ label, c: COL[i] })), hv, chartRef: this.chartRef, onMove, onLeave: () => this.setState({ hover: null }),
+      ranges, dp, proj: projRows, wlTabs, wl };
+  }
+}
+</script>
+</body>
+</html>
