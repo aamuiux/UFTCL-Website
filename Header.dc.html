@@ -145,7 +145,7 @@ class Component extends DCLogic {
     const L = (label, page, q) => page ? { label, href: encodeURI(page + '.dc.html') + (q ? '?' + q : '') } : { label, href: '#', soon: true };
     return [
       { id: 'home', label: 'Home', href: 'Home.dc.html' },
-      { id: 'price', label: 'Share Price', groups: [{ links: [L('Latest Share Price', 'Latest Share Price'), L('Sector Wise Share Price', 'Sector Share Price'), L('Circuit Breaker', 'Sector Share Price', 'tab=circuit'), L('Stock Quotes / Price Board', 'Latest Share Price')] }] },
+      { id: 'price', label: 'Share Price', groups: [{ links: [L('Latest Share Price', 'Latest Share Price'), L('Sector Wise Share Price', 'Sector Share Price'), L('Circuit Breaker', 'Sector Share Price', 'tab=circuit')] }] },
       { id: 'market', label: 'Market Data & Analysis', mega: true, note: 'Create a profile to save your chart, PE ratio and VPA settings.', groups: [
         { title: 'Charts', links: [L('Stock Chart', 'Stock Chart'), L('Interactive Chart', 'Stock Chart'), L('MTF Charts'), L('Multiple Charts'), L('Technical & Fundamental Charts', 'Stock Chart')] },
         { title: 'PE Ratio', links: [L('Market PE Ratio'), L('Sector PE Ratio'), L('Category PE Ratio'), L('Compare PE Ratio'), L('Compare Sector PE'), L('Weighted PE Chart')] },
