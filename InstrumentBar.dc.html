@@ -14,8 +14,7 @@
 </helmet>
 <section style="display: flex; flex-direction: column; gap: 16px; font-family: var(--font-sans); color: var(--ink); font-size: 14px;">
   <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
-    <div style="font-size: 13px; color: var(--text-muted);"><a href="Home.dc.html">Home</a> / <a href="Latest%20Share%20Price.dc.html">Instruments</a> / {{ s.code }} / {{ pageName }}</div>
-    <div style="position: relative; width: 340px; max-width: 100%;">
+    <div style="position: relative; width: 340px; max-width: 100%; margin-left: auto;">
       <div style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 8px 0 10px; border: 1px solid var(--ink); background: var(--paper);">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
         <input ref="{{ inputRef }}" value="{{ q }}" onChange="{{ onQ }}" onFocus="{{ onFocus }}" onBlur="{{ onBlur }}" onKeyDown="{{ onKey }}" placeholder="Search instrument, company or sector" style="flex: 1; min-width: 0; border: 0; outline: none; font: inherit; font-size: 14px; background: transparent; color: var(--ink);">
