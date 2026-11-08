@@ -84,15 +84,6 @@
       </sc-for>
     </div>
   </div>
-
-  <nav style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink); align-self: flex-start; max-width: 100%;">
-    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
-      <a href="{{ t.href }}" style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-right: 1px solid var(--ink); margin-right: -1px; background: {{ t.bg }}; color: {{ t.fg }}; font-weight: 700;">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ t.icon }}"></path></svg>
-        <span>{{ t.label }}</span>
-      </a>
-    </sc-for>
-  </nav>
 </section>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:460},&quot;symbol&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;GP&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chart&quot;,&quot;vpa&quot;,&quot;archive&quot;,&quot;depth&quot;,&quot;effect&quot;],&quot;default&quot;:&quot;chart&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
