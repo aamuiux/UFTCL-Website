@@ -22,6 +22,8 @@ a:hover { color: var(--blue-700); }
 <dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
 <main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
 
+  <dc-import name="InstrumentTabs" active="chart" hint-size="100%,40px"></dc-import>
+
   <nav aria-label="Breadcrumb" style="font-size: 13px; color: var(--text-muted); display: flex; gap: 6px;"><a href="Home.dc.html">Home</a><span>/</span><span>Charts</span><span>/</span><span style="color: var(--ink);">{{ code }}</span></nav>
 
   <section data-screen-label="Chart workspace" style="border: 1px solid var(--ink); display: flex; flex-direction: column; min-width: 0;">

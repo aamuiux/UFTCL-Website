@@ -22,9 +22,7 @@ a:hover { color: var(--blue-700); }
 <dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
 <main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
 
-  <nav data-screen-label="VPA sections" style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink); align-self: flex-start; max-width: 100%;">
-    <sc-for list="{{ sections }}" as="s" hint-placeholder-count="3"><a href="{{ s.href }}" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border-right: 1px solid var(--ink); font-size: 13px; font-weight: 700; background: {{ s.bg }}; color: {{ s.fg }};">{{ s.label }}</a></sc-for>
-  </nav>
+  <dc-import name="InstrumentTabs" active="vpa" hint-size="100%,40px"></dc-import>
 
   <section data-screen-label="Instrument strip" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: stretch;">
     <label style="display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 12px 16px; border-right: 1px solid var(--ink); min-width: 220px;">
