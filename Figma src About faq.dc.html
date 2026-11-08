@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#111"/><text x="50" y="58" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="#fff">FAQ</text></svg></template>
+<x-dc>
+<helmet>
+<title>About — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] .uft-plus { transform: rotate(45deg); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="about" hint-size="100%,140px"></dc-import>
+<main style="max-width: none; margin: 0; padding: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; align-items: start;">
+  <aside style="grid-column: span 1; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 16px;">
+    <sc-for list="{{ nav }}" as="g">
+      <div style="display: flex; flex-direction: column;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); padding: 0 12px 6px;">{{ g.title }}</div>
+        <sc-for list="{{ g.items }}" as="i"><a href="{{ i.href }}" style="height: 32px; padding: 0 12px; display: flex; align-items: center; background: {{ i.bg }}; color: {{ i.fg }}; border: 1px solid {{ i.bd }};" style-hover="text-decoration: underline;">{{ i.label }}</a></sc-for>
+      </div>
+    </sc-for>
+  </aside>
+  <div style="grid-column: span 3; min-width: 0; display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div style="font-size: 13px; color: var(--text-muted);"><a href="Home.dc.html">Home</a> / About / {{ crumb }}</div>
+      <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">{{ title }}</h1>
+      <div style="color: var(--text-muted); max-width: 640px;">{{ sub }}</div>
+    </div>
+
+    <sc-if value="{{ is.overview }}">
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div style="border: 1px solid var(--ink); padding: 24px; display: flex; flex-direction: column; gap: 12px; max-width: 760px; text-wrap: pretty; line-height: 24px;">
+          <p style="margin: 0;">UFTCL is a securities brokerage and research platform for the Dhaka Stock Exchange (DSE) and Chittagong Stock Exchange (CSE). It combines live prices, charts, volume price analysis and market depth with online trading and BO account services.</p>
+          <p style="margin: 0;">Research tools on this site cover DSEX, DSES and DS30, sector and circuit breaker views, IPO tracking, news effect charts and the stock scanner.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+          <sc-for list="{{ facts }}" as="f"><div style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted);">{{ f.k }}</span><span style="font-size: 18px; font-weight: 700;">{{ f.v }}</span></div></sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+          <sc-for list="{{ pillars }}" as="p"><div style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 6px;"><b>{{ p.t }}</b><span style="color: var(--text-muted); text-wrap: pretty;">{{ p.d }}</span></div></sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ is.team }}">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+        <sc-for list="{{ team }}" as="m">
+          <div style="border: 1px solid var(--ink); display: flex; flex-direction: column;">
+            <div style="aspect-ratio: 4 / 3; background: var(--neutral-100); border-bottom: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">Photo</div>
+            <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 2px;"><b>{{ m.name }}</b><span style="color: var(--text-muted);">{{ m.role }}</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ is.trec }}">
+      <div style="display: flex; flex-direction: column; gap: 24px; max-width: 900px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+          <sc-for list="{{ certs }}" as="c"><div style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted);">{{ c.k }}</span><span style="font-weight: 700;">{{ c.v }}</span><span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">{{ c.n }}</span></div></sc-for>
+        </div>
+        <div style="border: 1px solid var(--ink);">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700;">Compliance documents</div>
+          <sc-for list="{{ docs }}" as="d"><div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--neutral-200);"><span>{{ d.name }}</span><a href="#" style="display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--ink);" style-hover="background: var(--ink); color: var(--paper);">View PDF</a></div></sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ is.branches }}">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+          <div style="display: flex; border: 1px solid var(--ink);"><sc-for list="{{ cityTabs }}" as="t"><button onClick="{{ t.onClick }}" style="font: inherit; height: 30px; padding: 0 12px; border: 0; border-right: 1px solid var(--ink); margin-right: -1px; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+        </div>
+        <div style="border: 1px solid var(--ink); overflow-x: auto;">
+          <div style="min-width: 640px;">
+            <div style="display: grid; grid-template-columns: 1fr 2fr 1.2fr 1fr; background: var(--neutral-50); border-bottom: 1px solid var(--ink); font-size: 12px; color: var(--text-muted);"><span style="padding: 10px 16px;">Branch</span><span style="padding: 10px 16px;">Address</span><span style="padding: 10px 16px;">Phone</span><span style="padding: 10px 16px;">Hours</span></div>
+            <sc-for list="{{ branches }}" as="b"><div style="display: grid; grid-template-columns: 1fr 2fr 1.2fr 1fr; border-bottom: 1px solid var(--neutral-200);"><span style="padding: 10px 16px; font-weight: 700;">{{ b.name }}</span><span style="padding: 10px 16px;">{{ b.addr }}</span><span style="padding: 10px 16px; font-family: var(--font-mono);">{{ b.phone }}</span><span style="padding: 10px 16px; color: var(--text-muted);">Sun–Thu, 10 AM – 5 PM</span></div></sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ is.careers }}">
+      <div style="border: 1px solid var(--ink); max-width: 900px;">
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700;">Open positions</div>
+        <sc-for list="{{ jobs }}" as="j"><div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--neutral-200);"><div style="display: flex; flex-direction: column;"><b>{{ j.t }}</b><span style="color: var(--text-muted); font-size: 13px;">{{ j.meta }}</span></div><a href="#apply" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border: 1px solid var(--ink);" style-hover="background: var(--ink); color: var(--paper);">Apply</a></div></sc-for>
+        <div style="padding: 12px 16px; background: var(--neutral-100); font-size: 13px;">Send your CV to careers@uftcl.com.bd.</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ is.faq }}">
+      <div style="display: flex; flex-direction: column; gap: 24px; max-width: 800px;">
+        <sc-for list="{{ faq }}" as="g">
+          <div style="border: 1px solid var(--ink);">
+            <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700;">{{ g.title }}</div>
+            <sc-for list="{{ g.items }}" as="q">
+              <details style="border-bottom: 1px solid var(--neutral-200);">
+                <summary style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px;"><span>{{ q.q }}</span><svg class="uft-plus" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" style="flex-shrink: 0; transition: transform 150ms;"><path d="M8 2v12M2 8h12"></path></svg></summary>
+                <div style="padding: 0 16px 14px; color: var(--text-muted); line-height: 22px; text-wrap: pretty;">{{ q.a }}</div>
+              </details>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ is.forms }}">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px;">
+        <sc-for list="{{ forms }}" as="f">
+          <div style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 12px; justify-content: space-between;">
+            <div style="display: flex; flex-direction: column; gap: 2px;"><b>{{ f.t }}</b><span style="color: var(--text-muted); font-size: 13px;">{{ f.d }}</span></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">PDF</span><a href="#download" style="display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--ink);" style-hover="background: var(--ink); color: var(--paper);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"></path></svg>Download</a></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ is.contact }}">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1000px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <sc-for list="{{ contacts }}" as="c"><div style="border: 1px solid var(--ink); padding: 12px 16px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted);">{{ c.k }}</span><span style="font-family: var(--font-mono);">{{ c.v }}</span><span style="font-size: 13px; color: var(--text-muted);">{{ c.n }}</span></div></sc-for>
+        </div>
+        <form onSubmit="{{ onSend }}" style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+          <b style="font-size: 16px;">Send a message</b>
+          <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Input" label="Name" hint-size="100%,56px"></x-import>
+          <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Input" label="Email or client code" hint-size="100%,56px"></x-import>
+          <label style="display: flex; flex-direction: column; gap: 4px; font-weight: 700;">Message<textarea rows="5" style="font: inherit; font-weight: 400; border: 1px solid var(--ink); padding: 8px; resize: vertical; outline: none; background: var(--paper); color: var(--ink);"></textarea></label>
+          <div style="display: flex; align-items: center; gap: 12px;"><button type="submit" style="font: inherit; height: 32px; padding: 0 12px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer;">Send</button><span style="font-size: 13px; color: var(--text-muted);">{{ sent }}</span></div>
+        </form>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ is.links }}">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px;">
+        <sc-for list="{{ links }}" as="l">
+          <a href="{{ l.href }}" style="border: 1px solid var(--ink); padding: 16px; display: flex; justify-content: space-between; gap: 12px;" style-hover="background: var(--neutral-100);">
+            <div style="display: flex; flex-direction: column; gap: 2px;"><b>{{ l.t }}</b><span style="color: var(--text-muted); font-size: 13px;">{{ l.d }}</span></div>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" style="flex-shrink: 0;"><path d="M6 3H3v10h10v-3M9 2.5h4.5V7M13.5 2.5 7 9"></path></svg>
+          </a>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { city: 'All', sent: '' };
+  renderVals() {
+    const P = (() => { try { return new URLSearchParams(location.search).get('p') || 'faq'; } catch (e) { return 'overview'; } })();
+    const META = { overview: ['Overview', 'About us', 'Who we are and what the platform offers.'], team: ['Management & team', 'Management & Team', 'The people who run UFTCL.'], trec: ['TREC certificate & compliance', 'TREC & Compliance', 'Exchange membership and regulatory documents.'], branches: ['Branch network', 'Branch Network', 'Find a UFTCL branch near you.'], careers: ['Careers', 'Careers', 'Join the brokerage and research teams.'], faq: ['Frequently asked questions', 'FAQ', 'Answers on accounts, trading and platform tools.'], forms: ['Download forms', 'Download Forms', 'Account, nomination and service request forms.'], contact: ['Contact us', 'Contact Us', 'Reach customer care or send a message.'], links: ['Important links', 'Important Links', 'Regulators, exchanges and depositories.'] };
+    const m = META[P] || META.overview;
+    const grp = [['About us', [['overview', 'Overview'], ['team', 'Management & Team'], ['trec', 'TREC Certificate & Compliance'], ['branches', 'Branch Network'], ['careers', 'Careers']]], ['Help & support', [['faq', 'FAQ'], ['forms', 'Download Forms'], ['contact', 'Contact Us'], ['links', 'Important Links']]]];
+    const nav = grp.map(([title, it]) => ({ title, items: it.map(([k, label]) => ({ label, href: 'About.dc.html?p=' + k, bg: k === P ? 'var(--ink)' : 'transparent', fg: k === P ? 'var(--paper)' : 'var(--ink)', bd: k === P ? 'var(--ink)' : 'transparent' })) }));
+    const is = {}; Object.keys(META).forEach(k => is[k] = k === P);
+    const cities = ['All', 'Dhaka', 'Chattogram', 'Other'];
+    const B = [['Head office', 'Motijheel C/A, Dhaka 1000', '+880 2 9000 001', 'Dhaka'], ['Gulshan', 'Gulshan Avenue, Dhaka 1212', '+880 2 9000 002', 'Dhaka'], ['Banani', 'Banani, Dhaka 1213', '+880 2 9000 003', 'Dhaka'], ['Uttara', 'Uttara Sector 7, Dhaka 1230', '+880 2 9000 004', 'Dhaka'], ['Agrabad', 'Agrabad C/A, Chattogram 4100', '+880 31 900 005', 'Chattogram'], ['GEC Circle', 'GEC Circle, Chattogram 4000', '+880 31 900 006', 'Chattogram'], ['Sylhet', 'Zindabazar, Sylhet 3100', '+880 821 900 007', 'Other'], ['Rajshahi', 'Shaheb Bazar, Rajshahi 6100', '+880 721 900 008', 'Other']];
+    return {
+      nav, is, crumb: m[1], title: m[0], sub: m[2],
+      facts: [{ k: 'EXCHANGES', v: 'DSE and CSE' }, { k: 'INDICES COVERED', v: 'DSEX, DSES, DS30' }, { k: 'TRADING PORTAL', v: 'UFTFAST' }, { k: 'CUSTOMER CARE', v: '10 AM – 5 PM, Sun–Thu' }],
+      pillars: [{ t: 'Research tools', d: 'Charts, VPA, market depth, news effect charts and a stock scanner on one platform.' }, { t: 'Brokerage', d: 'BO account opening, fund deposit and withdrawal, and IPO applications.' }, { t: 'Practice', d: 'UFT Play lets new investors trade with virtual money before using real funds.' }],
+      team: ['Chairman', 'Managing Director', 'Chief Executive Officer', 'Head of Research', 'Head of Trading', 'Head of Compliance', 'Head of Technology', 'Head of Customer Care'].map(r => ({ name: 'Name to be added', role: r })),
+      certs: [{ k: 'DSE TREC', v: 'Trading Right Entitlement Certificate', n: 'TREC No. to be added' }, { k: 'CSE TREC', v: 'Trading Right Entitlement Certificate', n: 'TREC No. to be added' }, { k: 'BSEC', v: 'Stock broker / dealer registration', n: 'Reg. No. to be added' }, { k: 'CDBL', v: 'Depository participant', n: 'DP ID to be added' }],
+      docs: ['TREC certificate, DSE', 'TREC certificate, CSE', 'BSEC registration', 'Annual compliance report', 'Anti money laundering policy', 'Client complaint procedure'].map(name => ({ name })),
+      cityTabs: cities.map(c => ({ label: c, bg: this.state.city === c ? 'var(--ink)' : 'var(--paper)', fg: this.state.city === c ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ city: c }) })),
+      branches: B.filter(b => this.state.city === 'All' || b[3] === this.state.city).map(b => ({ name: b[0], addr: b[1], phone: b[2] })),
+      jobs: [['Equity research analyst', 'Research · Dhaka · Full time'], ['Frontend engineer', 'Technology · Dhaka · Full time'], ['Dealer', 'Trading · Dhaka, Chattogram · Full time'], ['Customer care executive', 'Support · Dhaka · Full time']].map(([t, meta]) => ({ t, meta })),
+      faq: [{ title: 'Accounts', items: [['How do I open a BO account?', 'Select Open BO account in the header, fill in the form and submit your identity and nominee documents at any branch or upload them online.'], ['What documents are needed?', 'A national ID or passport, a passport size photo, a TIN certificate and bank account details. Nominee details are also required.']] }, { title: 'Trading', items: [['What are the trading hours?', 'DSE trades Sunday to Thursday from 10:00 AM to 2:30 PM. The pre-open session starts at 9:30 AM.'], ['What is the circuit breaker?', 'A daily limit on how far a share price can move from yesterday\'s close. The limit is 10% in either direction.']] }, { title: 'Platform', items: [['What is VPA?', 'Volume price analysis compares traded volume with price movement to show buying and selling pressure.'], ['Can I practice without real money?', 'Yes. UFT Play provides a virtual portfolio for practice trading.']] }].map(g => ({ title: g.title, items: g.items.map(([q, a]) => ({ q, a })) })),
+      forms: [['BO account opening form', 'Individual account'], ['Joint account form', 'Two holders'], ['Nominee change form', 'Update nominee details'], ['Fund withdrawal request', 'Withdraw to a linked bank account'], ['Power of attorney', 'Authorize a representative'], ['Account closure form', 'Close a BO account']].map(([t, d]) => ({ t, d })),
+      contacts: [{ k: 'CUSTOMER CARE HOTLINE', v: '+880 9610 000 000', n: '10 AM – 5 PM, Sun–Thu' }, { k: 'EMAIL', v: 'support@uftcl.com.bd', n: 'Replies within one working day' }, { k: 'HEAD OFFICE', v: 'Motijheel C/A, Dhaka 1000', n: 'Address to be confirmed' }],
+      links: [['Bangladesh Securities and Exchange Commission', 'Market regulator', 'https://www.sec.gov.bd/'], ['Dhaka Stock Exchange', 'DSE', 'https://www.dsebd.org/'], ['Chittagong Stock Exchange', 'CSE', 'https://www.cse.com.bd/'], ['Central Depository Bangladesh', 'CDBL', 'https://www.cdbl.com.bd/'], ['Bangladesh Bank', 'Central bank', 'https://www.bb.org.bd/'], ['National Board of Revenue', 'Tax', 'https://nbr.gov.bd/']].map(([t, d, href]) => ({ t, d, href })),
+      sent: this.state.sent, onSend: e => { e.preventDefault(); this.setState({ sent: 'Message sent.' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

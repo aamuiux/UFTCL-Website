@@ -1,0 +1,125 @@
+/* Base UI Custom — colors.
+ * Two layers, both lifted verbatim from mui/base-ui:
+ *  1. Demo palette (oklch neutrals + red/green/blue) — the look of every component demo.
+ *  2. Docs chrome palette (hsl gray/indigo scales, alpha blacks/whites, accents) — the docs site.
+ */
+:root{
+  /* Demo neutrals (Tailwind-neutral oklch values registered in docs/src/css/index.css) */
+  --neutral-50:oklch(98.5% 0 0deg);
+  --neutral-100:oklch(97% 0 0deg);
+  --neutral-200:oklch(92.2% 0 0deg);
+  --neutral-300:oklch(87% 0 0deg);
+  --neutral-400:oklch(70.8% 0 0deg);
+  --neutral-500:oklch(55.6% 0 0deg);
+  --neutral-600:oklch(43.9% 0 0deg);
+  --neutral-700:oklch(37.1% 0 0deg);
+  --neutral-800:oklch(26.9% 0 0deg);
+  --neutral-900:oklch(20.5% 0 0deg);
+  --neutral-950:oklch(14.5% 0 0deg);
+  --white:#fff;
+  --black:#000;
+  --blue-500:oklch(62.3% 0.214 259.815deg);
+  --blue-700:oklch(48.8% 0.243 264.376deg);
+  --blue-800:oklch(42.4% 0.199 265.638deg);
+  --red-400:oklch(70.4% 0.191 22.216deg);
+  --red-700:oklch(50.5% 0.213 27.518deg);
+  --green-400:oklch(79.2% 0.209 151.711deg);
+  --green-700:oklch(52.7% 0.154 150.069deg);
+
+  /* Docs chrome scales: s = surface, c = component, p = primary/placeholder, t = text */
+  --gray-s1:hsl(0deg 0% 99%);
+  --gray-s2:hsl(0deg 0% 97.5%);
+  --gray-c1:hsl(0deg 0% 95.25%);
+  --gray-c2:hsl(0deg 0% 94%);
+  --gray-c3:hsl(0deg 0% 88%);
+  --gray-p1:hsl(0deg 0% 55%);
+  --gray-p2:hsl(0deg 0% 51%);
+  --gray-t1:hsl(0deg 0% 46.4%);
+  --gray-t2:hsl(0deg 0% 18%);
+  --indigo-s1:hsl(204deg 100% 98.75%);
+  --indigo-s2:hsl(198deg 100% 97.5%);
+  --indigo-c1:hsl(204deg 100% 95%);
+  --indigo-c2:hsl(205deg 100% 93.5%);
+  --indigo-c3:hsl(206deg 100% 92.5%);
+  --indigo-p1:hsl(214deg 98% 50%);
+  --indigo-p2:hsl(207deg 96% 48%);
+  --indigo-t1:hsl(221deg 74% 51%);
+  --indigo-t2:hsl(221deg 74% 19.8%);
+  --blackA-1:hsl(0deg 0% 0% / 4%);
+  --blackA-2:hsl(0deg 0% 0% / 8%);
+  --blackA-3:hsl(0deg 0% 0% / 12%);
+  --blackA-4:hsl(0deg 0% 0% / 16%);
+  --blackA-5:hsl(0deg 0% 0% / 24%);
+  --blackA-6:hsl(0deg 0% 0% / 64%);
+  --whiteA-1:hsl(0deg 0% 100% / 4%);
+  --whiteA-2:hsl(0deg 0% 100% / 8%);
+  --whiteA-3:hsl(0deg 0% 100% / 12%);
+  --whiteA-4:hsl(0deg 0% 100% / 16%);
+  --whiteA-5:hsl(0deg 0% 100% / 24%);
+  --whiteA-6:hsl(0deg 0% 100% / 64%);
+  --poppy-t1:hsl(10deg 86% 48%);
+  --blue-t1:hsl(211deg 100% 49%);
+  --green-t1:hsl(156deg 81% 29%);
+  --orange-t1:hsl(14deg 96% 52.5%);
+  --pink-t1:hsl(316deg 84% 51%);
+  --grape-t1:hsl(276deg 66% 54%);
+  --lime-t1:hsl(91deg 64% 38.75%);
+
+  /* Syntax (code) colors */
+  --color-blue:oklch(45% 50% 264deg);
+  --color-red:oklch(50% 55% 31deg);
+  --color-gray:var(--gray-t1);
+  --color-navy:oklch(31% 25% 264deg);
+  --color-green:oklch(46% 30% 150deg);
+  --color-violet:oklch(40% 60% 300deg);
+
+  /* Docs functional colors */
+  --color-content:white;
+  --color-background:var(--gray-s2);
+  --color-foreground:var(--gray-t2);
+  --color-border:var(--blackA-2);
+  --color-popup:white;
+  --color-gridline:var(--gray-c3);
+  --color-selection:hsl(0deg 0% 92%);
+  --color-line-highlight:hsl(205deg 100% 96%);
+  --color-line-highlight-strong:hsl(205deg 100% 90%);
+
+  /* ── Component semantic aliases (demo style) ── */
+  --ink:var(--neutral-950);            /* borders, text, fills, focus rings */
+  --paper:var(--white);                /* control + popup surfaces */
+  --ink-inverse:var(--white);          /* text on ink fills (highlighted items, checked) */
+  --surface-hover:var(--neutral-100);  /* hover / pressed-open */
+  --surface-active:var(--neutral-200); /* :active press */
+  --track:var(--neutral-200);          /* progress / meter / slider tracks, avatar bg */
+  --text-body:var(--ink);
+  --text-muted:var(--neutral-600);     /* descriptions */
+  --text-placeholder:var(--neutral-500);/* placeholder, disabled, empty */
+  --text-danger:var(--red-700);
+  --text-link-hover:var(--blue-700);
+  --border-control:var(--ink);
+  --border-disabled:var(--neutral-500);
+  --border-subtle:var(--neutral-300);  /* separator */
+  --backdrop:var(--black);
+  --backdrop-opacity:0.2; /* @kind other */
+  --scrollbar-track:rgb(0 0 0 / 12%);
+}
+/* Dark theme for components — add data-theme="dark" to any ancestor */
+[data-theme="dark"]{
+  --ink:var(--white);
+  --paper:var(--neutral-950);
+  --ink-inverse:var(--neutral-950);
+  --surface-hover:var(--neutral-800);
+  --surface-active:var(--neutral-700);
+  --track:var(--neutral-800);
+  --text-body:var(--white);
+  --text-muted:var(--neutral-400);
+  --text-placeholder:var(--neutral-400);
+  --text-danger:var(--red-400);
+  --text-link-hover:var(--blue-500);
+  --border-control:var(--white);
+  --border-disabled:var(--neutral-400);
+  --border-subtle:var(--neutral-700);
+  --backdrop-opacity:0.5; /* @kind other */
+  --scrollbar-track:rgb(255 255 255 / 12%);
+  --shadow-offset:none;
+}

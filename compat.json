@@ -1,0 +1,190 @@
+{
+  "v": 1,
+  "mode": "omelette",
+  "root": "project/",
+  "title": "UFTCL Website Clone Project",
+  "entry": "Home.dc.html",
+  "pages": [
+    {
+      "path": "Home.dc.html",
+      "title": "Home",
+      "kind": "page"
+    },
+    {
+      "path": "UFTCL About Important Links (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL About Contact Us (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL About Download Forms (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL About FAQ (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL About Careers (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL About Branch Network (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL About TREC and Compliance (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL About Management and Team (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL About Overview (Figma import).html",
+      "title": "About — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL Circuit Breaker (Figma import).html",
+      "title": "Sector wise share price — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL Sector Share Price (Figma import).html",
+      "title": "Sector wise share price — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL Stock Chart (Figma import).html",
+      "title": "Stock chart — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL Latest Share Price (Figma import).html",
+      "title": "Latest share price — UFTCL",
+      "kind": "plain"
+    },
+    {
+      "path": "UFTCL Home (Figma import).html",
+      "title": "UFTCL — DSE market overview",
+      "kind": "plain"
+    },
+    {
+      "path": "Figma src About links.dc.html",
+      "title": "Figma src About links",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src About contact.dc.html",
+      "title": "Figma src About contact",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src About forms.dc.html",
+      "title": "Figma src About forms",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src About faq.dc.html",
+      "title": "Figma src About faq",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src About careers.dc.html",
+      "title": "Figma src About careers",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src About branches.dc.html",
+      "title": "Figma src About branches",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src About trec.dc.html",
+      "title": "Figma src About trec",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src About team.dc.html",
+      "title": "Figma src About team",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src About overview.dc.html",
+      "title": "Figma src About overview",
+      "kind": "page"
+    },
+    {
+      "path": "About.dc.html",
+      "title": "About",
+      "kind": "page"
+    },
+    {
+      "path": "Figma src Circuit Breaker.dc.html",
+      "title": "Figma src Circuit Breaker",
+      "kind": "page"
+    },
+    {
+      "path": "Sector Share Price.dc.html",
+      "title": "Sector Share Price",
+      "kind": "page"
+    },
+    {
+      "path": "Stock Chart.dc.html",
+      "title": "Stock Chart",
+      "kind": "page"
+    },
+    {
+      "path": "Latest Share Price.dc.html",
+      "title": "Latest Share Price",
+      "kind": "page"
+    },
+    {
+      "path": "Header.dc.html",
+      "title": "Header",
+      "kind": "component"
+    },
+    {
+      "path": "Footer.dc.html",
+      "title": "Footer",
+      "kind": "component"
+    },
+    {
+      "path": "InstrumentBar.dc.html",
+      "title": "InstrumentBar",
+      "kind": "component"
+    }
+  ],
+  "migratorVersion": "artifact-migrator (claude-design-backend ed667f7ac9c1)",
+  "createdAt": "2026-11-08T14:03:35.028Z",
+  "source": {
+    "v": 1,
+    "app": "claude-design",
+    "url": "https://claude.ai/design/p/7c843545-a021-495b-9d96-e89789311143",
+    "projectId": "7c843545-a021-495b-9d96-e89789311143",
+    "exportedAt": "2026-11-08T14:03:35.028Z"
+  },
+  "report": {
+    "itemsVersion": 2,
+    "pages": {
+      "total": 29,
+      "ok": 29,
+      "partial": 0,
+      "notMigrated": 0
+    },
+    "items": [],
+    "truncated": 0,
+    "truncatedLeftOut": 0
+  }
+}

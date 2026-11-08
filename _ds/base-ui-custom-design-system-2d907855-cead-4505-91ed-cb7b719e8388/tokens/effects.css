@@ -1,0 +1,25 @@
+:root{
+  /* Signature hard offset shadow on every component popup (light theme only) */
+  --shadow-offset:0.25rem 0.25rem 0 rgb(0 0 0 / 12%);
+
+  /* Docs chrome soft shadows */
+  --shadow-1:0 1px 1px 0 var(--blackA-1), 0 2px 1px -1px var(--blackA-1), 0 1px 3px 0 var(--blackA-1);
+  --shadow-2:0 1px 1px 0 var(--blackA-1), 0 1px 3px -1px var(--blackA-1), 0 4px 8px -2px var(--blackA-1);
+  --shadow-3:0 1px 1px 0 var(--blackA-1), 0 2px 6px -1px var(--blackA-1), 0 6px 12px -3px var(--blackA-1), 0 8px 16px -4px var(--blackA-1);
+  --shadow-4:0 1px 1px 0 var(--blackA-1), 0 2px 4px -1px var(--blackA-1), 0 4px 8px -2px var(--blackA-1), 0 12px 32px -6px var(--blackA-3), 0 20px 48px -10px var(--blackA-1);
+  --shadow-5:0 10px 32px var(--blackA-5), 0 1px 1px var(--blackA-1), 0 4px 6px var(--blackA-2), 0 1px 1px var(--blackA-2), 0 24px 68px var(--blackA-4);
+
+  /* Focus */
+  --focus-ring-width:2px;
+
+  /* Motion */
+  --duration-fast:100ms; /* @kind other */     /* popup scale/opacity, icon rotate */
+  --duration-base:150ms; /* @kind other */     /* panel height, switch thumb, tab indicator, backdrop */
+  --duration-slow:450ms; /* @kind other */     /* drawer */
+  --ease-popup:ease-out; /* @kind other */
+  --ease-drawer:cubic-bezier(0.32, 0.72, 0, 1); /* @kind other */
+  --ease-expo-out:cubic-bezier(0.22, 1, 0.36, 1); /* @kind other */ /* toast, navigation menu */
+  --ease-out-fast:cubic-bezier(0.45, 1.005, 0, 1.005); /* @kind other */
+  --ease-in-slow:cubic-bezier(0.375, 0.015, 0.545, 0.455); /* @kind other */
+  --popup-enter-scale:0.98; /* @kind other */
+}

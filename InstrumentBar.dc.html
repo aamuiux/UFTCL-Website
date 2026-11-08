@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+</helmet>
+<section style="display: flex; flex-direction: column; gap: 16px; font-family: var(--font-sans); color: var(--ink); font-size: 14px;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+    <div style="font-size: 13px; color: var(--text-muted);"><a href="Home.dc.html">Home</a> / <a href="Latest%20Share%20Price.dc.html">Instruments</a> / {{ s.code }} / {{ pageName }}</div>
+    <div style="position: relative; width: 340px; max-width: 100%;">
+      <div style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 8px 0 10px; border: 1px solid var(--ink); background: var(--paper);">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+        <input ref="{{ inputRef }}" value="{{ q }}" onChange="{{ onQ }}" onFocus="{{ onFocus }}" onBlur="{{ onBlur }}" onKeyDown="{{ onKey }}" placeholder="Search instrument, company or sector" style="flex: 1; min-width: 0; border: 0; outline: none; font: inherit; font-size: 14px; background: transparent; color: var(--ink);">
+        <kbd style="font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--neutral-400); padding: 0 5px; color: var(--text-muted);">/</kbd>
+      </div>
+      <sc-if value="{{ open }}">
+        <div style="position: absolute; z-index: 40; top: 40px; left: 0; right: 0; background: var(--paper); border: 1px solid var(--ink); box-shadow: 0.25rem 0.25rem 0 rgb(0 0 0 / 12%); padding: 4px 0; max-height: 380px; overflow-y: auto;">
+          <div style="padding: 4px 12px 6px; font-size: 12px; color: var(--text-muted);">{{ listTitle }}</div>
+          <sc-for list="{{ results }}" as="m">
+            <div onMouseDown="{{ m.pick }}" onMouseEnter="{{ m.hover }}" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 6px 12px; cursor: pointer; background: {{ m.bg }}; color: {{ m.fg }};">
+              <span style="font-weight: 700;">{{ m.code }}</span>
+              <span style="font-family: var(--font-mono); text-align: right;">{{ m.ltp }}</span>
+              <span style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.75;">{{ m.name }}</span>
+              <span style="font-family: var(--font-mono); font-size: 12px; text-align: right; color: {{ m.chgColor }};">{{ m.chg }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ noResults }}"><div style="padding: 10px 12px; color: var(--text-muted);">No instrument matches “{{ q }}”.</div></sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div data-screen-label="Company header" style="border: 1px solid var(--ink);">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 20px 20px 16px;">
+      <div style="display: flex; gap: 16px; align-items: flex-start; min-width: 0;">
+        <div style="width: 56px; height: 56px; flex: none; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-sans-b); font-weight: 700; font-size: 18px; background: var(--neutral-100);">{{ s.initials }}</div>
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
+          <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 28px; line-height: 34px; text-wrap: pretty;">{{ s.name }}</h1>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px;">
+            <span style="background: var(--ink); color: var(--paper); padding: 2px 8px; font-weight: 700;">DSE: {{ s.code }}</span>
+            <span style="border: 1px solid var(--ink); padding: 1px 8px;">{{ s.sector }}</span>
+            <span style="border: 1px solid var(--ink); padding: 1px 8px;">Category {{ s.cat }}</span>
+            <span style="border: 1px solid var(--ink); padding: 1px 8px;">{{ s.board }} board</span>
+            <span title="{{ s.creditTitle }}" style="border: 1px solid var(--ink); padding: 1px 8px;">Rating {{ s.credit }}</span>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <button onClick="{{ toggleWatch }}" style="font: inherit; height: 32px; padding: 0 12px; border: 1px solid var(--ink); background: {{ watch.bg }}; color: {{ watch.fg }}; cursor: pointer; display: flex; align-items: center; gap: 6px;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ watch.icon }}"></path></svg>{{ watch.label }}</button>
+        <button onClick="{{ toggleAlert }}" style="font: inherit; height: 32px; padding: 0 12px; border: 1px solid var(--ink); background: {{ alert.bg }}; color: {{ alert.fg }}; cursor: pointer;">{{ alert.label }}</button>
+        <a href="{{ compareHref }}" style="height: 32px; padding: 0 12px; border: 1px solid var(--ink); display: flex; align-items: center;">Compare</a>
+      </div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 24px; padding: 0 20px 16px;">
+      <div style="display: flex; align-items: baseline; gap: 12px;">
+        <span style="font-family: var(--font-mono); font-size: 40px; line-height: 44px;">{{ s.ltp }}</span>
+        <span style="font-family: var(--font-mono); font-size: 18px; color: {{ s.color }};">{{ s.change }}</span>
+      </div>
+      <span style="font-size: 13px; color: var(--text-muted); padding-bottom: 4px;">BDT · Last trade 05 Nov 2026, 14:30 · Market closed</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-top: 1px solid var(--ink);">
+      <sc-for list="{{ stats }}" as="k" hint-placeholder-count="12">
+        <div style="padding: 10px 16px; border-right: 1px solid var(--neutral-200); border-bottom: 1px solid var(--neutral-200); display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 12px; color: var(--text-muted);">{{ k.label }}</span>
+          <span style="font-family: var(--font-mono); color: {{ k.color }};">{{ k.value }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 32px; padding: 12px 20px 16px;">
+      <sc-for list="{{ ranges }}" as="g" hint-placeholder-count="2">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);"><span>{{ g.label }}</span><span>{{ g.note }}</span></div>
+          <div style="position: relative; height: 6px; background: var(--neutral-200);"><div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{ g.w }}; background: var(--ink);"></div><div style="position: absolute; top: -4px; left: {{ g.w }}; width: 2px; height: 14px; margin-left: -1px; background: var(--ink);"></div></div>
+          <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px;"><span>{{ g.low }}</span><span>{{ g.high }}</span></div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink); align-self: flex-start; max-width: 100%;">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+      <a href="{{ t.href }}" style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-right: 1px solid var(--ink); margin-right: -1px; background: {{ t.bg }}; color: {{ t.fg }}; font-weight: 700;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ t.icon }}"></path></svg>
+        <span>{{ t.label }}</span>
+      </a>
+    </sc-for>
+  </nav>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:460},&quot;symbol&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;GP&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chart&quot;,&quot;vpa&quot;,&quot;archive&quot;,&quot;depth&quot;,&quot;effect&quot;],&quot;default&quot;:&quot;chart&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, q: '', open: false, hi: 0, watch: false, alert: false };
+  inputRef = React.createRef();
+  componentDidMount() {
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50);
+    this.k = e => { if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement && document.activeElement.tagName)) { e.preventDefault(); this.inputRef.current && this.inputRef.current.focus(); } };
+    window.addEventListener('keydown', this.k);
+  }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('keydown', this.k); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const active = this.props.active || 'chart';
+    const sym = (this.props.symbol || U.param('symbol', 'GP')).toUpperCase(); const x = U.bySym[sym] || U.stocks[0];
+    const P = [['chart', 'Stock Chart', 'Stock chart', 'M2 12l4-4 3 3 5-6'], ['vpa', 'VPA', 'VPA', 'M3 13V8M6.5 13V4M10 13V9M13.5 13V6'], ['archive', 'VPA Archive', 'VPA archive', 'M2.5 3h11v3h-11zM3.5 6v7h9V6M6.5 9h3'], ['depth', 'Depth Monitor', 'Depth monitor', 'M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6'], ['effect', 'News Effect Chart', 'Effect chart', 'M3 2.5h10v11H3zM5.5 5.5h5M5.5 8h5M5.5 10.5h3']];
+    const cur = P.find(p => p[0] === active) || P[0];
+    const go = code => { location.href = U.href(cur[1], { symbol: code }); };
+    const Q = st.q.trim().toUpperCase();
+    let list;
+    if (Q) list = U.stocks.map(s => { const n = U.company(s.code).toUpperCase(); const score = s.code.startsWith(Q) ? 0 : s.code.includes(Q) ? 1 : n.includes(Q) ? 2 : s.sector.toUpperCase().includes(Q) ? 3 : 9; return { s, score }; }).filter(o => o.score < 9).sort((a, b) => a.score - b.score || a.s.code.localeCompare(b.s.code)).slice(0, 10).map(o => o.s);
+    else list = U.top('value', 8);
+    const hi = Math.min(st.hi, Math.max(0, list.length - 1));
+    const results = list.map((s, i) => { const on = i === hi; return { code: s.code, name: U.company(s.code), ltp: U.fmt(s.ltp, 1), chg: U.sign(s.changePct) + '%', chgColor: on ? 'var(--paper)' : U.tone(s.change), bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', pick: e => { e.preventDefault(); go(s.code); }, hover: () => this.setState({ hi: i }) }; });
+    const onKey = e => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); this.setState({ open: true, hi: Math.min(hi + 1, list.length - 1) }); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); this.setState({ hi: Math.max(hi - 1, 0) }); }
+      else if (e.key === 'Enter' && list[hi]) go(list[hi].code);
+      else if (e.key === 'Escape') { this.setState({ open: false }); e.target.blur(); }
+    };
+    const { fmt, fmtInt, sign } = U;
+    const pf = U.profile(x.code);
+    const stats = [['Open', fmt(x.open, 1)], ['YCP', fmt(x.ycp, 1)], ['Day high', fmt(x.high, 1)], ['Day low', fmt(x.low, 1)], ['Volume', fmtInt(x.volume)], ['Value (mn)', fmt(x.value, 2)], ['Trades', fmtInt(x.trades)], ['Market cap (mn)', fmt(x.mcap, 1)], ['EPS (TTM)', fmt(x.eps)], ['PE ratio', fmt(x.pe)], ['NAV / share', fmt(x.nav)], ['Circuit', `${fmt(x.lower, 1)} – ${fmt(x.upper, 1)}`]].map(([label, value]) => ({ label, value, color: 'var(--ink)' }));
+    const rg = (label, lo, hi2, note) => ({ label, note, low: fmt(lo, 1), high: fmt(hi2, 1), w: Math.max(0, Math.min(100, (x.ltp - lo) / ((hi2 - lo) || 1) * 100)) + '%' });
+    const name = pf.name; const tv = Math.min(400, x.volume * 250 / (pf.shares * pf.freeFloat / 100) * 100);
+    return {
+      pageName: cur[2], inputRef: this.inputRef, q: st.q, open: st.open, results, noResults: !!Q && !list.length, listTitle: Q ? `${list.length} match${list.length === 1 ? '' : 'es'}` : 'Most traded today',
+      onQ: e => this.setState({ q: e.target.value, open: true, hi: 0 }), onFocus: () => this.setState({ open: true }), onBlur: () => setTimeout(() => this.setState({ open: false }), 120), onKey,
+      s: { code: x.code, name, initials: name.replace(/[^A-Za-z ]/g, '').split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join(''), ltp: fmt(x.ltp, 1), change: `${U.arrow(x.change)} ${sign(x.change, 1)} (${sign(x.changePct)}%)`, color: U.tone(x.change), sector: x.sector, cat: x.cat, board: x.board, credit: pf.credit.lt + ' / ' + pf.credit.st, creditTitle: 'Long term / short term · ' + pf.credit.agency },
+      stats, ranges: [rg('Day range', x.low, x.high, 'LTP ' + fmt(x.ltp, 1)), rg('52 week range', x.w52l, x.w52h, sign((x.ltp - x.w52l) / x.w52l * 100, 1) + '% from low'),
+        { label: 'RSI (14)', note: fmt(x.rsi, 1) + (x.rsi > 70 ? ' · Overbought' : x.rsi < 30 ? ' · Oversold' : ' · Neutral'), low: '0 · 30', high: '70 · 100', w: x.rsi + '%' },
+        { label: 'Turnover velocity', note: fmt(tv, 2) + '%', low: '0%', high: '200%', w: Math.min(100, tv / 2) + '%' }],
+      watch: { label: st.watch ? 'In watchlist' : 'Add to watchlist', icon: st.watch ? 'M3 8.5l3 3 7-7' : 'M8 3v10M3 8h10', bg: st.watch ? 'var(--ink)' : 'var(--paper)', fg: st.watch ? 'var(--paper)' : 'var(--ink)' },
+      alert: { label: st.alert ? 'Alert set' : 'Price alert', bg: st.alert ? 'var(--ink)' : 'var(--paper)', fg: st.alert ? 'var(--paper)' : 'var(--ink)' },
+      toggleWatch: () => this.setState(s => ({ watch: !s.watch })), toggleAlert: () => this.setState(s => ({ alert: !s.alert })),
+      compareHref: U.href('Latest Share Price', { sector: x.sector }),
+      tabs: P.map(([k, page, label, icon]) => ({ label, icon, href: U.href(page, { symbol: x.code }), bg: k === active ? 'var(--ink)' : 'var(--paper)', fg: k === active ? 'var(--paper)' : 'var(--ink)' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

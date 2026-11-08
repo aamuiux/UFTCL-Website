@@ -1,0 +1,30 @@
+:root{
+  --font-sans:'die grotesk a', system-ui, sans-serif;           /* body + UI */
+  --font-sans-b:'die grotesk b', system-ui, sans-serif;         /* headings (wider cut) */
+  --font-mono:'Paper Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-serif:Georgia, 'Times New Roman', Times, serif; /* <em> in docs prose */
+
+  --font-size-12:0.75rem;
+  --font-size-13:0.8125rem;
+  --font-size-14:0.875rem;
+  --font-size-15:0.9375rem;
+  --font-size-16:1rem;
+  --font-size-18:1.125rem;
+  --font-size-21:1.3125rem;
+  --font-size-24:1.5rem;
+  --font-size-34:2.125rem;
+  --font-size-42:2.625rem;
+  --font-weight-400:400;
+  --font-weight-700:700;
+
+  /* Semantic type roles */
+  --type-h1-size:var(--font-size-34);  --type-h1-leading:2.7rem;
+  --type-h2-size:var(--font-size-21);  --type-h2-leading:1.625rem;
+  --type-h3-size:var(--font-size-18);  --type-h3-leading:1.75rem;
+  --type-subtitle-size:var(--font-size-18); --type-subtitle-leading:1.75rem;
+  --type-body-size:var(--font-size-16); --type-body-leading:1.5;
+  --type-ui-size:var(--font-size-14);  --type-ui-leading:1.25rem;  /* component labels, items */
+  --type-nav-size:var(--font-size-14); --type-nav-leading:1.375rem;
+  --type-code-size:var(--font-size-13); --type-code-leading:1.25rem;
+  --type-badge-size:0.625rem;          --type-badge-tracking:0.035em;
+}

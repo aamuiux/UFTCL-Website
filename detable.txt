@@ -1,0 +1,7 @@
+function detable(h){
+ return h.replace(/<table style="/g,'<div style="display: table; ').replace(/<\/table>/g,'</div>')
+ .replace(/<thead>/g,'<div style="display: table-header-group;">').replace(/<\/thead>/g,'</div>')
+ .replace(/<tbody>/g,'<div style="display: table-row-group;">').replace(/<\/tbody>/g,'</div>')
+ .replace(/<tr style="/g,'<div style="display: table-row; ').replace(/<tr>/g,'<div style="display: table-row;">').replace(/<tr (?!style=")/g,'<div style="display: table-row;" ').replace(/<\/tr>/g,'</div>')
+ .replace(/<t[hd] style="/g,'<div style="display: table-cell; vertical-align: middle; ').replace(/<\/t[hd]>/g,'</div>');
+}

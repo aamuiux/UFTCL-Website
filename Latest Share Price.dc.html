@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#111"/><path d="M30 64l12-14 9 9 19-23" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="square"/><text x="50" y="88" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">PRICES</text></svg></template>
+<x-dc>
+<helmet>
+<title>Latest share price — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="price" hint-size="100%,140px"></dc-import>
+<main style="max-width: none; margin: 0; padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+  <section style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div style="font-size: 13px; color: var(--text-muted);"><a href="Home.dc.html">Home</a> / Share price</div>
+      <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Latest share price</h1>
+      <div style="color: var(--text-muted);">Live prices for all listed instruments on the Dhaka Stock Exchange.</div>
+    </div>
+    <div style="display: flex; border: 1px solid var(--ink);">
+      <a href="Latest%20Share%20Price.dc.html" style="height: 32px; padding: 0 12px; display: flex; align-items: center; background: var(--ink); color: var(--paper);">Latest share price</a>
+      <a href="Sector%20Share%20Price.dc.html" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border-left: 1px solid var(--ink);">Sector wise</a>
+      <a href="Sector%20Share%20Price.dc.html?tab=circuit" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border-left: 1px solid var(--ink);">Circuit breaker</a>
+    </div>
+  </section>
+
+  <section data-screen-label="Market summary" style="display: flex; flex-direction: column; gap: 12px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+      <div style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; justify-content: center; gap: 6px;">
+        <div style="font-family: var(--font-sans-b); font-size: 20px; line-height: 26px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">Latest share price</div>
+        <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--red-700);"></span><b style="color: var(--red-700);">Closed</b><span style="color: var(--text-muted);">· 2:10 pm · 5 Nov</span></div>
+      </div>
+      <sc-for list="{{ idxCards }}" as="i" hint-placeholder-count="3">
+        <a href="Home.dc.html" style="border: 1px solid var(--ink); display: flex; flex-direction: column; color: var(--ink);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 16px 0;"><div style="display: flex; flex-direction: column;"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-muted);">{{ i.name }}</span><span style="font-family: var(--font-mono); font-size: 24px; line-height: 32px; font-weight: 700;">{{ i.value }}</span></div><span style="font-family: var(--font-mono); font-weight: 700; color: {{ i.c }};">{{ i.ch }}</span></div>
+          <svg viewBox="0 0 200 44" preserveAspectRatio="none" style="width: 100%; height: 44px; display: block;"><path d="{{ i.area }}" fill="{{ i.c }}" fill-opacity="0.1"></path><path d="{{ i.line }}" fill="none" stroke="{{ i.c }}" stroke-width="1.5" vector-effect="non-scaling-stroke"></path></svg>
+        </a>
+      </sc-for>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px;">
+      <div style="border: 1px solid var(--ink); display: flex; flex-direction: column;">
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 12px 16px; gap: 16px;">
+          <sc-for list="{{ totalsCards }}" as="t" hint-placeholder-count="3"><div style="display: flex; flex-direction: column;"><span style="font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted);">{{ t.label }}</span><span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700; line-height: 30px;">{{ t.v }} <span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">{{ t.u }}</span></span></div></sc-for>
+        </div>
+        <div style="display: flex; height: 30px; border-top: 1px solid var(--ink); font-size: 11px; letter-spacing: 0.08em; font-weight: 700;">
+          <div style="width: {{ buyW }}; background: oklch(96% 0.04 150); color: var(--green-700); display: flex; align-items: center; padding: 0 12px; gap: 6px; white-space: nowrap; overflow: hidden;"><span>{{ buyP }}</span><span>BUY PRESSURE</span></div>
+          <div style="flex: 1; background: oklch(96% 0.03 27); color: var(--red-700); display: flex; align-items: center; justify-content: flex-end; padding: 0 12px; gap: 6px; white-space: nowrap; overflow: hidden;"><span>SELL PRESSURE</span><span>{{ sellP }}</span></div>
+        </div>
+      </div>
+      <div style="border: 1px solid var(--ink); padding: 12px 16px; display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;">
+          <sc-for list="{{ breadthCards }}" as="b" hint-placeholder-count="3"><span style="display: flex; gap: 6px; align-items: baseline; color: {{ b.c }};"><span style="font-size: 12px;">{{ b.arrow }}</span><b style="font-family: var(--font-mono); font-size: 22px;">{{ b.n }}</b><span style="font-size: 13px; color: var(--text-muted);">{{ b.label }}</span></span></sc-for>
+        </div>
+        <div style="display: flex; height: 8px;"><sc-for list="{{ breadthCards }}" as="b"><div style="width: {{ b.w }}; background: {{ b.c }};"></div></sc-for></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-wrap: wrap; gap: 24px;">
+    <div data-screen-label="Change distribution" style="flex: 2 1 520px; min-width: 0; border: 1px solid var(--ink);">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--ink);"><span style="font-weight: 700;">Price change distribution</span><span style="font-size: 12px; color: var(--text-muted);">Number of instruments per change band</span></div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: flex-end; gap: 4px; height: 140px;">
+          <sc-for list="{{ hist }}" as="h" hint-placeholder-count="11">
+            <button onClick="{{ h.pick }}" title="{{ h.tip }}" style="flex: 1; height: 100%; border: 0; padding: 0; background: transparent; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 2px; cursor: pointer;">
+              <span style="font-family: var(--font-mono); font-size: 11px; text-align: center; color: var(--ink);">{{ h.n }}</span>
+              <span style="height: {{ h.h }}; background: {{ h.bg }}; outline: {{ h.outline }}; outline-offset: 1px;"></span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 4px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);"><sc-for list="{{ hist }}" as="h"><span style="flex: 1; text-align: center;">{{ h.label }}</span></sc-for></div>
+      </div>
+    </div>
+    <div style="flex: 1 1 300px; min-width: 0; border: 1px solid var(--ink); display: flex; flex-direction: column;">
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700;">Value by category</div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; height: 20px; border: 1px solid var(--ink);"><sc-for list="{{ catShare }}" as="c" hint-placeholder-count="4"><div title="{{ c.label }}" style="width: {{ c.w }}; background: {{ c.bg }};"></div></sc-for></div>
+        <sc-for list="{{ catShare }}" as="c"><div style="display: grid; grid-template-columns: 14px minmax(0, 1fr) auto auto; gap: 8px; align-items: center; font-size: 13px;"><span style="width: 12px; height: 12px; background: {{ c.bg }}; border: 1px solid var(--ink);"></span><span>{{ c.label }}</span><span style="font-family: var(--font-mono);">{{ c.value }}</span><span style="font-family: var(--font-mono); color: var(--text-muted); width: 52px; text-align: right;">{{ c.pct }}</span></div></sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Price board" style="border: 1px solid var(--ink);">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <div style="display: flex; border: 1px solid var(--ink);"><sc-for list="{{ filterTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.onClick }}" style="font: inherit; height: 30px; padding: 0 12px; border: 0; border-right: 1px solid var(--ink); margin-right: -1px; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; display: flex; gap: 6px; align-items: center;"><span>{{ t.label }}</span><span style="font-family: var(--font-mono); font-size: 12px; opacity: 0.7;">{{ t.count }}</span></button></sc-for></div>
+        <div style="display: flex; border: 1px solid var(--ink);"><sc-for list="{{ catTabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.onClick }}" style="font: inherit; height: 30px; min-width: 34px; padding: 0 8px; border: 0; border-right: 1px solid var(--ink); margin-right: -1px; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+        <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Select" items="{{ sectorItems }}" value="{{ sector }}" onValueChange="{{ setSector }}" hint-size="220px,32px"></x-import>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <div style="display: flex; align-items: center; height: 32px; border: 1px solid var(--ink); width: 220px;">
+          <span style="display: flex; padding: 0 6px 0 8px; color: var(--text-muted);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5 14 14"></path></svg></span>
+          <input value="{{ q }}" onInput="{{ onQ }}" placeholder="Filter by trading code" style="flex: 1; min-width: 0; height: 30px; border: 0; outline: none; font: inherit; background: transparent; color: var(--ink);">
+        </div>
+        <span style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">{{ shown }}</span>
+      </div>
+    </div>
+    <div style="overflow-x: auto;">
+      <div style="display: table; width: 100%; min-width: 1120px; border-collapse: collapse; font-size: 13px;">
+        <div style="display: table-header-group;"><div style="display: table-row; font-size: 12px; color: var(--text-muted);">
+          <sc-for list="{{ cols }}" as="c" hint-placeholder-count="14"><div style="display: table-cell; vertical-align: middle; text-align: {{ c.align }}; padding: 0; border-bottom: 1px solid var(--ink); background: var(--neutral-50); position: sticky; top: 0;"><button onClick="{{ c.sort }}" style="font: inherit; color: {{ c.fg }}; font-weight: {{ c.weight }}; background: none; border: 0; height: 36px; padding: 0 10px; cursor: pointer; width: 100%; text-align: {{ c.align }}; white-space: nowrap;">{{ c.label }}{{ c.arrow }}</button></div></sc-for>
+        </div></div>
+        <div style="display: table-row-group;">
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="20">
+            <div style="display: table-row;" style-hover="background: var(--neutral-100);">
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); font-family: var(--font-mono); color: var(--text-muted);">{{ r.n }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200);"><a href="{{ r.a.chart }}" style="font-weight: 700;">{{ r.code }}</a> <span style="font-size: 11px; padding: 0 3px; border: 1px solid var(--neutral-400); color: var(--text-muted);">{{ r.cat }}</span></div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200);">
+                <div style="display: flex; gap: 2px;">
+                  <a href="{{ r.a.chart }}" title="Stock chart" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 12l4-4 3 3 5-6"></path></svg></a>
+                  <a href="{{ r.a.vpa }}" title="VPA" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M3 13V8M6.5 13V4M10 13V9M13.5 13V6"></path></svg></a>
+                  <a href="{{ r.a.archive }}" title="VPA archive" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2.5 3h11v3h-11zM3.5 6v7h9V6M6.5 9h3"></path></svg></a>
+                  <a href="{{ r.a.depth }}" title="Depth monitor" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6"></path></svg></a>
+                  <a href="{{ r.a.effect }}" title="News effect chart" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M3 2.5h10v11H3zM5.5 5.5h5M5.5 8h5M5.5 10.5h3"></path></svg></a>
+                </div>
+              </div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono); font-weight: 700;">{{ r.ltp }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.high }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.low }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.close }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.ycp }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono); color: {{ r.color }};">{{ r.change }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);"><span style="display: inline-block; min-width: 60px; padding: 1px 4px; background: {{ r.bg }}; color: {{ r.fg }};">{{ r.pct }}</span></div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.trades }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.value }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.volume }}</div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); width: 110px;"><svg viewBox="0 0 100 24" preserveAspectRatio="none" style="width: 100px; height: 24px; display: block;"><path d="{{ r.spark }}" fill="none" stroke="{{ r.color }}" stroke-width="1.25" vector-effect="non-scaling-stroke"></path></svg></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ empty }}"><div style="padding: 32px 16px; color: var(--text-muted);">No instruments match these filters.</div></sc-if>
+    </div>
+  </section>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, filter: (window.UFT && window.UFT.param('filter', 'all')) || 'all', cat: 'all', sector: 'all', q: '', sort: 'code', dir: 1, band: null };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true, filter: window.UFT.param('filter', 'all') }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt, fmtInt, sign, tone } = U; const S = U.stocks;
+    const tab = (key, v, label, extra) => ({ label, ...(extra || {}), bg: st[key] === v ? 'var(--ink)' : 'var(--paper)', fg: st[key] === v ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ [key]: v, band: null }) });
+    const F = { all: () => true, gainers: s => s.change > 0, losers: s => s.change < 0, unchanged: s => s.change === 0 };
+    const edges = [-Infinity, -7, -5, -3, -1, -0.001, 0.001, 1, 3, 5, 7, Infinity];
+    const labels = ['≤−7', '−7', '−5', '−3', '−1', '0', '+1', '+3', '+5', '+7', '≥+7'];
+    const bandOf = p => { for (let i = 0; i < edges.length - 1; i++) if (p >= edges[i] && p < edges[i + 1]) return i; return 10; };
+    const counts = labels.map((_, i) => S.filter(s => bandOf(s.changePct) === i).length); const cmax = Math.max(...counts);
+    const hist = labels.map((label, i) => ({ label, n: counts[i], h: (counts[i] / cmax * 100) + '%', bg: i < 5 ? U.DOWN : i === 5 ? 'var(--neutral-400)' : U.UP, outline: st.band === i ? '1px solid var(--ink)' : 'none', tip: `${counts[i]} instruments`, pick: () => this.setState(s => ({ band: s.band === i ? null : i, filter: 'all' })) }));
+    let list = S.filter(F[st.filter]).filter(s => st.cat === 'all' || s.cat === st.cat).filter(s => st.sector === 'all' || s.sector === st.sector).filter(s => !st.q || s.code.includes(st.q.toUpperCase())).filter(s => st.band == null || bandOf(s.changePct) === st.band);
+    list = list.slice().sort((a, b) => { const x = a[st.sort], y = b[st.sort]; return (typeof x === 'string' ? x.localeCompare(y) : x - y) * st.dir; });
+    const colDef = [['#', null, 'left'], ['Trading code', 'code', 'left'], ['Actions', null, 'left'], ['LTP', 'ltp', 'right'], ['High', 'high', 'right'], ['Low', 'low', 'right'], ['Close', 'close', 'right'], ['YCP', 'ycp', 'right'], ['Change', 'change', 'right'], ['Change %', 'changePct', 'right'], ['Trade', 'trades', 'right'], ['Value (mn)', 'value', 'right'], ['Volume', 'volume', 'right'], ['5 day trend', null, 'left']];
+    const cols = colDef.map(([label, key, align]) => ({ label, align, arrow: key && st.sort === key ? (st.dir > 0 ? ' ↑' : ' ↓') : '', fg: key && st.sort === key ? 'var(--ink)' : 'var(--text-muted)', weight: key && st.sort === key ? 700 : 400, sort: () => key && this.setState(s => ({ sort: key, dir: s.sort === key ? -s.dir : (key === 'code' ? 1 : -1) })) }));
+    const rows = list.map((s, i) => { const d = U.daily(s.code, 20).slice(-20).map(b => b.c);
+      return { n: i + 1, code: s.code, cat: s.cat, a: U.actions(s.code), ltp: fmt(s.ltp, 1), high: fmt(s.high, 1), low: fmt(s.low, 1), close: fmt(s.close, 1), ycp: fmt(s.ycp, 1), change: sign(s.change, 1), pct: sign(s.changePct) + '%', color: tone(s.change), bg: U.heat(s.changePct), fg: U.heatText(s.changePct), trades: fmtInt(s.trades), value: fmt(s.value, 3), volume: fmtInt(s.volume), spark: U.linePath(d, 100, 24, { pad: 2 }).line }; });
+    const cats = ['A', 'B', 'N', 'Z']; const tv = S.reduce((a, s) => a + s.value, 0);
+    const catShare = cats.map((c, i) => { const v = S.filter(s => s.cat === c).reduce((a, s) => a + s.value, 0); return { label: `Category ${c}`, value: fmt(v * 2.9) + ' mn', pct: (v / tv * 100).toFixed(1) + '%', w: (v / tv * 100) + '%', bg: ['var(--ink)', 'var(--neutral-600)', 'var(--neutral-400)', 'var(--neutral-200)'][i] }; });
+    const B = U.breadth; const gv = S.filter(s => s.change > 0).reduce((a, s) => a + s.value, 0), lv = S.filter(s => s.change < 0).reduce((a, s) => a + s.value, 0); const bp = gv / (gv + lv) * 100;
+    const idxCards = ['DSEX', 'DS30', 'DSES'].map(k => { const x = U.indices[k]; const p = U.linePath(x.series, 200, 44, { pad: 3 }); const c = tone(x.change); return { name: k, value: fmt(x.value), ch: `${sign(x.change)} (${sign(x.pct)}%)`, c, line: p.line, area: p.area }; });
+    const totalsCards = [{ label: 'TURNOVER', v: fmt(U.totals.value / 10), u: 'cr' }, { label: 'VOLUME', v: fmt(U.totals.volume / 1e7), u: 'cr' }, { label: 'TRADES', v: fmtInt(U.totals.trades), u: '' }];
+    const breadthCards = [{ arrow: '▲', n: B.adv, label: 'Gainers', c: U.UP }, { arrow: '▼', n: B.dec, label: 'Losers', c: U.DOWN }, { arrow: '■', n: B.unch, label: 'Unchanged', c: 'var(--blue-700)' }].map(b => ({ ...b, w: (b.n / B.total * 100) + '%' }));
+    return {
+      idxCards, totalsCards, breadthCards, buyW: bp + '%', buyP: bp.toFixed(2) + '%', sellP: (100 - bp).toFixed(2) + '%',
+      hist, catShare, cols, rows, empty: rows.length === 0, q: st.q, onQ: e => this.setState({ q: e.target.value }),
+      shown: `${rows.length} of ${S.length} instruments`,
+      filterTabs: [['all', 'All'], ['gainers', 'Gainers'], ['losers', 'Losers'], ['unchanged', 'Unchanged']].map(([v, l]) => tab('filter', v, l, { count: S.filter(F[v]).length })),
+      catTabs: [['all', 'All'], ['A', 'A'], ['B', 'B'], ['N', 'N'], ['Z', 'Z']].map(([v, l]) => tab('cat', v, l)),
+      sectorItems: [{ value: 'all', label: 'All sectors' }, ...U.sectors.map(s => ({ value: s.name, label: s.name }))], sector: st.sector, setSector: v => this.setState({ sector: v })
+    };
+  }
+}
+</script>
+</body>
+</html>

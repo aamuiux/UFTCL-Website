@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+@keyframes uft-marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<header style="position: relative; z-index: 50; background: var(--paper); font-family: var(--font-sans); color: var(--ink); font-size: 14px;">
+  <div style="border-bottom: 1px solid var(--neutral-300);">
+    <div style="max-width: none; margin: 0; padding: 10px 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+      <a href="Home.dc.html" style="display: flex; align-items: center;"><img src="data:image/png;base64,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" alt="United Financial Trading Company Limited" style="height: 44px; width: auto; display: block;"></a>
+      <div style="display: flex; align-items: center; gap: 16px; padding-left: 20px; border-left: 1px solid var(--neutral-300); flex-wrap: wrap;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-family: var(--font-mono); font-size: 18px; line-height: 20px; font-variant-numeric: tabular-nums;">{{ clock }}</span>
+          <span style="font-size: 12px; color: var(--text-muted);">{{ dateLabel }} · Dhaka</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border: 1px solid var(--ink); font-size: 12px; font-weight: 700;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ statusColor }};"></span>
+          <span>{{ status }}</span>
+        </div>
+      </div>
+      <div style="flex: 1 1 0; min-width: 0;"></div>
+      <form onSubmit="{{ onSearch }}" style="display: flex; align-items: center; height: 32px; border: 1px solid var(--ink); flex: 0 1 240px; min-width: 160px;">
+        <span style="display: flex; padding: 0 6px 0 8px; color: var(--text-muted);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5 14 14"></path></svg></span>
+        <input list="uft-symbols" name="q" placeholder="Search instrument" style="flex: 1; min-width: 0; height: 30px; border: 0; outline: none; font: inherit; font-size: 14px; background: transparent; color: var(--ink);">
+        <datalist id="uft-symbols"><sc-for list="{{ symbols }}" as="s"><option value="{{ s }}"></option></sc-for></datalist>
+      </form>
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <a href="#bo" style="display: flex;"><x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Button" hint-size="140px,32px">Open BO account</x-import></a>
+          <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Button" onClick="{{ toggleLogin }}" style="background: var(--ink); color: var(--paper);" hint-size="72px,32px">Login</x-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{ mobile }}">
+        <button onClick="{{ toggleDrawer }}" aria-label="Menu" style="width: 32px; height: 32px; border: 1px solid var(--ink); background: var(--paper); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 4h12M2 8h12M2 12h12"></path></svg></button>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+    <nav onMouseLeave="{{ closeMenu }}" style="position: relative; z-index: 60; border-bottom: 1px solid var(--ink);">
+      <div style="max-width: none; margin: 0; padding: 0 24px; display: flex; align-items: stretch;">
+        <sc-for list="{{ menu }}" as="g" hint-placeholder-count="9">
+          <div style="position: {{ g.pos }};" onMouseEnter="{{ g.open }}">
+            <a href="{{ g.href }}" onClick="{{ g.click }}" style="display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px; font-weight: 700; background: {{ g.bg }}; color: {{ g.fg }}; white-space: nowrap;">
+              <span>{{ g.label }}</span>
+              <sc-if value="{{ g.hasMenu }}"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M12 6H4l4 4.5z"></path></svg></sc-if>
+            </a>
+            <sc-if value="{{ g.isOpen }}">
+              <div style="position: absolute; top: 100%; left: {{ g.left }}; right: {{ g.right }}; margin-top: 1px; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset); padding: 16px; display: grid; grid-template-columns: {{ g.cols }}; gap: 24px; min-width: 240px;">
+                <sc-for list="{{ g.groups }}" as="col">
+                  <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                    <sc-if value="{{ col.title }}"><div style="font-size: 12px; font-weight: 700; color: var(--text-muted); padding: 0 8px 6px; border-bottom: 1px solid var(--neutral-300); margin-bottom: 4px;">{{ col.title }}</div></sc-if>
+                    <sc-for list="{{ col.links }}" as="l">
+                      <a href="{{ l.href }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 32px; padding: 0 8px; color: var(--ink);" style-hover="background: var(--ink); color: var(--paper);">
+                        <span>{{ l.label }}</span>
+                        <sc-if value="{{ l.soon }}"><span style="font-size: 10px; font-weight: 700; color: var(--text-placeholder);">SOON</span></sc-if>
+                      </a>
+                    </sc-for>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ g.note }}"><div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px; background: var(--neutral-100); font-size: 13px;"><span>{{ g.note }}</span><a href="#login" style="font-weight: 700; text-decoration: underline;">Create profile</a></div></sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <div style="flex: 1;"></div>
+        <a href="UFT%20Play.dc.html" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; font-weight: 700; border-left: 1px solid var(--neutral-300);">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><rect x="4" y="1.5" width="8" height="13"></rect><path d="M7 12.5h2"></path></svg>
+          <span>UFT Play</span>
+        </a>
+      </div>
+    </nav>
+  </sc-if>
+
+  <sc-if value="{{ drawerOpen }}">
+    <div style="border-bottom: 1px solid var(--ink); background: var(--paper); max-height: 70vh; overflow: auto;">
+      <sc-for list="{{ menu }}" as="g">
+        <div style="border-top: 1px solid var(--neutral-300);">
+          <a href="{{ g.href }}" onClick="{{ g.click }}" style="display: flex; justify-content: space-between; align-items: center; height: 44px; padding: 0 24px; font-weight: 700;"><span>{{ g.label }}</span><sc-if value="{{ g.hasMenu }}"><span>{{ g.sign }}</span></sc-if></a>
+          <sc-if value="{{ g.isOpen }}">
+            <div style="padding: 0 24px 12px; display: flex; flex-direction: column;">
+              <sc-for list="{{ g.flat }}" as="l"><a href="{{ l.href }}" style="display: flex; align-items: center; min-height: 44px; padding-left: 12px; border-left: 1px solid var(--ink);">{{ l.label }}</a></sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+      <div style="display: flex; gap: 8px; padding: 12px 24px; border-top: 1px solid var(--neutral-300);">
+        <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Button" hint-size="140px,32px">Open BO account</x-import>
+        <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Button" onClick="{{ toggleLogin }}" style="background: var(--ink); color: var(--paper);" hint-size="72px,32px">Login</x-import>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="background: var(--ink); color: var(--paper); display: flex; align-items: stretch; height: 36px; overflow: hidden; font-size: 13px;">
+    <div style="display: flex; align-items: stretch; flex-shrink: 0; border-right: 1px solid var(--neutral-700);">
+      <sc-for list="{{ idx }}" as="i" hint-placeholder-count="3">
+        <a href="Home.dc.html" style="display: flex; align-items: center; gap: 8px; padding: 0 14px; border-right: 1px solid var(--neutral-800); color: var(--paper); white-space: nowrap;">
+          <span style="font-weight: 700;">{{ i.name }}</span>
+          <span style="font-family: var(--font-mono);">{{ i.v }}</span>
+          <span style="font-family: var(--font-mono); color: {{ i.c }};">{{ i.ch }}</span>
+        </a>
+      </sc-for>
+    </div>
+    <div style="flex: 1; min-width: 0; overflow: hidden; display: flex; align-items: center;">{{ marquee }}</div>
+  </div>
+
+  <sc-if value="{{ loginOpen }}">
+    <div onClick="{{ toggleLogin }}" style="position: fixed; inset: 0; background: rgb(0 0 0 / 20%); z-index: 90;"></div>
+    <div style="position: fixed; top: 96px; left: 50%; transform: translateX(-50%); width: min(380px, calc(100vw - 32px)); background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset); z-index: 91; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;"><div style="font-size: 16px; font-weight: 700;">Login to UFTCL</div><button onClick="{{ toggleLogin }}" aria-label="Close" style="border: 0; background: none; cursor: pointer; color: var(--ink);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M3 3l10 10M13 3 3 13"></path></svg></button></div>
+      <div style="color: var(--text-muted); font-size: 14px;">Save watchlists, chart layouts, PE and VPA settings to your profile.</div>
+      <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Input" label="Email or client code" placeholder="e.g. UF-102938" hint-size="100%,56px"></x-import>
+      <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Input" label="Password" type="password" hint-size="100%,56px"></x-import>
+      <x-import component-from-global-scope="BaseUICustomDesignSystem_2d9078.Button" onClick="{{ toggleLogin }}" style="background: var(--ink); color: var(--paper); width: 100%;" hint-size="100%,32px">Login</x-import>
+      <div style="display: flex; justify-content: space-between; font-size: 13px;"><a href="#bo" style="text-decoration: underline;">Open a BO account</a><a href="#trade" style="text-decoration: underline;">UFTFAST trading login</a></div>
+    </div>
+  </sc-if>
+</header>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:420},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;price&quot;,&quot;market&quot;,&quot;scanner&quot;,&quot;ipo&quot;,&quot;company&quot;,&quot;news&quot;,&quot;trade&quot;,&quot;about&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { now: new Date(), open: null, drawer: false, login: false, w: typeof window !== 'undefined' ? window.innerWidth : 1280, ready: !!window.UFT };
+  componentDidMount() {
+    this.t = setInterval(() => this.setState({ now: new Date(), ready: !!window.UFT }), 1000);
+    this.onR = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this.onR);
+  }
+  componentWillUnmount() { clearInterval(this.t); window.removeEventListener('resize', this.onR); }
+  menuDef() {
+    const L = (label, page, q) => page ? { label, href: encodeURI(page + '.dc.html') + (q ? '?' + q : '') } : { label, href: '#', soon: true };
+    return [
+      { id: 'home', label: 'Home', href: 'Home.dc.html' },
+      { id: 'price', label: 'Share Price', groups: [{ links: [L('Latest Share Price', 'Latest Share Price'), L('Sector Wise Share Price', 'Sector Share Price'), L('Circuit Breaker', 'Sector Share Price', 'tab=circuit'), L('Stock Quotes / Price Board', 'Latest Share Price')] }] },
+      { id: 'market', label: 'Market Data & Analysis', mega: true, note: 'Create a profile to save your chart, PE ratio and VPA settings.', groups: [
+        { title: 'Charts', links: [L('Stock Chart', 'Stock Chart'), L('Interactive Chart', 'Stock Chart'), L('MTF Charts'), L('Multiple Charts'), L('Technical & Fundamental Charts', 'Stock Chart')] },
+        { title: 'PE Ratio', links: [L('Market PE Ratio'), L('Sector PE Ratio'), L('Category PE Ratio'), L('Compare PE Ratio'), L('Compare Sector PE'), L('Weighted PE Chart')] },
+        { title: 'VPA', links: [L('Market Watch'), L('1 Minute VPA', 'VPA'), L('VPA Watch List'), L('VPA Archive', 'VPA Archive'), L('Market Depth', 'Depth Monitor'), L('Market Depth Monitor', 'Depth Monitor'), L('Minute Map')] },
+        { title: 'Analysis', links: [L('Sector Performance', 'Sector Share Price'), L('Order Book / Market Depth', 'Depth Monitor'), L('Historical Data', 'VPA Archive'), L('Chart Gallery'), L('Tools'), L('Alert')] }] },
+      { id: 'scanner', label: 'Scanner', groups: [{ links: [L('Stock Scanner', 'Stock Scanner'), L('Pre Scanner', 'Stock Scanner', 'tab=pre'), L('Custom Scanner', 'Stock Scanner', 'tab=custom'), L('Robo Trader (AI)', 'Robo Trader')] }] },
+      { id: 'ipo', label: 'IPO', groups: [{ links: [L('Overview', 'IPO'), L('Upcoming IPOs', 'IPO', 'tab=upcoming'), L('Open IPOs', 'IPO', 'tab=open'), L('Past IPOs', 'IPO', 'tab=past'), L('IPO Application', 'IPO', 'tab=open')] }] },
+      { id: 'company', label: 'Company Corner', groups: [{ links: [L('Company Profile'), L('Financial Reports'), L('Corporate Actions'), L('Price Sensitive Information')] }] },
+      { id: 'news', label: 'Research & News', groups: [{ links: [L('DSE News', 'News Effect Chart'), L('News Effect Chart', 'News Effect Chart'), L('Event Calendar', 'Event Calendar'), L('Brokerage Research Reports'), L('Economic Calendar')] }] },
+      { id: 'trade', label: 'Trading & Services', groups: [{ links: [L('Online Trading Portal (UFTFAST)'), L('BO Account Opening'), L('Fund Deposit & Withdrawal'), L('IPO Application', 'IPO', 'tab=open'), L('UFT Play', 'UFT Play')] }] },
+      { id: 'about', label: 'About', right: true, groups: [
+        { title: 'About us', links: [L('Overview', 'About', 'p=overview'), L('Management & Team', 'About', 'p=team'), L('TREC Certificate & Compliance', 'About', 'p=trec'), L('Branch Network', 'About', 'p=branches'), L('Careers', 'About', 'p=careers')] },
+        { title: 'Help & support', links: [L('FAQ', 'About', 'p=faq'), L('Download Forms', 'About', 'p=forms'), L('Contact Us', 'About', 'p=contact'), L('Important Links', 'About', 'p=links')] }] }
+    ];
+  }
+  renderVals() {
+    const U = window.UFT; const now = this.state.now; const mobile = this.state.w < 1100;
+    const dk = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }));
+    const mins = dk.getHours() * 60 + dk.getMinutes(); const day = dk.getDay(); const wd = day >= 0 && day <= 4;
+    const status = !wd ? 'Market closed' : mins >= 600 && mins < 870 ? 'Market open' : mins >= 570 && mins < 600 ? 'Pre-open' : 'Market closed';
+    const active = this.props.active;
+    const menu = this.menuDef().map(g => {
+      const hasMenu = !!g.groups; const isOpen = this.state.open === g.id;
+      const on = isOpen || active === g.id;
+      return { ...g, hasMenu, isOpen, href: g.href || '#', sign: isOpen ? '−' : '+',
+        bg: on ? 'var(--ink)' : 'transparent', fg: on ? 'var(--paper)' : 'var(--ink)',
+        pos: g.mega ? 'static' : 'relative', left: g.mega ? '24px' : g.right ? 'auto' : '0', right: g.mega ? '24px' : g.right ? '0' : 'auto',
+        cols: g.mega ? 'repeat(4, minmax(0, 1fr))' : g.groups && g.groups.length > 1 ? 'repeat(2, minmax(200px, 1fr))' : '1fr',
+        flat: (g.groups || []).flatMap(c => c.links),
+        open: () => !mobile && hasMenu && this.setState({ open: g.id }),
+        click: e => { if (hasMenu) { e.preventDefault(); this.setState(s => ({ open: s.open === g.id ? null : g.id })); } } };
+    });
+    let idx = [], marquee = null;
+    if (U) {
+      idx = ['DSEX', 'DSES', 'DS30'].map(k => { const i = U.indices[k]; return { name: k, v: U.fmt(i.value), ch: `${U.arrow(i.change)} ${U.sign(i.change)} (${U.sign(i.pct)}%)`, c: i.change >= 0 ? 'var(--green-400)' : 'var(--red-400)' }; });
+      const item = (s, k) => React.createElement('a', { key: k, href: U.href('Stock Chart', { symbol: s.code }), style: { display: 'inline-flex', gap: 6, padding: '0 16px', color: '#fff', whiteSpace: 'nowrap', borderRight: '1px solid oklch(26.9% 0 0)' } },
+        React.createElement('b', null, s.code), React.createElement('span', { style: { fontFamily: 'var(--font-mono)' } }, U.fmt(s.ltp, 1)),
+        React.createElement('span', { style: { fontFamily: 'var(--font-mono)', color: s.change > 0 ? 'var(--green-400)' : s.change < 0 ? 'var(--red-400)' : 'oklch(70.8% 0 0)' } }, `${U.arrow(s.change)} ${U.sign(s.change, 1)} ${U.sign(s.changePct)}%`));
+      const list = U.stocks.slice(0, 40);
+      marquee = React.createElement('div', { style: { display: 'flex', width: 'max-content', animation: 'uft-marquee 120s linear infinite' } }, [...list, ...list].map((s, i) => item(s, i)));
+    }
+    return {
+      clock: dk.toLocaleTimeString('en-GB', { hour12: false }), dateLabel: dk.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }),
+      status, statusColor: status === 'Market open' ? 'var(--green-700)' : status === 'Pre-open' ? 'var(--neutral-500)' : 'var(--red-700)',
+      menu, desktop: !mobile, mobile, drawerOpen: mobile && this.state.drawer, idx, marquee, symbols: U ? U.symbols : [],
+      closeMenu: () => !mobile && this.setState({ open: null }),
+      toggleDrawer: () => this.setState(s => ({ drawer: !s.drawer })),
+      toggleLogin: () => this.setState(s => ({ login: !s.login })), loginOpen: this.state.login,
+      onSearch: e => { e.preventDefault(); const q = (new FormData(e.target).get('q') || '').toString().trim().toUpperCase(); if (q) location.href = encodeURI('Stock Chart.dc.html') + '?symbol=' + encodeURIComponent(q); }
+    };
+  }
+}
+</script>
+</body>
+</html>
