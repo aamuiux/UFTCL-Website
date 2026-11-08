@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Market Depth Monitor — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <nav data-screen-label="VPA sections" style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink); align-self: flex-start; max-width: 100%;">
+    <sc-for list="{{ sections }}" as="s" hint-placeholder-count="3"><a href="{{ s.href }}" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border-right: 1px solid var(--ink); font-size: 13px; font-weight: 700; background: {{ s.bg }}; color: {{ s.fg }};">{{ s.label }}</a></sc-for>
+  </nav>
+
+  <section data-screen-label="Symbol bar" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px;">
+    <div style="display: flex; flex-direction: column;"><span style="font-weight: 700; font-size: 18px;">{{ code }} · {{ name }}</span><span style="font-size: 12px; color: var(--text-muted);">Market depth monitor · {{ asOf }}</span></div>
+    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+      <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700;">{{ ltp }}</span><span style="font-family: var(--font-mono); font-size: 13px; color: {{ chgColor }};">{{ chg }}</span>
+      <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; font-weight: 700; height: 36px; min-width: 200px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
+        <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.code }}</option></sc-for>
+      </select>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px; align-items: start;">
+
+    <div style="display: flex; flex-direction: column; gap: 24px; min-width: 0;">
+      <div data-screen-label="Market depth" style="border: 1px solid var(--ink);">
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Market Depth</div>
+        <div style="display: flex; justify-content: space-between; padding: 10px 16px; font-size: 13px;"><span>Buy Vol <b style="font-family: var(--font-mono); color: var(--green-700);">{{ dp.buyVol }}</b></span><span>Sell Vol <b style="font-family: var(--font-mono); color: var(--red-700);">{{ dp.sellVol }}</b></span></div>
+        <div style="display: flex; font-family: var(--font-mono); font-weight: 700; color: var(--paper);"><div style="width: {{ dp.buyPct }}; background: var(--green-700); padding: 10px 16px;">{{ dp.buyPct }}</div><div style="flex: 1; background: var(--red-700); padding: 10px 16px; text-align: right;">{{ dp.sellPct }}</div></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 8px 16px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink);"><span>Bid qty</span><span style="text-align: right;">Bid</span><span style="padding-left: 16px;">Ask</span><span style="text-align: right;">Ask qty</span></div>
+        <sc-for list="{{ dp.rows }}" as="r" hint-placeholder-count="10">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 0 16px; font-family: var(--font-mono); font-size: 13px; border-bottom: 1px solid var(--neutral-200); position: relative; height: 32px; align-items: center;">
+            <div style="position: absolute; right: 50%; top: 0; bottom: 0; width: {{ r.bw }}; background: oklch(52.7% 0.154 150 / 0.14);"></div>
+            <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: {{ r.aw }}; background: oklch(50.5% 0.213 27.5 / 0.14);"></div>
+            <span style="position: relative;">{{ r.bq }}</span><span style="position: relative; text-align: right; color: var(--green-700); font-weight: 700;">{{ r.bp }}</span><span style="position: relative; padding-left: 16px; color: var(--red-700); font-weight: 700;">{{ r.ap }}</span><span style="position: relative; text-align: right;">{{ r.aq }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div data-screen-label="Price statistics" style="border: 1px solid var(--ink);">
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Price Statistics</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr;">
+          <sc-for list="{{ stats }}" as="s" hint-placeholder-count="9"><div style="display: flex; justify-content: space-between; gap: 8px; padding: 9px 16px; border-bottom: 1px solid var(--neutral-200); border-right: 1px solid var(--neutral-200); font-size: 13px;"><span style="color: var(--text-muted);">{{ s.label }}</span><span style="font-family: var(--font-mono); font-weight: 700;">{{ s.value }}</span></div></sc-for>
+        </div>
+        <div style="padding: 10px 16px; border-top: 1px solid var(--ink); font-weight: 700; text-align: center; font-size: 13px;">Total Buy Volume vs Total Sell Volume</div>
+        <div style="display: flex; justify-content: space-around; padding: 10px 16px; font-size: 13px; border-top: 1px solid var(--neutral-200);"><span>Total Buy Volume: <b style="font-family: var(--font-mono);">{{ dp.buyVol }}</b></span><span>Total Sell Volume: <b style="font-family: var(--font-mono);">{{ dp.sellVol }}</b></span></div>
+      </div>
+    </div>
+
+    <div data-screen-label="Depth analysis" style="border: 1px solid var(--ink); min-width: 0;">
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Market Depth Analysis</div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 16px; align-items: center;">
+        <b>Buy Volume vs Sell Volume</b>
+        <div style="position: relative; width: 200px; height: 200px;">
+          <svg viewBox="0 0 120 120" width="200" height="200" aria-label="Buy vs sell volume"><sc-for list="{{ donut }}" as="s"><path d="{{ s.d }}" fill="{{ s.c }}"></path></sc-for><circle cx="60" cy="60" r="28" fill="var(--paper)"></circle></svg>
+          <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-mono);"><b style="font-size: 18px;">{{ dp.buyPct }}</b><span style="font-size: 11px; color: var(--text-muted);">buy</span></div>
+        </div>
+        <div style="display: flex; gap: 20px; font-size: 12px;"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: var(--green-700);"></span>Buy volume</span><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: var(--red-700);"></span>Sell volume</span></div>
+        <div style="width: 100%; display: flex; height: 22px; font-family: var(--font-mono); font-size: 11px; color: var(--paper);"><div style="width: {{ dp.buyPct }}; background: var(--green-700); display: flex; align-items: center; padding-left: 8px;">{{ dp.buyVol }}</div><div style="flex: 1; background: var(--red-700); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px;">{{ dp.sellVol }}</div></div>
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 6px; font-size: 13px; border-top: 1px solid var(--neutral-200); padding-top: 12px;">
+          <sc-for list="{{ insights }}" as="i" hint-placeholder-count="3"><div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">{{ i.label }}</span><b style="font-family: var(--font-mono);">{{ i.value }}</b></div></sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div data-screen-label="Daily chart" style="border: 1px solid var(--ink); min-width: 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--ink);"><b>Daily Chart</b><a href="{{ chartHref }}" style="font-size: 13px; text-decoration: underline;">Open full chart</a></div>
+      <div style="font-family: var(--font-mono); font-size: 11px; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; border-bottom: 1px solid var(--neutral-200);">
+        <span style="font-family: var(--font-sans); font-weight: 700;">{{ code }}</span><span>BB(20,2)</span><span style="color: var(--green-700);">Upper {{ bbU }}</span><span>Mid {{ bbM }}</span><span style="color: var(--red-700);">Lower {{ bbL }}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 52px; padding: 8px 0 0 8px;">
+        <div style="position: relative; height: 300px;">
+          <svg viewBox="0 0 400 300" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+            <sc-for list="{{ dc.grid }}" as="g"><line x1="0" x2="400" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" vector-effect="non-scaling-stroke"></line></sc-for>
+            <path d="{{ dc.up }}" fill="none" stroke="var(--green-700)" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+            <path d="{{ dc.lo }}" fill="none" stroke="var(--red-700)" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+            <path d="{{ dc.mid }}" fill="none" stroke="var(--blue-700)" stroke-width="1" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"></path>
+            <sc-for list="{{ dc.candles }}" as="c"><line x1="{{ c.cx }}" x2="{{ c.cx }}" y1="{{ c.hy }}" y2="{{ c.ly }}" stroke="{{ c.color }}" vector-effect="non-scaling-stroke"></line><rect x="{{ c.x }}" y="{{ c.y }}" width="{{ c.w }}" height="{{ c.h }}" fill="{{ c.color }}"></rect></sc-for>
+          </svg>
+        </div>
+        <div style="position: relative; height: 300px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);"><sc-for list="{{ dc.grid }}" as="g"><span style="position: absolute; left: 6px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for><span style="position: absolute; left: 0; top: {{ dc.lastPct }}; transform: translateY(-50%); background: var(--ink); color: var(--paper); padding: 1px 4px;">{{ dc.last }}</span></div>
+        <div style="position: relative; height: 80px; border-top: 1px solid var(--ink);">
+          <svg viewBox="0 0 400 80" preserveAspectRatio="none" style="width: 100%; height: 80px; display: block;"><rect x="0" y="{{ dc.r70 }}" width="400" height="{{ dc.rBand }}" fill="var(--neutral-100)"></rect><path d="{{ dc.rsi }}" fill="none" stroke="oklch(52% 0.17 285)" stroke-width="1.25" vector-effect="non-scaling-stroke"></path></svg>
+          <span style="position: absolute; left: 6px; top: 4px; font-size: 11px; color: var(--text-muted);">RSI 14 <b style="font-family: var(--font-mono); color: var(--ink);">{{ dc.rsiLast }}</b></span>
+        </div>
+        <div style="border-top: 1px solid var(--ink); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); padding: 4px 6px; display: flex; flex-direction: column; justify-content: space-between;"><span>70</span><span>30</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="1 minute VPA" style="border: 1px solid var(--ink);">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+      <div style="display: flex; flex-direction: column;"><b style="font-size: 16px;">1 Minute Volume Price Analysis</b><span style="font-size: 12px; color: var(--text-muted);">{{ code }}</span></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px;"><sc-for list="{{ legend }}" as="l" hint-placeholder-count="3"><span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: {{ l.c }};"></span>{{ l.label }}</span></sc-for></div>
+    </div>
+    <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; padding: 12px 12px 0;">
+      <div style="position: relative; height: 260px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ vc.volAxis }}" as="g"><span style="position: absolute; right: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+      <div style="position: relative; height: 260px; border-bottom: 1px solid var(--ink);">
+        <svg viewBox="0 0 1000 260" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          <sc-for list="{{ vc.grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" vector-effect="non-scaling-stroke"></line></sc-for>
+          <sc-for list="{{ vc.bars }}" as="b"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.color }}"></rect></sc-for>
+          <path d="{{ vc.line }}" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+        </svg>
+        <svg viewBox="0 0 40 40" width="40" height="40" style="position: absolute; left: 8px; top: 8px;" aria-label="Volume split"><sc-for list="{{ pie }}" as="s"><path d="{{ s.d }}" fill="{{ s.c }}"></path></sc-for></svg>
+      </div>
+      <div style="position: relative; height: 260px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ vc.priceAxis }}" as="g"><span style="position: absolute; left: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+    </div>
+    <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; padding: 0 12px;"><span></span><div style="position: relative; height: 22px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ vc.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%);">{{ x.label }}</span></sc-for></div><span></span></div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); border-top: 1px solid var(--ink); font-size: 12px;">
+      <sc-for list="{{ totals }}" as="t" hint-placeholder-count="4"><div style="padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--neutral-200);"><span style="width: 10px; height: 10px; background: {{ t.c }};"></span><span>{{ t.label }}: <b style="font-family: var(--font-mono);">{{ t.value }}</b> {{ t.pct }}</span></div></sc-for>
+    </div>
+  </section>
+
+  <dc-import name="SymbolIndex" page="Depth Monitor" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const { fmt, fmtInt, sign, tone } = U;
+    const sym = U.param('symbol', 'BRACBANK').toUpperCase(); const S = U.bySym[sym] || U.stocks[0];
+    const COL = ['var(--green-700)', 'var(--blue-700)', 'var(--red-700)'], NAMES = ['Bull', 'Neutral', 'Bear'];
+    // depth
+    const D = U.depth(S.code, 10); const mq = Math.max(...D.bids.map(b => b.qty), ...D.asks.map(a => a.qty));
+    const dp = { buyVol: fmtInt(D.totalBid), sellVol: fmtInt(D.totalAsk), buyPct: fmt(D.buyPct) + '%', sellPct: fmt(D.sellPct) + '%', rows: D.bids.map((b, i) => ({ bq: fmtInt(b.qty), bp: fmt(b.price, 1), bw: (b.qty / mq * 48) + '%', ap: fmt(D.asks[i].price, 1), aq: fmtInt(D.asks[i].qty), aw: (D.asks[i].qty / mq * 48) + '%' })) };
+    const stats = [['Open price', fmt(S.open, 1)], ["Day's high", fmt(S.high, 1)], ['Last trade price', fmt(S.ltp, 1)], ["Day's low", fmt(S.low, 1)], ['Yesterday close', fmt(S.ycp, 1)], ['No. of trade', fmtInt(S.trades)], ['Close price', fmt(S.ltp, 1)], ['Total volume', fmtInt(S.volume)], ['Total value (mn)', fmt(S.value, 3)]].map(([label, value]) => ({ label, value }));
+    // donut buy/sell
+    const donut = (() => { const cx = 60, cy = 60, R = 52; const parts = [[D.totalBid, COL[0]], [D.totalAsk, COL[2]]]; const tot = D.totalBid + D.totalAsk; let a0 = -Math.PI / 2; return parts.map(([v, c]) => { const a1 = a0 + v / tot * 2 * Math.PI; const P = a => [cx + R * Math.cos(a), cy + R * Math.sin(a)]; const [x0, y0] = P(a0), [x1, y1] = P(a1); const d = `M${cx} ${cy}L${x0.toFixed(2)} ${y0.toFixed(2)}A${R} ${R} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z`; a0 = a1; return { d, c }; }); })();
+    const best = D.asks[0].price - D.bids[0].price;
+    const insights = [['Best bid', fmt(D.bids[0].price, 1)], ['Best ask', fmt(D.asks[0].price, 1)], ['Spread', fmt(best, 2)], ['Buy / sell ratio', fmt(D.totalBid / D.totalAsk, 2)]].map(([label, value]) => ({ label, value }));
+    // daily chart with Bollinger bands + RSI
+    const all = U.daily(S.code, 160); const cl = all.map(b => b.c); const N = 70, off = all.length - N; const view = all.slice(off);
+    const mid = U.sma(cl, 20); const sd = cl.map((_, i) => { if (i < 19) return null; const w = cl.slice(i - 19, i + 1); const m = mid[i]; return Math.sqrt(w.reduce((a, v) => a + (v - m) ** 2, 0) / 20); });
+    const up = mid.map((m, i) => m == null ? null : m + 2 * sd[i]), lo = mid.map((m, i) => m == null ? null : m - 2 * sd[i]);
+    const W = 400, H = 300; const sc = U.scaleY([...view.map(b => b.h), ...view.map(b => b.l), ...up.slice(off), ...lo.slice(off)].filter(x => x != null), H, 12);
+    const rsiA = U.rsiSeries(cl); const rsc = { y: v => 4 + 72 * (1 - (v - 20) / 70) };
+    const grid = [0, 0.25, 0.5, 0.75, 1].map(f => { const v = sc.max - (sc.max - sc.min) * f; const y = sc.y(v); return { y: y.toFixed(1), pct: (y / H * 100) + '%', label: fmt(v, 1) }; });
+    const last = view[N - 1];
+    const dc = { grid, candles: U.candles(view, W, H, sc), up: U.linePath(up.slice(off), W, H, { scale: sc }).line, lo: U.linePath(lo.slice(off), W, H, { scale: sc }).line, mid: U.linePath(mid.slice(off), W, H, { scale: sc }).line,
+      last: fmt(last.c, 1), lastPct: (sc.y(last.c) / H * 100) + '%', rsi: U.linePath(rsiA.slice(off).map(v => v == null ? null : Math.max(20, Math.min(90, v))), W, 80, { scale: rsc }).line, r70: rsc.y(70).toFixed(1), rBand: (rsc.y(30) - rsc.y(70)).toFixed(1), rsiLast: fmt(rsiA[rsiA.length - 1], 1) };
+    // 1 minute VPA
+    const data = U.vpa(S.code, 120); const NV = data.length;
+    const kind = d => { const r = d.buy / d.vol; return r > 0.58 ? 0 : r < 0.42 ? 2 : 1; };
+    const sums = [0, 0, 0]; data.forEach(d => { sums[kind(d)] += d.vol; }); const tot = sums.reduce((a, b) => a + b, 0) || 1;
+    const VH = 260, VW = 1000; const vTop = Math.ceil(Math.max(...data.map(d => d.vol)) / 10000) * 10000 || 10000;
+    const vsc = U.scaleY(data.map(d => d.price), VH - 40, 24); const bw = VW / NV;
+    const vc = { bars: data.map((d, i) => { const h = d.vol / vTop * (VH - 20); return { x: (i * bw + bw * 0.2).toFixed(2), w: Math.max(bw * 0.6, 1).toFixed(2), y: (VH - h).toFixed(2), h: h.toFixed(2), color: COL[kind(d)] }; }),
+      line: data.map((d, i) => (i ? 'L' : 'M') + ((i + 0.5) * bw).toFixed(2) + ' ' + (vsc.y(d.price) + 10).toFixed(2)).join(''),
+      grid: [0, 0.25, 0.5, 0.75, 1].map(f => ({ y: (f * (VH - 1)).toFixed(1) })),
+      volAxis: [1, 0.75, 0.5, 0.25, 0].map(f => ({ pct: ((1 - f) * 100) + '%', label: f === 0 ? '0' : Math.round(vTop * f / 1000) + 'k' })),
+      priceAxis: [1, 0.75, 0.5, 0.25, 0].map(f => ({ pct: ((1 - f) * 100) + '%', label: fmt(vsc.min + (vsc.max - vsc.min) * f, 1) })),
+      x: data.map((d, i) => i).filter(i => i % 10 === 0).map(i => ({ left: ((i + 0.5) / NV * 100) + '%', label: data[i].time })) };
+    const pie = (() => { const cx = 20, cy = 20, R = 19; let a0 = -Math.PI / 2; return sums.map((v, i) => { const a1 = a0 + v / tot * 2 * Math.PI; const P = a => [cx + R * Math.cos(a), cy + R * Math.sin(a)]; const [x0, y0] = P(a0), [x1, y1] = P(a1); const d = `M${cx} ${cy}L${x0.toFixed(2)} ${y0.toFixed(2)}A${R} ${R} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z`; a0 = a1; return { d, c: COL[i] }; }); })();
+    const totals = [{ label: 'Total volume', value: fmtInt(tot), pct: '', c: 'var(--neutral-500)' }, ...NAMES.map((n, i) => ({ label: n + ' vol', value: fmtInt(sums[i]), pct: '(' + fmt(sums[i] / tot * 100, 1) + '%)', c: COL[i] }))];
+    const sections = [['1 Minute VPA', 'VPA'], ['VPA Archive', 'VPA Archive'], ['Market Depth Monitor', 'Depth Monitor']].map(([label, page]) => ({ label, href: U.href(page, { symbol: S.code }), bg: page === 'Depth Monitor' ? 'var(--ink)' : 'var(--paper)', fg: page === 'Depth Monitor' ? 'var(--paper)' : 'var(--ink)' }));
+    return { code: S.code, name: U.company(S.code), ltp: fmt(S.ltp, 1), chg: `${sign(S.change)} (${sign(S.changePct)}%)`, chgColor: tone(S.change), asOf: 'As of ' + U.dateStr(new Date(2026, 10, 8)) + ', 2:10 PM', sections,
+      dp, stats, donut, insights, dc, bbU: fmt(up[up.length - 1], 2), bbM: fmt(mid[mid.length - 1], 2), bbL: fmt(lo[lo.length - 1], 2), chartHref: U.actions(S.code).chart,
+      vc, pie, totals, legend: NAMES.map((label, i) => ({ label, c: COL[i] })),
+      symbolOptions: U.symbols.map(code => ({ code })), onSymbol: e => { location.href = U.href('Depth Monitor', { symbol: e.target.value }); } };
+  }
+}
+</script>
+</body>
+</html>
