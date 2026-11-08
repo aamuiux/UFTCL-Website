@@ -154,5 +154,22 @@
   const actions = code => ({ stock: href('Stock Chart', { symbol: code }), chart: href('Chart', { symbol: code }), vpa: href('VPA', { symbol: code }), archive: href('VPA Archive', { symbol: code }), depth: href('Depth Monitor', { symbol: code }), effect: href('News Effect Chart', { symbol: code }) });
   const dateStr = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
-  window.UFT = { rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, symbols: stocks.map(s => s.code).sort() };
+  // ---- PE ratio model (quarterly EPS, annualised EPS, weighted PE, sector / category roll-ups)
+  const fmtIN = (n, d = 0) => (n == null || isNaN(n)) ? '-' : Number(n).toLocaleString('en-IN', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const peModel = (() => {
+    const totalM = stocks.reduce((a, s) => a + s.mcap, 0);
+    const rows = stocks.map(s => {
+      const r = rng(hash(s.code) + 555); const roll = r(); const sg = roll < 0.22 ? -1 : 1; const zero = roll > 0.92;
+      const q = k => zero ? 0 : round(sg * s.eps * (0.12 + r() * 0.32) * (sg < 0 ? 1.4 : 1), 2);
+      const q1 = q(), q2 = q(), q3 = q(), q4 = 0; const ann = round((q1 + q2 + q3) / 3 * 4, 2);
+      const apeV = ann === 0 ? 0 : round(s.ltp / ann, 2); const shares = s.mcap * 1e6 / s.ltp; const earn = ann * shares / 1e6;
+      return { code: s.code, sector: s.sector, cat: s.cat, ltp: s.ltp, change: s.change, changePct: s.changePct, q1, q2, q3, q4, ann, ape: apeV, mcap: s.mcap, earn: round(earn, 0), shares: Math.round(shares), wmcap: round(s.mcap / totalM, 4), wpe: round(apeV * s.mcap / totalM, 2), eps: round(q1 + q2 + q3 + q4, 2), tone: ann > 0 ? 1 : ann < 0 ? -1 : 0 };
+    });
+    const roll = list => { const m = list.reduce((a, x) => a + x.mcap, 0); const e = list.reduce((a, x) => a + x.earn, 0); const pos = list.filter(x => x.tone > 0).length, neg = list.filter(x => x.tone < 0).length; const goodM = list.filter(x => x.ape > 0).reduce((a, x) => a + x.mcap, 0) || 1; return { mcap: m, earn: e, pe: e > 0 ? round(m / e, 2) : 0, wpe: round(list.filter(x => x.ape > 0).reduce((a, x) => a + x.ape * x.mcap / goodM, 0), 2), pos, neg, weight: round(m / totalM, 2) }; };
+    const group = key => [...new Set(rows.map(x => x[key]))].sort().map(name => { const list = rows.filter(x => x[key] === name).sort((a, b) => a.code.localeCompare(b.code)); const g = roll(list); list.forEach(x => { x.gw = round(x.mcap / g.mcap, 4); x.gwpe = round(x.ape * x.mcap / g.mcap, 2); }); return { name, rows: list, ...g }; });
+    const total = roll(rows);
+    return { rows: rows.slice().sort((a, b) => a.code.localeCompare(b.code)), byCode: Object.fromEntries(rows.map(x => [x.code, x])), total, sectors: group('sector'), cats: group('cat') };
+  })();
+
+  window.UFT = { rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
 })();

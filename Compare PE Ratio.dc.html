@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Compare PE Ratio — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+  <dc-import name="PETabs" active="Compare PE Ratio" hint-size="100%,40px"></dc-import>
+  <dc-import name="PESummary" title="Compare PE" hint-size="100%,130px"></dc-import>
+
+  <section data-screen-label="Compare PE" style="border: 1px solid var(--ink); display: flex; flex-direction: column;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--ink);"><div style="display: flex; flex-direction: column;"><b style="font-size: 18px;">Compare PE ratio</b><span style="font-size: 12px; color: var(--text-muted);">Pick up to {{ max }} securities to compare EPS, earnings and PE side by side · {{ count }} selected</span></div><button onClick="{{ clearAll }}" style="font: inherit; font-size: 13px; height: 32px; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">Clear all</button></div>
+    <div style="overflow-x: auto;"><div style="min-width: 1280px;">
+      <div style="display: grid; grid-template-columns: 200px 130px repeat(13, minmax(86px, 1fr)); background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 700; text-align: right;">
+        <span style="text-align: left; padding: 12px;">Stocks</span><span style="padding: 12px;"></span>
+        <sc-for list="{{ heads }}" as="h"><span style="padding: 12px 10px; display: flex; align-items: flex-end; justify-content: flex-end;">{{ h.label }}</span></sc-for>
+      </div>
+      <sc-for list="{{ rows }}" as="r">
+        <div style="display: grid; grid-template-columns: 200px 130px repeat(13, minmax(86px, 1fr)); align-items: center; min-height: 48px; border-bottom: 1px solid var(--neutral-200); background: {{ r.zebra }};">
+          <div style="display: flex; align-items: center; gap: 6px; padding: 0 12px;"><select onChange="{{ r.onChange }}" value="{{ r.code }}" style="font: inherit; font-weight: 700; height: 32px; flex: 1; min-width: 0; padding: 0 8px; border: 1px solid var(--ink); background: var(--paper); color: {{ r.color }}; cursor: pointer;"><sc-for list="{{ symbolOptions }}" as="o"><option value="{{ o.code }}">{{ o.code }}</option></sc-for></select><button onClick="{{ r.onRemove }}" title="Remove" style="width: 28px; height: 32px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">×</button></div>
+          <div style="display: flex; gap: 2px; padding: 0 12px;"><sc-for list="{{ r.acts }}" as="a"><a href="{{ a.href }}" title="{{ a.title }}" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ a.d }}"></path></svg></a></sc-for></div>
+          <sc-for list="{{ r.cells }}" as="c"><span style="text-align: right; padding: 0 10px; font-family: var(--font-mono); font-size: 13px; color: {{ c.color }};">{{ c.v }}</span></sc-for>
+        </div>
+      </sc-for>
+      <sc-if value="{{ canAdd }}"><div style="display: grid; grid-template-columns: 200px 130px repeat(13, minmax(86px, 1fr)); align-items: center; min-height: 48px; border-bottom: 1px solid var(--neutral-200);">
+        <div style="padding: 0 12px;"><select onChange="{{ onAdd }}" value="" style="font: inherit; height: 32px; width: 100%; padding: 0 8px; border: 1px dashed var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;"><option value="">Select Symbol</option><sc-for list="{{ addOptions }}" as="o"><option value="{{ o.code }}">{{ o.code }}</option></sc-for></select></div>
+        <span></span><sc-for list="{{ heads }}" as="b"><span style="text-align: right; padding: 0 10px; color: var(--text-muted);">–</span></sc-for>
+      </div></sc-if>
+    </div></div>
+  </section>
+
+  <dc-import name="SymbolIndex" page="Market Watch" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, codes: ['BRACBANK', 'GP', 'SQURPHARMA', 'RENATA'] };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt } = U; const IN = U.fmtIN; const MAX = 8;
+    const codes = st.codes.filter(c => U.pe.byCode[c]);
+    const ICONS = [['Stock chart', 'chart', 'M2 12l4-4 3 3 5-6'], ['1 Minute VPA', 'vpa', 'M3 13V8M6.5 13V4M10 13V9M13.5 13V6'], ['Depth monitor', 'depth', 'M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6'], ['News effect chart', 'effect', 'M3 2.5h10v11H3zM5.5 5.5h5M5.5 8h5M5.5 10.5h3']];
+    const neg = v => v < 0 ? 'var(--red-700)' : 'var(--ink)';
+    const rows = codes.map((code, i) => { const r = U.pe.byCode[code]; const A = U.actions(code);
+      const cells = [[fmt(r.eps), neg(r.eps)], [String(r.q1), neg(r.q1)], [String(r.q2), neg(r.q2)], [String(r.q3), neg(r.q3)], [String(r.q4), 'var(--ink)'], [IN(r.shares), 'var(--ink)'], [fmt(r.ltp, 1), 'var(--ink)'], [IN(r.mcap), 'var(--ink)'], [fmt(r.wmcap, 2), 'var(--ink)'], [fmt(r.ann), neg(r.ann)], [IN(r.earn), neg(r.earn)], [fmt(r.wpe), neg(r.wpe)], [fmt(r.ape), neg(r.ape)]].map(([v, color]) => ({ v, color }));
+      return { code, color: r.tone < 0 ? 'var(--red-700)' : 'var(--ink)', zebra: i % 2 ? 'var(--neutral-50)' : 'transparent', acts: ICONS.map(([title, key, d]) => ({ title, href: A[key], d })), cells, onChange: e => this.setState({ codes: codes.map((c, j) => j === i ? e.target.value : c) }), onRemove: () => this.setState({ codes: codes.filter((c, j) => j !== i) }) }; });
+    const heads = ['EPS', 'Q1 EPS', 'Q2 EPS', 'Q3 EPS', 'Q4 EPS', 'Total securities', 'LTP', 'Market capital (mn)', 'Weighted market capital', 'Annualized EPS', 'Annualized earning (mn)', 'Weighted PE', 'Annualized PE'].map(label => ({ label }));
+    return { rows, heads, symbolOptions: U.symbols.map(code => ({ code })), canAdd: codes.length < MAX, addOptions: U.symbols.filter(c => !codes.includes(c)).map(code => ({ code })), onAdd: e => { if (e.target.value) this.setState({ codes: [...codes, e.target.value] }); }, clearAll: () => this.setState({ codes: [] }), count: codes.length, max: MAX };
+  }
+}
+</script>
+</body>
+</html>
