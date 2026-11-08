@@ -123,7 +123,7 @@ a:hover { color: var(--blue-700); }
       </div>
     </div>
 
-    <aside data-screen-label="Symbol list" style="flex: 1 1 300px; max-width: 380px; min-width: 280px; border: 1px solid var(--ink); position: relative;">
+    <aside data-screen-label="Symbol list" style="flex: 1 1 300px; max-width: 380px; min-width: 280px; border: 1px solid var(--ink); position: relative; align-self: stretch; display: flex; flex-direction: column;">
       <div style="display: flex; border-bottom: 1px solid var(--ink);">
         <button onClick="{{ toggleMenu }}" aria-haspopup="listbox" style="font: inherit; font-size: 15px; flex: 1; height: 48px; padding: 0 16px; border: 0; border-right: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; text-align: left;"><span>{{ filterLabel }}</span><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 4l4 4 4-4z"></path></svg></button>
         <button onClick="{{ toggleMenu }}" title="Filters" style="width: 48px; height: 48px; border: 0; background: {{ menuBg }}; color: {{ menuFg }}; cursor: pointer; display: flex; align-items: center; justify-content: center;"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 4h12M2 8h12M2 12h12"></path><circle cx="10" cy="4" r="1.6" fill="var(--paper)"></circle><circle cx="5" cy="8" r="1.6" fill="var(--paper)"></circle><circle cx="11" cy="12" r="1.6" fill="var(--paper)"></circle></svg></button>
@@ -139,7 +139,7 @@ a:hover { color: var(--blue-700); }
       </sc-if>
 
       <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) 64px 70px; padding: 8px 12px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink);"><span></span><span>Symbol</span><span style="text-align: right;">Last</span><span style="text-align: right;">Chg %</span></div>
-      <div style="max-height: 560px; overflow-y: auto;">
+      <div style="flex: 1; min-height: 320px; position: relative;"><div style="position: absolute; inset: 0; overflow-y: auto;">
         <sc-for list="{{ list }}" as="s" hint-placeholder-count="14">
           <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) 64px 70px; align-items: center; padding: 0 12px; height: 38px; border-bottom: 1px solid var(--neutral-200); font-size: 13px; background: {{ s.bg }};" style-hover="background: var(--neutral-100);">
             <button onClick="{{ s.toggleWatch }}" title="Watchlist" style="border: 0; background: transparent; cursor: pointer; padding: 0; display: flex; color: {{ s.heartColor }};"><svg width="16" height="16" viewBox="0 0 16 16" fill="{{ s.heartFill }}" stroke="currentColor" stroke-width="1.3"><path d="M8 13.5S2 9.8 2 6a3 3 0 015.5-1.7h1A3 3 0 0114 6c0 3.800-6 7.500-6 7.500z"></path></svg></button>
@@ -148,7 +148,7 @@ a:hover { color: var(--blue-700); }
           </div>
         </sc-for>
         <sc-if value="{{ listEmpty }}"><div style="padding: 32px 16px; text-align: center; color: var(--text-muted);">{{ emptyText }}</div></sc-if>
-      </div>
+      </div></div>
       <div style="padding: 8px 12px; border-top: 1px solid var(--ink); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between;"><span>{{ listCount }} symbols</span><span>Updated 2:10 PM</span></div>
     </aside>
   </section>
