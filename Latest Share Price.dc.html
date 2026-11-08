@@ -115,7 +115,7 @@ a:hover { color: var(--blue-700); }
           <sc-for list="{{ rows }}" as="r" hint-placeholder-count="20">
             <div style="display: table-row;" style-hover="background: var(--neutral-100);">
               <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); font-family: var(--font-mono); color: var(--text-muted);">{{ r.n }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200);"><a href="{{ r.a.chart }}" style="font-weight: 700;">{{ r.code }}</a> <span style="font-size: 11px; padding: 0 3px; border: 1px solid var(--neutral-400); color: var(--text-muted);">{{ r.cat }}</span></div>
+              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200);"><a href="{{ r.a.stock }}" style="font-weight: 700;">{{ r.code }}</a> <span style="font-size: 11px; padding: 0 3px; border: 1px solid var(--neutral-400); color: var(--text-muted);">{{ r.cat }}</span></div>
               <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200);">
                 <div style="display: flex; gap: 2px;">
                   <a href="{{ r.a.chart }}" title="Stock chart" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 12l4-4 3 3 5-6"></path></svg></a>
