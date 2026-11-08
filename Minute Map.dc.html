@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Minute Map — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <nav aria-label="Breadcrumb" style="font-size: 13px; color: var(--text-muted); display: flex; gap: 6px;"><a href="Home.dc.html">Home</a><span>/</span><span>VPA</span><span>/</span><span style="color: var(--ink);">Minute map</span></nav>
+
+  <section data-screen-label="Minute map" style="border: 1px solid var(--ink);">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+      <div style="display: flex; flex-direction: column;"><b style="font-size: 18px;">Minute map</b><span style="font-size: 12px; color: var(--text-muted);">Last-minute activity across all {{ total }} securities · tile size shows {{ metricLabel }}, colour shows price change</span></div>
+      <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 4px;"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; height: 36px; padding: 0 18px; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);">{{ t.label }}</button></sc-for></div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--neutral-200); font-size: 12px; color: var(--text-muted);">
+      <span>Last minute · {{ asOf }}</span>
+      <div style="display: flex; align-items: center; gap: 8px;"><span>−5%</span><div style="display: flex;"><sc-for list="{{ scale }}" as="c" hint-placeholder-count="9"><span style="width: 28px; height: 12px; background: {{ c }};"></span></sc-for></div><span>+5%</span></div>
+    </div>
+
+    <div style="padding: 12px;">
+      <div style="position: relative; width: 100%; height: 560px; background: var(--ink);" onMouseLeave="{{ onLeave }}">
+        <sc-for list="{{ sectors }}" as="g"><div title="{{ g.name }}" style="position: absolute; left: {{ g.x }}; top: {{ g.y }}; width: {{ g.w }}; height: {{ g.h }}; box-sizing: border-box; border: 2px solid var(--ink); background: var(--ink); pointer-events: none;"><span style="position: absolute; left: 4px; top: 1px; font-size: 10px; line-height: 14px; font-weight: 700; color: var(--paper); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; max-width: 96%;">{{ g.label }}</span></div></sc-for>
+        <sc-for list="{{ tiles }}" as="t">
+          <a href="{{ t.href }}" onMouseEnter="{{ t.onEnter }}" style="position: absolute; left: {{ t.x }}; top: {{ t.y }}; width: {{ t.w }}; height: {{ t.h }}; box-sizing: border-box; border: 1px solid var(--ink); background: {{ t.bg }}; color: {{ t.fg }}; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; text-align: center; line-height: 1.15;" style-hover="outline: 2px solid var(--paper); outline-offset: -3px; z-index: 2;">
+            <sc-if value="{{ t.showCode }}"><b style="font-size: {{ t.fs }}px;">{{ t.code }}</b></sc-if>
+            <sc-if value="{{ t.showPct }}"><span style="font-family: var(--font-mono); font-size: 11px;">{{ t.pct }}</span></sc-if>
+          </a>
+        </sc-for>
+        <sc-if value="{{ tip.show }}"><div style="position: absolute; right: 12px; top: 12px; z-index: 5; background: var(--paper); color: var(--ink); border: 1px solid var(--ink); padding: 10px 12px; min-width: 200px; display: flex; flex-direction: column; gap: 3px; font-size: 12px; pointer-events: none;"><b style="font-size: 14px;">{{ tip.code }}</b><span style="color: var(--text-muted);">{{ tip.sector }}</span><span style="font-family: var(--font-mono);">LTP {{ tip.ltp }} · <span style="color: {{ tip.color }};">{{ tip.chg }}</span></span><span style="font-family: var(--font-mono);">Value {{ tip.value }} mn</span><span style="font-family: var(--font-mono);">Volume {{ tip.volume }}</span><span style="font-family: var(--font-mono);">Trades {{ tip.trades }}</span></div></sc-if>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 24px; align-items: start;">
+    <sc-for list="{{ tables }}" as="tb" hint-placeholder-count="2">
+      <div data-screen-label="Ranking" style="border: 1px solid var(--ink); min-width: 0;">
+        <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">{{ tb.title }}</div>
+        <div style="display: grid; grid-template-columns: 36px minmax(0, 1.3fr) 72px 1fr 1fr 1.3fr; padding: 8px 12px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink); gap: 6px;"><span>No</span><span>Scrip</span><span>Actions</span><span style="text-align: right;">LTP</span><span style="text-align: right;">{{ metricHead }}</span><span style="text-align: right;">Change</span></div>
+        <sc-for list="{{ tb.rows }}" as="r" hint-placeholder-count="20">
+          <div style="display: grid; grid-template-columns: 36px minmax(0, 1.3fr) 72px 1fr 1fr 1.3fr; padding: 0 12px; height: 34px; align-items: center; gap: 6px; border-bottom: 1px solid var(--neutral-200); font-size: 13px;" style-hover="background: var(--neutral-100);">
+            <span style="color: var(--text-muted); font-family: var(--font-mono);">{{ r.n }}</span>
+            <a href="{{ r.watch }}" style="font-weight: 700; color: {{ r.color }}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ r.code }}</a>
+            <div style="display: flex; gap: 2px;"><a href="{{ r.chart }}" title="Stock chart" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 12l4-4 3 3 5-6"></path></svg></a><a href="{{ r.vpa }}" title="1 minute VPA" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M3 13V8M6.5 13V4M10 13V9M13.5 13V6"></path></svg></a></div>
+            <span style="text-align: right; font-family: var(--font-mono);">{{ r.ltp }}</span>
+            <span style="text-align: right; font-family: var(--font-mono); font-weight: 700;">{{ r.metric }}</span>
+            <span style="text-align: right; font-family: var(--font-mono); color: {{ r.color }};">{{ r.chg }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </section>
+
+  <dc-import name="SymbolIndex" page="Market Watch" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, metric: 'value', hover: null };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt, fmtInt, sign, tone } = U;
+    const M = st.metric;
+    const META = { value: ['Value Map', 'value', 'Value (mn)'], volume: ['Volume Map', 'volume', 'Volume'], trades: ['Trade Map', 'trades', 'Trades'] };
+    // last-minute activity per security (deterministic)
+    const lm = U.stocks.map(s => { const r = U.rng(U.hash(s.code) + 991); const volume = Math.round(s.volume * (0.002 + r() * 0.022)); const trades = Math.max(0, Math.round(volume / (90 + r() * 320))); return { s, volume, trades, value: U.round(volume * s.ltp / 1e6, 2) }; });
+    const size = o => o[M === 'value' ? 'value' : M === 'volume' ? 'volume' : 'trades'];
+    const WV = 1200, HV = 560;
+    const squarify = (items, x, y, w, h) => {
+      const out = []; const tot = items.reduce((a, i) => a + i.v, 0) || 1; let rest = items.map(i => ({ ...i, a: i.v / tot * w * h }));
+      while (rest.length) {
+        const short = Math.min(w, h); let row = [rest[0]]; let s = rest[0].a;
+        const worst = (r, sum) => { const mx = Math.max(...r.map(q => q.a)), mn = Math.min(...r.map(q => q.a)); return Math.max(short * short * mx / (sum * sum), sum * sum / (short * short * mn)); };
+        let i = 1; while (i < rest.length) { const nr = [...row, rest[i]]; const ns = s + rest[i].a; if (worst(nr, ns) <= worst(row, s)) { row = nr; s = ns; i++; } else break; }
+        const th = s / short;
+        if (w >= h) { let yy = y; row.forEach(r => { const hh = r.a / th; out.push({ ...r, x, y: yy, w: th, h: hh }); yy += hh; }); x += th; w -= th; }
+        else { let xx = x; row.forEach(r => { const ww = r.a / th; out.push({ ...r, x: xx, y, w: ww, h: th }); xx += ww; }); y += th; h -= th; }
+        rest = rest.slice(row.length);
+      }
+      return out;
+    };
+    const bySector = {}; lm.forEach(o => { (bySector[o.s.sector] = bySector[o.s.sector] || []).push(o); });
+    const secItems = Object.entries(bySector).map(([name, list]) => ({ name, list, v: Math.max(list.reduce((a, o) => a + Math.max(size(o), 0.02), 0), 0.05) })).sort((a, b) => b.v - a.v);
+    const secRects = squarify(secItems, 0, 0, WV, HV);
+    const pc = (v, t) => (v / t * 100).toFixed(3) + '%';
+    const sectors = [], tiles = [];
+    secRects.forEach(g => {
+      const head = g.h > 54 && g.w > 70 ? 15 : 0; const pad = 2;
+      sectors.push({ name: g.name, label: head ? g.name : '', x: pc(g.x, WV), y: pc(g.y, HV), w: pc(g.w, WV), h: pc(g.h, HV) });
+      const inner = { x: g.x + pad, y: g.y + pad + head, w: Math.max(g.w - pad * 2, 1), h: Math.max(g.h - pad * 2 - head, 1) };
+      const items = g.list.map(o => ({ o, v: Math.max(size(o), 0.02) })).sort((a, b) => b.v - a.v);
+      squarify(items, inner.x, inner.y, inner.w, inner.h).forEach(t => {
+        const s = t.o.s; const pct = s.changePct; const big = t.w > 46 && t.h > 26; const mid = t.w > 30 && t.h > 16;
+        tiles.push({ code: s.code, href: U.href('Market Watch', { symbol: s.code }), x: pc(t.x, WV), y: pc(t.y, HV), w: pc(t.w, WV), h: pc(t.h, HV), bg: U.heat(pct), fg: U.heatText(pct), showCode: mid, showPct: big, fs: t.w > 90 && t.h > 40 ? 14 : 11, pct: sign(pct) + '%', onEnter: () => this.setState({ hover: s.code }) });
+      });
+    });
+    const hs = st.hover && U.bySym[st.hover]; const ho = hs && lm.find(o => o.s.code === hs.code);
+    const tip = hs ? { show: true, code: hs.code, sector: hs.sector, ltp: fmt(hs.ltp, 1), chg: `${sign(hs.change)} (${sign(hs.changePct)}%)`, color: tone(hs.change), value: fmt(ho.value), volume: fmtInt(ho.volume), trades: fmtInt(ho.trades) } : { show: false };
+    // ranking tables
+    const ranked = lm.slice().sort((a, b) => size(b) - size(a));
+    const fmtM = o => M === 'value' ? fmt(o.value) : M === 'volume' ? fmtInt(o.volume) : fmtInt(o.trades);
+    const mk = (list, off) => list.map((o, i) => ({ n: off + i + 1, code: o.s.code, color: o.s.change === 0 ? 'var(--ink)' : tone(o.s.change), ltp: fmt(o.s.ltp, 1), metric: fmtM(o), chg: `${sign(o.s.change, 1)} (${sign(o.s.changePct)}%)`, watch: U.href('Market Watch', { symbol: o.s.code }), chart: U.actions(o.s.code).chart, vpa: U.actions(o.s.code).vpa }));
+    const half = Math.ceil(ranked.length / 2); const label = META[M][0].replace(' Map', '');
+    const tables = [{ title: `Last minute top ${ranked.length} ${label.toLowerCase()}`, rows: mk(ranked.slice(0, half), 0) }, { title: `Last minute top ${ranked.length} ${label.toLowerCase()} (continued)`, rows: mk(ranked.slice(half), half) }];
+    const tabs = Object.entries(META).map(([k, [l]]) => ({ label: l, bd: M === k ? 'var(--ink)' : 'var(--neutral-300)', bg: M === k ? 'var(--ink)' : 'var(--paper)', fg: M === k ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ metric: k, hover: null }) }));
+    return { tabs, sectors, tiles, tip, onLeave: () => this.setState({ hover: null }), tables, metricHead: META[M][2], metricLabel: META[M][2].toLowerCase().replace(' (mn)', ''), total: U.stocks.length, asOf: '14:09', scale: [-5, -3.75, -2.5, -1.25, 0, 1.25, 2.5, 3.75, 5].map(p => U.heat(p)) };
+  }
+}
+</script>
+</body>
+</html>
