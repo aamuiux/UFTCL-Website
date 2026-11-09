@@ -171,5 +171,32 @@
     return { rows: rows.slice().sort((a, b) => a.code.localeCompare(b.code)), byCode: Object.fromEntries(rows.map(x => [x.code, x])), total, sectors: group('sector'), cats: group('cat') };
   })();
 
-  window.UFT = { rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
+  // ---- chart bars for any stock or index. tf: '1m' (intraday), 'D', 'W' or 'M'. Latest bars are pinned to the quote.
+  const chartCache = {};
+  function chartBars(code, tf) {
+    const key = code + '|' + tf; if (chartCache[key]) return chartCache[key];
+    const S = bySym[code], IX = indices[code]; if (!S && !IX) return [];
+    const fmtD = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
+    let out;
+    if (tf === '1m') {
+      if (S) { const pts = vpa(code, 100); out = pts.map((q, i) => { const o = i ? pts[i - 1].price : S.open; return { o, c: q.price, h: Math.max(o, q.price), l: Math.min(o, q.price), v: q.vol, t: q.time }; }); }
+      else out = IX.series.map((v, i) => { const o = i ? IX.series[i - 1] : v; return { o, c: v, h: Math.max(o, v), l: Math.min(o, v), v: Math.round(IX.vols[i] * 2e7), t: times[i] }; });
+    } else {
+      let raw;
+      if (S) {
+        raw = daily(code, 1300); const rl = raw[raw.length - 1], rp = raw[raw.length - 2];
+        rp.c = S.ycp; rp.h = Math.max(rp.h, S.ycp); rp.l = Math.min(rp.l, S.ycp); rl.o = S.open; rl.h = S.high; rl.l = S.low; rl.c = S.ltp; rl.v = S.volume;
+      } else {
+        const r = rng(hash(code) + 41); let p = IX.value * (0.8 + r() * 0.2); const d0 = new Date(2026, 10, 5); raw = [];
+        for (let i = 1299; i >= 0; i--) { const o = p, c = o * (1 + (r() - 0.49) * 0.014); const d = new Date(d0); d.setDate(d0.getDate() - Math.round(i * 7 / 5)); raw.push({ date: d, o, h: Math.max(o, c) * (1 + r() * 0.004), l: Math.min(o, c) * (1 - r() * 0.004), c, v: Math.round(8e7 * (0.5 + r())) }); p = c; }
+        const k = IX.value / raw[raw.length - 1].c; raw.forEach(b => { b.o = round(b.o * k, 2); b.h = round(b.h * k, 2); b.l = round(b.l * k, 2); b.c = round(b.c * k, 2); });
+        const rl = raw[raw.length - 1], rp = raw[raw.length - 2]; rp.c = IX.prev; rp.h = Math.max(rp.h, IX.prev); rp.l = Math.min(rp.l, IX.prev); rl.o = IX.open; rl.h = IX.high; rl.l = IX.low; rl.c = IX.value;
+      }
+      const grp = k => { const g = []; for (let i = raw.length % k; i < raw.length; i += k) { const sl = raw.slice(i, i + k); g.push({ o: sl[0].o, h: Math.max(...sl.map(b => b.h)), l: Math.min(...sl.map(b => b.l)), c: sl[sl.length - 1].c, v: sl.reduce((a, b) => a + b.v, 0), t: fmtD(sl[sl.length - 1].date) }); } return g; };
+      out = tf === 'W' ? grp(5) : tf === 'M' ? grp(21) : raw.map(b => ({ o: b.o, h: b.h, l: b.l, c: b.c, v: b.v, t: fmtD(b.date) }));
+    }
+    return (chartCache[key] = out);
+  }
+
+  window.UFT = { chartBars, rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
 })();

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>MTF Charts — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.mtf { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.mtf-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 440px; gap: 16px; min-width: 0; }
+.mtf-side { height: 896px; display: flex; flex-direction: column; border: 1px solid var(--ink); min-width: 0; }
+.mtf-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 70px 70px; align-items: center; height: 34px; border-bottom: 1px solid var(--neutral-200); font-size: 13px; cursor: pointer; }
+.mtf-row:hover { background: var(--neutral-50); }
+@media (max-width: 1100px) { .mtf { grid-template-columns: 1fr; } .mtf-side { height: 520px; } }
+@media (max-width: 720px) { .mtf-charts { grid-template-columns: 1fr; } }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+
+  <sc-if value="{{ bannerOn }}"><div role="note" data-screen-label="Info banner" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: hsl(32deg 88% 52%); color: var(--ink); font-size: 14px;"><span>In a multi-timeframe chart you can view the same instrument across different time intervals. Changing the instrument in one chart changes the others too.</span><button onClick="{{ onBanner }}" aria-label="Dismiss" style="flex-shrink: 0; width: 28px; height: 28px; border: 0; background: transparent; color: var(--ink); cursor: pointer; font-size: 20px; line-height: 1;">×</button></div></sc-if>
+
+  <div class="mtf">
+    <div class="mtf-charts" data-screen-label="Charts">
+      <dc-import name="ChartPane" mode="compact" code="DSEX" tf="1m" sync="1" urlsym="1" height="100%" hint-size="100%,440px"></dc-import>
+      <dc-import name="ChartPane" mode="compact" code="DSEX" tf="D" sync="1" urlsym="1" height="100%" hint-size="100%,440px"></dc-import>
+      <dc-import name="ChartPane" mode="compact" code="DSEX" tf="W" sync="1" urlsym="1" height="100%" hint-size="100%,440px"></dc-import>
+      <dc-import name="ChartPane" mode="compact" code="DSEX" tf="M" sync="1" urlsym="1" height="100%" hint-size="100%,440px"></dc-import>
+    </div>
+
+    <aside class="mtf-side" data-screen-label="Symbol list">
+      <div style="display: flex; gap: 8px; padding: 8px; border-bottom: 1px solid var(--ink);">
+        <select onChange="{{ onList }}" value="{{ list }}" aria-label="Symbol list" style="font: inherit; font-size: 13px; font-weight: 700; flex: 1; min-width: 0; height: 36px; padding: 0 8px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
+          <sc-for list="{{ listOpts }}" as="o" hint-placeholder-count="7"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+        </select>
+      </div>
+      <div style="padding: 8px; border-bottom: 1px solid var(--neutral-300);"><input type="search" placeholder="Search symbol" value="{{ q }}" onChange="{{ onQ }}" aria-label="Search symbol" style="font: inherit; font-size: 13px; width: 100%; box-sizing: border-box; height: 34px; padding: 0 10px; border: 1px solid var(--neutral-400); background: var(--paper); color: var(--ink);"></div>
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 1fr) 70px 70px; align-items: center; height: 30px; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);"><span></span><span>Symbol</span><span style="text-align: right;">Last</span><span style="text-align: right; padding-right: 10px;">Chg%</span></div>
+      <div style="flex: 1; overflow-y: auto; min-height: 0;">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="14"><div class="mtf-row" onClick="{{ r.onPick }}" style="background: {{ r.bg }};"><button onClick="{{ r.onFav }}" aria-label="{{ r.favLabel }}" aria-pressed="{{ r.favOn }}" style="font: inherit; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 34px; color: {{ r.favCol }};"><svg width="14" height="14" viewBox="0 0 16 16" fill="{{ r.favFill }}" stroke="currentColor" stroke-width="1.3"><path d="M8 13.5S2 9.8 2 6a3 3 0 015.2-2L8 4.8 8.8 4A3 3 0 0114 6c0 3.800-6 7.500-6 7.500z"></path></svg></button><span style="font-weight: {{ r.fw }}; color: {{ r.col }};">{{ r.code }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ r.last }}</span><span style="text-align: right; padding-right: 10px; font-family: var(--font-mono); color: {{ r.tone }};">{{ r.pct }}</span></div></sc-for>
+        <sc-if value="{{ noRows }}"><div style="padding: 20px 12px; font-size: 13px; color: var(--text-muted); text-align: center;">{{ emptyText }}</div></sc-if>
+      </div>
+    </aside>
+  </div>
+
+  <dc-import name="SymbolIndex" page="MTF Charts" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, sel: null, list: 'all', q: '', favs: ['1JANATAMF'], banner: true };
+  readStore(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+  writeStore(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+  componentDidMount() {
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50);
+    const f = this.readStore('uftcl.mtf.favs'); if (Array.isArray(f)) this.setState({ favs: f });
+    if (this.readStore('uftcl.mtf.banner') === false) this.setState({ banner: false });
+    this.onSym = e => { const d = e.detail || {}; if (d.code) this.setState({ sel: d.code }); };
+    window.addEventListener('uft-chart-symbol', this.onSym);
+  }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-chart-symbol', this.onSym); }
+  pick(code) { this.setState({ sel: code }); window.dispatchEvent(new CustomEvent('uft-chart-symbol', { detail: { code, src: 'page' } })); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt, sign, tone } = U;
+    const q0 = (U.param('symbol', '') || '').toUpperCase(); const init = U.bySym[q0] || U.indices[q0] ? q0 : 'DSEX';
+    const sel = st.sel || init;
+    const ix = Object.keys(U.indices).map(c => ({ code: c, last: U.indices[c].value, chg: U.indices[c].change, pct: U.indices[c].pct, d: 2 }));
+    const stocks = U.stocks.slice().sort((a, b) => a.code.localeCompare(b.code)).map(s => ({ code: s.code, last: s.ltp, chg: s.change, pct: s.changePct, d: 1, s }));
+    const LISTS = { all: ['All symbols', () => [...ix, ...stocks]], fav: ['Favourites', () => [...ix, ...stocks].filter(r => st.favs.includes(r.code))], gain: ['Top gainers', () => stocks.slice().sort((a, b) => b.pct - a.pct).slice(0, 15)], lose: ['Top losers', () => stocks.slice().sort((a, b) => a.pct - b.pct).slice(0, 15)], value: ['Top value', () => stocks.slice().sort((a, b) => b.s.value - a.s.value).slice(0, 15)], volume: ['Top volume', () => stocks.slice().sort((a, b) => b.s.volume - a.s.volume).slice(0, 15)], idx: ['Indices', () => ix] };
+    const q = st.q.trim().toUpperCase();
+    const rows = LISTS[st.list][1]().filter(r => !q || r.code.includes(q)).map(r => { const on = st.favs.includes(r.code); const cur = r.code === sel;
+      return { code: r.code, last: fmt(r.last, r.d), pct: sign(r.pct) + '%', tone: tone(r.pct), bg: cur ? 'var(--neutral-100)' : 'var(--paper)', fw: cur ? 700 : 400, col: 'var(--ink)',
+        favOn: on ? 'true' : 'false', favLabel: (on ? 'Remove ' : 'Add ') + r.code + (on ? ' from' : ' to') + ' favourites', favCol: on ? 'var(--red-700)' : 'var(--neutral-500)', favFill: on ? 'currentColor' : 'none',
+        onPick: () => this.pick(r.code), onFav: e => { e.stopPropagation(); const favs = on ? st.favs.filter(c => c !== r.code) : [...st.favs, r.code]; this.writeStore('uftcl.mtf.favs', favs); this.setState({ favs }); } }; });
+    return { bannerOn: st.banner, onBanner: () => { this.writeStore('uftcl.mtf.banner', false); this.setState({ banner: false }); },
+      list: st.list, listOpts: Object.keys(LISTS).map(k => ({ value: k, label: LISTS[k][0] })), onList: e => this.setState({ list: e.target.value }),
+      q: st.q, onQ: e => this.setState({ q: e.target.value }), rows, noRows: rows.length === 0, emptyText: st.list === 'fav' && !q ? 'No favourites yet. Tap the heart next to a symbol.' : 'No symbols match.' };
+  }
+}
+</script>
+</body>
+</html>
