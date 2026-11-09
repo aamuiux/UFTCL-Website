@@ -133,13 +133,15 @@ a:hover { color: var(--blue-700); }
 
       <div style="padding: 32px; display: flex; flex-direction: column; gap: 20px; min-width: 0;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; flex-direction: column; gap: 4px;"><div style="font-family: var(--font-sans-b); font-size: 24px; line-height: 30px;">Welcome back</div><div style="color: var(--text-muted); font-size: 14px;">{{ loginSub }}</div></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><div style="font-family: var(--font-sans-b); font-size: 24px; line-height: 30px;">Welcome back</div><div style="color: var(--text-muted); font-size: 14px;">Login to open your saved watchlists and settings.</div></div>
           <button onClick="{{ toggleLogin }}" aria-label="Close login" style="flex-shrink: 0; width: 36px; height: 36px; border: 1px solid var(--neutral-300); background: var(--paper); cursor: pointer; color: var(--ink); display: inline-flex; align-items: center; justify-content: center;" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l10 10M13 3 3 13"></path></svg></button>
         </div>
 
-        <div style="display: flex; border: 1px solid var(--ink);">
-          <sc-for list="{{ loginTabs }}" as="t" hint-placeholder-count="2"><button type="button" onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; flex: 1; height: 40px; border: 0; border-left: {{ t.bl }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <button type="button" onClick="{{ onSocial }}" style="font: inherit; font-size: 14px; font-weight: 700; flex: 1; min-width: 160px; height: 46px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;" style-hover="background: var(--neutral-100);"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"></path><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 019.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A23.9 23.9 0 000 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"></path><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"></path></svg>Google</button>
+          <button type="button" onClick="{{ onSocial }}" style="font: inherit; font-size: 14px; font-weight: 700; flex: 1; min-width: 160px; height: 46px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;" style-hover="background: var(--neutral-100);"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#1877F2" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.02 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.88v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.09 24 18.09 24 12.07z"></path></svg>Facebook</button>
         </div>
+        <div style="display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-muted);"><span style="flex: 1; height: 1px; background: var(--neutral-300);"></span>or login with email<span style="flex: 1; height: 1px; background: var(--neutral-300);"></span></div>
 
         <form onSubmit="{{ onLoginSubmit }}" style="display: flex; flex-direction: column; gap: 16px;">
           <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700;">{{ idLabel }}
@@ -169,7 +171,7 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:420},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;price&quot;,&quot;market&quot;,&quot;scanner&quot;,&quot;ipo&quot;,&quot;company&quot;,&quot;news&quot;,&quot;trade&quot;,&quot;about&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
-  state = { now: new Date(), open: null, drawer: false, login: false, loginTab: 'investor', lid: '', lpw: '', showPw: false, remember: true, lerr: {}, w: typeof window !== 'undefined' ? window.innerWidth : 1280, ready: !!window.UFT };
+  state = { now: new Date(), open: null, drawer: false, login: false, lid: '', lpw: '', showPw: false, remember: true, lerr: {}, w: typeof window !== 'undefined' ? window.innerWidth : 1280, ready: !!window.UFT };
   componentDidMount() {
     this.t = setInterval(() => this.setState({ now: new Date(), ready: !!window.UFT }), 1000);
     this.onR = () => this.setState({ w: window.innerWidth });
@@ -199,22 +201,20 @@ class Component extends DCLogic {
     ];
   }
   loginVals() {
-    const st = this.state; const trade = st.loginTab === 'trade'; const wide = st.w >= 760; const err = st.lerr || {};
+    const st = this.state; const wide = st.w >= 760; const err = st.lerr || {};
     return {
       loginWide: wide, loginCols: wide ? '5fr 6fr' : '1fr',
       loginPerks: [{ t: 'Watchlists that follow you across devices' }, { t: 'Saved charts, PE ratio and VPA settings' }, { t: 'Price alerts on any DSE instrument' }, { t: 'One place for scanners, news and research' }],
-      loginSub: trade ? 'Continue to the UFTFAST online trading portal.' : 'Login to open your saved watchlists and settings.',
-      loginTabs: [['investor', 'Investor login'], ['trade', 'UFTFAST trading']].map(([k, label], i) => ({ label, bl: i ? '1px solid var(--ink)' : '0', bg: st.loginTab === k ? 'var(--ink)' : 'var(--paper)', fg: st.loginTab === k ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ loginTab: k, lerr: {} }) })),
-      idLabel: trade ? 'BO account or client code' : 'Email or client code', pwLabel: trade ? 'Trading password' : 'Password',
-      submitLabel: trade ? 'Continue to UFTFAST' : 'Login',
+      idLabel: 'Email or client code', pwLabel: 'Password', submitLabel: 'Login',
       lid: st.lid, lpw: st.lpw, onLid: e => this.setState({ lid: e.target.value }), onLpw: e => this.setState({ lpw: e.target.value }),
       pwType: st.showPw ? 'text' : 'password', pwToggleLabel: st.showPw ? 'Hide' : 'Show', onTogglePw: () => this.setState(s => ({ showPw: !s.showPw })),
       remMark: st.remember ? '✓' : '', remBg: st.remember ? 'var(--ink)' : 'var(--paper)', onRemember: () => this.setState(s => ({ remember: !s.remember })),
       hasErrId: !!err.id, errId: err.id || '', idBd: err.id ? 'var(--red-700)' : 'var(--ink)', hasErrPw: !!err.pw, errPw: err.pw || '', pwBd: err.pw ? 'var(--red-700)' : 'var(--ink)',
+      onSocial: () => this.setState({ login: false, lpw: '', lerr: {}, showPw: false }),
       onLoginSubmit: e => {
         e.preventDefault(); const lerr = {};
-        if (!st.lid.trim()) lerr.id = trade ? 'Enter your BO account or client code.' : 'Enter your email or client code.';
-        if (!st.lpw) lerr.pw = trade ? 'Enter your trading password.' : 'Enter your password.';
+        if (!st.lid.trim()) lerr.id = 'Enter your email or client code.';
+        if (!st.lpw) lerr.pw = 'Enter your password.';
         if (lerr.id || lerr.pw) this.setState({ lerr }); else this.setState({ login: false, lpw: '', lerr: {}, showPw: false });
       }
     };
