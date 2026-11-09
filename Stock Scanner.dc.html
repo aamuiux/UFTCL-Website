@@ -74,7 +74,7 @@ a:hover { color: var(--blue-700); }
   <sc-if value="{{ isPre }}">
   <section data-screen-label="Pre scanner" style="display: flex; flex-direction: column; gap: 12px;">
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
-      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">Time frame<span style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font-weight: 700;">D · Day</span></div>
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">Time frame<select onChange="{{ onTf }}" value="{{ tf }}" aria-label="Time frame" style="font: inherit; font-size: 13px; font-weight: 700; height: 36px; min-width: 120px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;"><sc-for list="{{ tfOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></div>
       <span style="font-size: 12px; color: var(--text-muted);">Pick an indicator, then a formula. The matching securities are listed below.</span>
     </div>
     <div class="scn-panels" data-screen-label="Pre scanner builder">
@@ -93,7 +93,7 @@ a:hover { color: var(--blue-700); }
       </div>
       <div>
         <div class="scn-panel-head">How it works</div>
-        <div style="padding: 14px; font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;"><span>Counts update from the day's data.</span><span>Select a formula to list the matching securities below. Select it again to hide the list.</span><span>Export the filtered list as CSV.</span></div>
+        <div style="padding: 14px; font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;"><span>Counts follow the selected time frame.</span><span>Select a formula to list the matching securities below. Select it again to hide the list.</span><span>Export the filtered list as CSV.</span></div>
       </div>
     </div>
   </section>
@@ -205,7 +205,7 @@ class Component extends DCLogic {
   state = {
     ready: !!window.UFT, sub: 'technical', msg: '', q: '', sort: { k: 'pct', d: -1 },
     slots: { technical: ['SMA20-below', ...Array(14).fill('')], fundamental: Array(15).fill(''), all: Array(15).fill('') },
-    preGroup: 'Oscillators', preInd: 'RSI (14)', preF: -1, cSel: -1,
+    preGroup: 'Oscillators', preInd: 'RSI (14)', preF: -1, cSel: -1, tf: 'D',
     cGroup: 'Oscillators', cInd: 'RSI', cPeriod: 14,
     cp: [{ n: 40, x: 3 }, { n: 60, x: 3 }, { n: 70, x: 3 }, { n: 30, x: 3 }, { n: 3, x: 3 }, { n: 40, x: 3 }, { n: 3, x: 3 }, { n: 60, x: 3 }],
     chips: [], lastRun: null,
@@ -218,9 +218,15 @@ class Component extends DCLogic {
   writeStore(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
   clampN(v) { return Math.max(1, Math.min(50, Math.round(+v) || 1)); }
 
-  calc(code) {
+  calc(code, tf = 'D') {
     const U = window.UFT; const S = U.bySym[code];
-    const bars = U.daily(code, 260);
+    const raw = U.daily(code, tf === 'D' ? 260 : 1300);
+    let bars = raw;
+    if (tf !== 'D') {
+      const k = tf === 'W' ? 5 : 21; bars = [];
+      for (let i = raw.length % k; i < raw.length; i += k) { const g = raw.slice(i, i + k); bars.push({ o: g[0].o, h: Math.max(...g.map(b => b.h)), l: Math.min(...g.map(b => b.l)), c: g[g.length - 1].c, v: g.reduce((a, b) => a + b.v, 0) }); }
+    }
+    const P52 = { D: 252, W: 52, M: 12 }[tf];
     const cl = bars.map(b => b.c), hi = bars.map(b => b.h), lo = bars.map(b => b.l), vo = bars.map(b => b.v);
     const tp = bars.map(b => (b.h + b.l + b.c) / 3);
     const last = a => a[a.length - 1], prev = a => a[a.length - 2];
@@ -248,13 +254,14 @@ class Component extends DCLogic {
     c.bbU = m20 + 2 * sd; c.bbL = m20 - 2 * sd;
     c.vol = last(vo); c.vma = sma(vo, 20);
     c.hi20 = Math.max(...hi.slice(-21, -1)); c.lo20 = Math.min(...lo.slice(-21, -1));
-    c.hi52 = Math.max(...hi.slice(-253, -1)); c.lo52 = Math.min(...lo.slice(-253, -1));
+    c.hi52 = Math.max(...hi.slice(-(P52 + 1), -1)); c.lo52 = Math.min(...lo.slice(-(P52 + 1), -1));
     return c;
   }
 
-  ctxMap() {
-    if (!this._map) { const U = window.UFT; this._map = {}; U.stocks.forEach(s => { this._map[s.code] = this.calc(s.code); }); }
-    return this._map;
+  ctxMap(tf = 'D') {
+    this._maps = this._maps || {};
+    if (!this._maps[tf]) { const U = window.UFT; const m = {}; U.stocks.forEach(s => { m[s.code] = this.calc(s.code, tf); }); this._maps[tf] = m; }
+    return this._maps[tf];
   }
 
   techCat() {
@@ -423,15 +430,17 @@ class Component extends DCLogic {
     }
 
     if (tab === 'pre') {
+      const Cp = this.ctxMap(st.tf); const TFN = { D: 'Day', W: 'Week', M: 'Month' }[st.tf];
+      out.tf = st.tf; out.tfOpts = [{ value: 'D', label: 'Day' }, { value: 'W', label: 'Week' }, { value: 'M', label: 'Month' }]; out.onTf = e => this.setState({ tf: e.target.value });
       const defs = this.preDefs(); const inds = defs[st.preGroup] || [];
       const ind = inds.find(i => i.n === st.preInd) || inds[0] || null;
       if (ind) {
         const fIdx = st.preF;
-        list = U.stocks.filter(s => fIdx < 0 || ind.f[fIdx][1](C[s.code]));
-        xOf = s => ind.v(C[s.code]); xFmt = v => U.fmt(v, ind.d); showX = true; xLabel = ind.n.toUpperCase();
-        out.preForms = ind.f.map(([label, test], idx) => { const cnt = U.stocks.filter(s => test(C[s.code])).length; const sel = fIdx === idx;
+        list = U.stocks.filter(s => fIdx < 0 || ind.f[fIdx][1](Cp[s.code]));
+        xOf = s => ind.v(Cp[s.code]); xFmt = v => U.fmt(v, ind.d); showX = true; xLabel = ind.n.toUpperCase();
+        out.preForms = ind.f.map(([label, test], idx) => { const cnt = U.stocks.filter(s => test(Cp[s.code])).length; const sel = fIdx === idx;
           return { label, count: U.fmtInt(cnt), countColor: sel ? 'var(--paper)' : 'var(--ink)', bg: sel ? 'var(--ink)' : 'var(--paper)', fg: sel ? 'var(--paper)' : 'var(--ink)', fw: sel ? 700 : 400, onClick: () => this.setState({ preF: sel ? -1 : idx }) }; });
-        out.resultTitle = `${list.length} securities · ${ind.n}${fIdx >= 0 ? ' · ' + ind.f[fIdx][0] : ''}`;
+        out.resultTitle = `${list.length} securities · ${TFN} · ${ind.n}${fIdx >= 0 ? ' · ' + ind.f[fIdx][0] : ''}`;
       } else {
         list = []; out.preForms = []; out.resultTitle = '0 securities';
         emptyText = 'Scanners for this group are coming soon.';
@@ -440,7 +449,7 @@ class Component extends DCLogic {
       out.preGroups = this.preGroupList.map(g => { const sel = g === st.preGroup; return { label: g, bg: sel ? 'var(--ink)' : 'var(--paper)', fg: sel ? 'var(--paper)' : 'var(--ink)', fw: sel ? 700 : 400, onClick: () => this.setState({ preGroup: g, preInd: (defs[g] && defs[g][0]) ? defs[g][0].n : '', preF: -1 }) }; });
       out.preInds = inds.map(i => { const sel = ind && i.n === ind.n; return { label: i.n, bg: sel ? 'var(--ink)' : 'var(--paper)', fg: sel ? 'var(--paper)' : 'var(--ink)', fw: sel ? 700 : 400, onClick: () => this.setState({ preInd: i.n, preF: -1 }) }; });
       out.onExport = () => this.exportCsv(out.rows || [], 'scanner-pre.csv');
-      out.footnote = 'Counts and values use the same day data as the table. Mock data, deterministic per symbol.';
+      out.footnote = 'Counts and values use the selected time frame. Mock data, deterministic per symbol.';
     }
 
     if (tab === 'custom') {
