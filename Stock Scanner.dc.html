@@ -21,10 +21,11 @@ a:hover { color: var(--blue-700); }
 .scn-panels > div { min-width: 0; border-right: 1px solid var(--ink); display: flex; flex-direction: column; }
 .scn-panels > div:last-child { border-right: 0; }
 .scn-panel-head { height: 36px; display: flex; align-items: center; padding: 0 14px; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.scn-row, .scn-input, .scn-btn { box-sizing: border-box; }
 .scn-row { font: inherit; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 40px; padding: 0 14px; border: 0; border-bottom: 1px solid var(--neutral-200); background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; font-size: 13px; }
 .scn-row:hover { background: var(--surface-hover, var(--neutral-50)); }
 .scn-table { overflow-x: auto; border: 1px solid var(--ink); }
-.scn-table-inner { min-width: 1400px; }
+.scn-table-inner { width: max-content; min-width: 100%; }
 .scn-btn { font: inherit; font-weight: 700; height: 40px; padding: 0 16px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 .scn-btn:hover { background: var(--ink); color: var(--paper); }
 .scn-btn-primary { background: var(--green-700); border-color: var(--green-700); color: var(--paper); }
@@ -129,7 +130,7 @@ a:hover { color: var(--blue-700); }
           <sc-if value="{{ cStale }}"><span style="font-size: 12px; color: var(--red-700);">Formulas changed. Run the scanner to update the results.</span></sc-if>
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--ink);">
-          <button class="scn-btn scn-btn-primary" onClick="{{ onRun }}" style="flex: 1; justify-content: center;"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z" fill="currentColor"></path></svg>Run scanner</button>
+          <button class="scn-btn scn-btn-primary" onClick="{{ onRun }}" style="flex: 1 1 100%; justify-content: center;"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z" fill="currentColor"></path></svg>Run scanner</button>
           <button class="scn-btn" onClick="{{ onCSave }}">Save</button>
           <button class="scn-btn" onClick="{{ onCLoad }}">Load</button>
           <button class="scn-btn" onClick="{{ onClear }}">Clear</button>
@@ -392,7 +393,7 @@ class Component extends DCLogic {
     const st = this.state; const C = this.ctxMap(); const lastOf = a => a[a.length - 1];
     const t0 = U.param('tab', 'technical'); const tab = t0 === 'pre' || t0 === 'custom' ? t0 : 'technical';
     const sub = st.sub; const slots = st.slots[sub]; const catAll = this.catMap();
-    const COLS = '120px 200px 90px 80px 90px 90px 90px 90px 90px 90px 80px 100px 110px 60px 90px';
+    const COLS = '110px 180px 72px 72px 72px 72px 72px 72px 72px 72px 68px 84px 96px 48px 80px';
 
     const TABS = [['technical', 'Scanner', null], ['pre', 'Pre scanner', { tab: 'pre' }], ['custom', 'Custom scanner', { tab: 'custom' }]];
     const out = {
@@ -471,7 +472,7 @@ class Component extends DCLogic {
     out.rows = this.makeRows(list, xOf, xFmt);
     out.empty = out.rows.length === 0;
     out.emptyText = emptyText;
-    out.showX = showX; out.xLabel = xLabel; out.cols = showX ? COLS + ' 120px' : COLS;
+    out.showX = showX; out.xLabel = xLabel; out.cols = showX ? COLS + ' 100px' : COLS;
     if (tab === 'technical') { out.total = out.rows.length; out.resultTitle = `Total ${out.rows.length} using Day period`; }
     if (!out.onExport) out.onExport = () => this.exportCsv(out.rows, 'scanner-technical.csv');
     out.onExport = out.onExport.bind ? out.onExport : out.onExport;
