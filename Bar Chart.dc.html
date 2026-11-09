@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>5 days value compare — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.tl-ctl { font: inherit; font-size: 13px; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.tl-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tl-btn:hover { background: var(--ink); color: var(--paper); }
+
+
+
+.bc-plot { position: relative; height: 380px; border-left: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+.bc-grp { flex: 1; min-width: 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 2px; position: relative; padding: 0 3px; }
+.bc-bar { flex: 1; max-width: 14px; min-width: 3px; }
+.bc-grp:hover { background: var(--neutral-50); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="tools" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">5 days value compare</h1>
+  <div style="color: var(--text-muted);">Turnover of each sector over the last five trading sessions, in BDT million.</div>
+</section>
+
+<dc-import name="ToolTabs" active="Bar Chart" hint-size="100%,40px"></dc-import>
+<section style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px;"><sc-for list="{{ legend }}" as="l" hint-placeholder-count="5"><span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: {{ l.c }};"></span>{{ l.d }}</span></sc-for></div>
+    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;">Sort sectors<select class="tl-ctl" value="{{ sort }}" onChange="{{ onSort }}"><sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></label>
+  </div>
+  <div style="display: grid; grid-template-columns: 64px 1fr; gap: 0;">
+    <div style="position: relative; height: 380px;"><sc-for list="{{ yl }}" as="y"><span style="position: absolute; right: 8px; top: {{ y.top }}; transform: translateY(-50%); font-size: 11px; font-family: var(--font-mono); color: var(--text-muted);">{{ y.t }}</span></sc-for></div>
+    <div class="bc-plot">
+      <sc-for list="{{ yl }}" as="y"><div style="position: absolute; left: 0; right: 0; top: {{ y.top }}; height: 1px; background: var(--neutral-200);"></div></sc-for>
+      <div style="position: absolute; inset: 0; display: flex;"><sc-for list="{{ groups }}" as="g" hint-placeholder-count="15"><div class="bc-grp" title="{{ g.tip }}"><sc-for list="{{ g.bars }}" as="b"><div class="bc-bar" style="height: {{ b.h }}; background: {{ b.c }};"></div></sc-for></div></sc-for></div>
+    </div>
+  </div>
+  <div style="display: grid; grid-template-columns: 64px 1fr;"><span></span><div style="display: flex; height: 120px;"><sc-for list="{{ groups }}" as="g"><div style="flex: 1; min-width: 0; position: relative;"><span style="position: absolute; top: 8px; right: 50%; transform-origin: 100% 0; transform: rotate(-45deg) translate(6px, 0); white-space: nowrap; font-size: 11px;">{{ g.name }}</span></div></sc-for></div></div>
+</section>
+
+<section style="border: 1px solid var(--ink); overflow-x: auto;"><table style="border-collapse: collapse; min-width: 1500px; width: 100%; font-size: 12px;">
+  <thead><tr style="background: var(--neutral-100); border-bottom: 1px solid var(--ink);"><th style="position: sticky; left: 0; background: var(--neutral-100); text-align: left; padding: 10px 12px; white-space: nowrap;">Date</th><sc-for list="{{ names }}" as="n" hint-placeholder-count="15"><th style="text-align: right; padding: 10px 10px; font-weight: 700; line-height: 16px;">{{ n }}<br><span style="font-weight: 400; color: var(--text-muted);">(mn)</span></th></sc-for><th style="text-align: right; padding: 10px 12px;">Total<br><span style="font-weight: 400; color: var(--text-muted);">(mn)</span></th></tr></thead>
+  <tbody><sc-for list="{{ trs }}" as="r" hint-placeholder-count="5"><tr style="background: {{ r.bg }}; border-top: 1px solid var(--neutral-200);"><td style="position: sticky; left: 0; background: {{ r.bg }}; padding: 10px 12px; font-family: var(--font-mono); white-space: nowrap;"><span style="display: inline-block; width: 8px; height: 8px; background: {{ r.dot }}; margin-right: 8px;"></span>{{ r.date }}</td><sc-for list="{{ r.cells }}" as="c"><td style="text-align: right; padding: 10px; font-family: var(--font-mono); font-weight: {{ c.fw }};">{{ c.v }}</td></sc-for><td style="text-align: right; padding: 10px 12px; font-family: var(--font-mono); font-weight: 700;">{{ r.total }}</td></tr></sc-for></tbody>
+</table></section>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, sort: 'alpha' };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const D = U.sectorDaily();
+    const dayCol = i => `color-mix(in oklch, var(--blue-700) ${100 - i * 18}%, var(--paper))`;
+    const tableRows = D => D.dates.map((d, i) => { const v = D.values[i]; const mx = Math.max(...v); return { date: d, dot: dayCol(i), bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)', total: U.fmt(v.reduce((a, b) => a + b, 0), 2), cells: v.map(x => ({ v: U.fmt(x, 2), fw: x === mx ? 700 : 400 })) }; });
+    let order = D.names.map((n, i) => i); if (st.sort === 'value') order.sort((a, b) => D.values[0][b] - D.values[0][a]);
+    const mx = Math.max(...D.values.flat()); const step = [100, 200, 250, 500, 1000, 2000].find(s => mx / s <= 7) || 2500; const top = Math.ceil(mx / step) * step;
+    const yl = []; for (let v = 0; v <= top; v += step) yl.push({ top: (100 - v / top * 100) + '%', t: U.fmtInt ? U.fmtInt(v) : String(v) });
+    const groups = order.map(i => ({ name: D.names[i], tip: D.names[i] + '\n' + D.dates.map((d, k) => d + ': ' + U.fmt(D.values[k][i], 2) + ' mn').join('\n'), bars: D.dates.map((_, k) => ({ h: (D.values[k][i] / top * 100) + '%', c: dayCol(k) })).reverse() }));
+    return { groups, yl, legend: D.dates.map((d, i) => ({ d, c: dayCol(i) })), sort: st.sort, onSort: e => this.setState({ sort: e.target.value }), sortOpts: [{ v: 'alpha', l: 'A to Z' }, { v: 'value', l: 'By latest value' }],
+      names: D.names, trs: tableRows(D) };
+  }
+}
+</script>
+</body>
+</html>

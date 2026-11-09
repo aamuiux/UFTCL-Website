@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Correlation — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.tl-ctl { font: inherit; font-size: 13px; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.tl-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tl-btn:hover { background: var(--ink); color: var(--paper); }
+
+
+.co-chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 4px 0 10px; border: 1px solid var(--ink); font-size: 12px; font-weight: 700; background: var(--paper); }
+.co-chip button { font: inherit; width: 22px; height: 22px; border: 0; background: transparent; cursor: pointer; font-size: 16px; line-height: 1; color: var(--ink); }
+.co-chip button:hover { background: var(--ink); color: var(--paper); }
+
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="tools" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Correlation</h1>
+  <div style="color: var(--text-muted);">Compare how instruments moved over the same period, rebased to 0% at the start.</div>
+</section>
+
+<dc-import name="ToolTabs" active="Correlation" hint-size="100%,40px"></dc-import>
+<section style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 20px; border: 1px solid var(--ink); padding: 12px 16px;">
+  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;">Instrument<select class="tl-ctl" value="{{ base }}" onChange="{{ onBase }}" style="min-width: 150px;"><sc-for list="{{ symOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+  <fieldset style="border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;"><legend style="position: absolute; left: -9999px;">Compare with</legend>
+    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;"><span style="display: flex; align-items: center; gap: 6px;"><input type="radio" name="mode" checked="{{ modeIdx }}" onChange="{{ onModeIdx }}" style="margin: 0;">Compare with index</span><select class="tl-ctl" value="{{ idxSel }}" onChange="{{ onIdxSel }}" style="min-width: 130px;"><sc-for list="{{ idxOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;"><span style="display: flex; align-items: center; gap: 6px;"><input type="radio" name="mode" checked="{{ modeSec }}" onChange="{{ onModeSec }}" style="margin: 0;">Compare with sector</span><select class="tl-ctl" value="{{ secSel }}" onChange="{{ onSecSel }}" style="min-width: 190px;"><sc-for list="{{ secOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+  </fieldset>
+  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;">From<input class="tl-ctl" type="date" value="{{ from }}" onChange="{{ onFrom }}"></label>
+  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;">To<input class="tl-ctl" type="date" value="{{ to }}" onChange="{{ onTo }}"></label>
+  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;">Interval<select class="tl-ctl" value="{{ tf }}" onChange="{{ onTf }}"><sc-for list="{{ tfOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></label>
+  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700;">Period<select class="tl-ctl" value="{{ range }}" onChange="{{ onRange }}"><sc-for list="{{ rangeOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></label>
+  <sc-if value="{{ hasDates }}"><button class="tl-btn" onClick="{{ clearDates }}">Clear dates</button></sc-if>
+</section>
+
+<section style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px;"><sc-for list="{{ legend }}" as="l" hint-placeholder-count="6"><span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 14px; height: 3px; background: {{ l.c }};"></span><b>{{ l.code }}</b><span style="font-family: var(--font-mono); color: {{ l.tone }};">{{ l.pct }}</span></span></sc-for></div>
+  <div style="display: grid; grid-template-columns: 1fr 52px; gap: 0;">
+    <div style="position: relative; height: 420px; border-left: 1px solid var(--ink); border-bottom: 1px solid var(--ink);" onMouseMove="{{ onMove }}" onMouseLeave="{{ onLeave }}">
+      <svg viewBox="0 0 1000 420" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;" role="img" aria-label="Percentage change comparison">
+        <sc-for list="{{ grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="{{ g.c }}" stroke-width="1" vector-effect="non-scaling-stroke"></line></sc-for>
+        <sc-for list="{{ lines }}" as="l"><path d="{{ l.d }}" fill="none" stroke="{{ l.c }}" stroke-width="{{ l.w }}" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path></sc-for>
+      </svg>
+      <sc-for list="{{ xlabels }}" as="x"><span style="position: absolute; top: 100%; margin-top: 6px; left: {{ x.left }}; transform: {{ x.tf }}; font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); white-space: nowrap;">{{ x.t }}</span></sc-for>
+      <sc-if value="{{ hov }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hovLeft }}; width: 1px; background: var(--neutral-500); pointer-events: none;"></div>
+        <div style="position: absolute; top: 8px; {{ hovSide }}; background: var(--paper); border: 1px solid var(--ink); padding: 8px 10px; font-size: 12px; pointer-events: none; min-width: 190px; z-index: 2;">
+          <div style="font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 4px;">{{ hovDate }}</div>
+          <sc-for list="{{ hovRows }}" as="r"><div style="display: grid; grid-template-columns: 10px 1fr auto; gap: 6px; align-items: center;"><span style="width: 10px; height: 3px; background: {{ r.c }};"></span><b>{{ r.code }}</b><span style="font-family: var(--font-mono); color: {{ r.tone }};">{{ r.pct }}</span></div></sc-for>
+        </div></sc-if>
+    </div>
+    <div style="position: relative; height: 420px;"><sc-for list="{{ ylabels }}" as="y"><span style="position: absolute; left: 8px; top: {{ y.top }}; transform: translateY(-50%); font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">{{ y.t }}</span></sc-for></div>
+  </div>
+  <div style="height: 14px;"></div>
+</section>
+
+<section style="border: 1px solid var(--ink); padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+  <b style="font-size: 13px; margin-right: 4px;">Compare with:</b>
+  <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6"><span class="co-chip" style="border-color: {{ c.c }};"><span style="width: 8px; height: 8px; background: {{ c.c }};"></span>{{ c.code }}<button onClick="{{ c.onRemove }}" aria-label="{{ c.label }}">×</button></span></sc-for>
+  <select class="tl-ctl" aria-label="Add instrument" value="" onChange="{{ onAdd }}" style="height: 30px; font-size: 12px;"><option value="">+ Add instrument</option><sc-for list="{{ addOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for></select>
+  <sc-if value="{{ hasChips }}"><button class="tl-btn" onClick="{{ clearChips }}" style="height: 30px; font-size: 12px;">Remove all</button></sc-if>
+</section>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, base: 'DS30', mode: 'sector', idxSel: 'DSEX', secSel: 'Bank', tf: 'D', range: '6M', from: '', to: '', extra: [], removed: [], hover: null };
+  PAL = ['#e8590c', '#2f9e44', '#1971c2', '#ae3ec9', '#c99700', '#0c8599', '#e03131', '#5c7cfa', '#66a80f', '#c2255c', '#9c6644', '#868e96'];
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  reset(o) { this.setState({ ...o, extra: [], removed: [] }); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const IDX = Object.keys(U.indices); const sectors = [...new Set(U.stocks.map(s => s.sector))].sort();
+    const sectorCodes = U.stocks.filter(s => s.sector === st.secSel).map(s => s.code);
+    const cmp = [...(st.mode === 'index' ? [st.idxSel] : sectorCodes), ...st.extra].filter((c, i, a) => a.indexOf(c) === i && c !== st.base && !st.removed.includes(c));
+    const codes = [st.base, ...cmp];
+    // window of bars
+    const baseBars = U.chartBars(st.base, st.tf); const last = baseBars[baseBars.length - 1].ts;
+    const DAYS = { '1M': 30, '3M': 91, '6M': 182, '1Y': 365, '2Y': 730, '5Y': 1826 };
+    const t0 = st.from ? new Date(st.from + 'T00:00:00Z').getTime() : last - DAYS[st.range] * 86400000;
+    const t1 = st.to ? new Date(st.to + 'T23:59:59Z').getTime() : last;
+    const idxs = []; baseBars.forEach((b, i) => { if (b.ts >= t0 && b.ts <= t1) idxs.push(i); });
+    const n = idxs.length;
+    const series = codes.map((code, k) => { const bars = U.chartBars(code, st.tf); const off = bars.length - baseBars.length; const c0 = (bars[idxs[0] + off] || bars[0]).c;
+      return { code, c: k === 0 ? 'var(--ink)' : this.PAL[(k - 1) % this.PAL.length], w: k === 0 ? 2.5 : 1.5, vals: idxs.map(i => ((bars[i + off] || bars[bars.length - 1]).c / c0 - 1) * 100) }; });
+    let lo = 0, hi = 0; series.forEach(s => s.vals.forEach(v => { if (v < lo) lo = v; if (v > hi) hi = v; }));
+    const step = [1, 2, 5, 10, 20, 25, 50, 100, 200].find(s => (hi - lo) / s <= 7) || 500; const yMin = Math.floor(lo / step) * step, yMax = Math.ceil(hi / step) * step || step; const span = yMax - yMin;
+    const Y = v => 420 - (v - yMin) / span * 420; const X = i => n > 1 ? i / (n - 1) * 1000 : 500;
+    const lines = n ? series.map(s => ({ c: s.c, w: s.w, d: s.vals.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ') })).reverse() : [];
+    const ticks = []; for (let v = yMin; v <= yMax + 1e-9; v += step) ticks.push(v);
+    const sg = v => (v > 0 ? '+' : '') + U.fmt(v, 2) + '%';
+    const hv = st.hover !== null && n ? Math.min(n - 1, Math.max(0, st.hover)) : null; const bb = hv === null ? null : baseBars[idxs[hv]];
+    const hovRows = hv === null ? [] : series.map(s => ({ code: s.code, c: s.c, v: s.vals[hv] })).sort((a, b) => b.v - a.v).map(r => ({ code: r.code, c: r.c, pct: sg(r.v), tone: r.v >= 0 ? 'var(--green-700)' : 'var(--red-700)' }));
+    const tone = v => v >= 0 ? 'var(--green-700)' : 'var(--red-700)';
+    const xl = []; for (let k = 0; k < 6 && n > 1; k++) { const i = Math.round(k * (n - 1) / 5); xl.push({ t: baseBars[idxs[i]].t, left: (i / (n - 1) * 100) + '%', tf: k === 0 ? 'none' : k === 5 ? 'translateX(-100%)' : 'translateX(-50%)' }); }
+    const catSyms = [...IDX, ...U.symbols];
+    const dateStr = ts => new Date(ts).toISOString().slice(0, 10);
+    return {
+      base: st.base, symOpts: catSyms, onBase: e => this.reset({ base: e.target.value }),
+      modeIdx: st.mode === 'index', modeSec: st.mode === 'sector', onModeIdx: () => this.reset({ mode: 'index' }), onModeSec: () => this.reset({ mode: 'sector' }),
+      idxSel: st.idxSel, idxOpts: IDX, onIdxSel: e => this.reset({ idxSel: e.target.value, mode: 'index' }), secSel: st.secSel, secOpts: sectors, onSecSel: e => this.reset({ secSel: e.target.value, mode: 'sector' }),
+      from: st.from, to: st.to, onFrom: e => this.setState({ from: e.target.value, hover: null }), onTo: e => this.setState({ to: e.target.value, hover: null }), hasDates: !!(st.from || st.to), clearDates: () => this.setState({ from: '', to: '' }),
+      tf: st.tf, onTf: e => this.setState({ tf: e.target.value, hover: null }), tfOpts: [{ v: 'D', l: 'Daily' }, { v: 'W', l: 'Weekly' }, { v: 'M', l: 'Monthly' }],
+      range: st.range, onRange: e => this.setState({ range: e.target.value, from: '', to: '', hover: null }), rangeOpts: Object.keys(DAYS).map(k => ({ v: k, l: { '1M': '1 month', '3M': '3 months', '6M': '6 months', '1Y': '1 year', '2Y': '2 years', '5Y': '5 years' }[k] })),
+      legend: series.map(s => { const v = s.vals[s.vals.length - 1] || 0; return { code: s.code, c: s.c, pct: sg(v), tone: tone(v) }; }),
+      lines, grid: ticks.map(v => ({ y: Y(v).toFixed(1), c: v === 0 ? 'var(--neutral-500)' : 'var(--neutral-200)' })), xlabels: xl,
+      ylabels: ticks.map(v => ({ top: (Y(v) / 420 * 100) + '%', t: (v > 0 ? '+' : '') + v + '%' })),
+      onMove: e => { const r = e.currentTarget.getBoundingClientRect(); const f = (e.clientX - r.left) / r.width; this.setState({ hover: Math.round(f * (n - 1)) }); }, onLeave: () => this.setState({ hover: null }),
+      hov: hv !== null, hovLeft: hv === null ? '0' : (n > 1 ? hv / (n - 1) * 100 : 50) + '%', hovSide: hv !== null && hv / Math.max(1, n - 1) > 0.6 ? 'right: calc(' + (100 - hv / (n - 1) * 100) + '% + 10px)' : 'left: calc(' + (hv === null ? 0 : hv / Math.max(1, n - 1) * 100) + '% + 10px)', hovDate: bb ? bb.t : '', hovRows,
+      chips: cmp.map(code => ({ code, c: this.PAL[(codes.indexOf(code) - 1) % this.PAL.length], label: 'Remove ' + code, onRemove: () => this.setState(s => ({ removed: [...s.removed, code], extra: s.extra.filter(x => x !== code) })) })),
+      hasChips: cmp.length > 0, clearChips: () => this.setState(s => ({ removed: [...new Set([...s.removed, ...cmp])], extra: [] })),
+      addOpts: catSyms.filter(c => !codes.includes(c)), onAdd: e => { const c = e.target.value; if (c) this.setState(s => ({ extra: [...s.extra, c], removed: s.removed.filter(x => x !== c) })); }
+    };
+  }
+}
+</script>
+</body>
+</html>

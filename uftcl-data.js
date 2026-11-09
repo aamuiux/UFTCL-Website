@@ -198,5 +198,15 @@
     return (chartCache[key] = out);
   }
 
-  window.UFT = { chartBars, rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
+  // sector turnover (BDT mn) for the last five sessions, newest first
+  let sdCache = null;
+  function sectorDaily() {
+    if (sdCache) return sdCache;
+    const days = [5, 4, 3, 2, 1].map(d => new Date(Date.UTC(2026, 10, d)));
+    const names = sectors.map(s => s.name).sort((a, b) => a.localeCompare(b));
+    const values = days.map((_, di) => names.map(n => { const s = sectors.find(x => x.name === n); if (di === 0) return s.value; return round(s.yValue * (0.6 + rng(hash(n) + di * 17)() * 0.8) * (1 - di * 0.02), 2); }));
+    const pad = n => String(n).padStart(2, '0');
+    return (sdCache = { names, values, dates: days.map(d => `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`), short: days.map(d => `${pad(d.getUTCDate())} Nov`) });
+  }
+  window.UFT = { sectorDaily, chartBars, rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
 })();
