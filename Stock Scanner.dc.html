@@ -22,7 +22,7 @@ a:hover { color: var(--blue-700); }
 .scn-panels > div:last-child { border-right: 0; }
 .scn-panel-head { height: 36px; display: flex; align-items: center; padding: 0 14px; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .scn-row, .scn-input, .scn-btn { box-sizing: border-box; }
-.scn-row { font: inherit; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 40px; padding: 0 14px; border: 0; border-bottom: 1px solid var(--neutral-200); background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; font-size: 13px; }
+.scn-row { height: 40px; font: inherit; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 0 14px; border: 0; border-bottom: 1px solid var(--neutral-200); background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; font-size: 13px; }
 .scn-row:hover { background: var(--surface-hover, var(--neutral-50)); }
 .scn-table { overflow-x: auto; border: 1px solid var(--ink); }
 .scn-table-inner { width: max-content; min-width: 100%; }
@@ -113,12 +113,12 @@ a:hover { color: var(--blue-700); }
       </div>
       <div>
         <div class="scn-panel-head">Formulas</div>
-        <sc-for list="{{ cForms }}" as="f" hint-placeholder-count="8"><div onClick="{{ f.onSelect }}" style="display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 14px; border-bottom: 1px solid var(--neutral-200); cursor: pointer; background: {{ f.bg }}; color: {{ f.fg }};">
+        <sc-for list="{{ cForms }}" as="f" hint-placeholder-count="8"><div onClick="{{ f.onSelect }}" style="display: flex; align-items: center; gap: 10px; box-sizing: border-box; height: 40px; padding: 0 14px; border-bottom: 1px solid var(--neutral-200); cursor: pointer; background: {{ f.bg }}; color: {{ f.fg }};">
           <span style="flex: 1; min-width: 0; font-size: 13px; font-weight: {{ f.fw }};">{{ f.name }}</span>
           <sc-if value="{{ f.sel }}"><div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 8px; flex-shrink: 0; font-size: 12px; color: var(--text-muted);">
-            <label style="display: flex; align-items: center; gap: 4px; color: var(--ink);">N <input class="scn-input" style="width: 52px;" type="number" min="1" max="50" value="{{ f.n }}" aria-label="{{ f.name }} N" onChange="{{ f.onN }}"></label>
-            <sc-if value="{{ f.hx }}"><label style="display: flex; align-items: center; gap: 4px;">X <input class="scn-input" style="width: 52px;" type="number" min="1" max="50" value="{{ f.x }}" aria-label="{{ f.name }} X" onChange="{{ f.onX }}"></label></sc-if>
-            <button class="scn-btn" style="height: 32px; padding: 0 14px;" onClick="{{ f.onAdd }}">Add</button>
+            <label style="display: flex; align-items: center; gap: 4px; color: var(--ink);">N <input class="scn-input" style="width: 52px; height: 28px;" type="number" min="1" max="50" value="{{ f.n }}" aria-label="{{ f.name }} N" onChange="{{ f.onN }}"></label>
+            <sc-if value="{{ f.hx }}"><label style="display: flex; align-items: center; gap: 4px;">X <input class="scn-input" style="width: 52px; height: 28px;" type="number" min="1" max="50" value="{{ f.x }}" aria-label="{{ f.name }} X" onChange="{{ f.onX }}"></label></sc-if>
+            <button class="scn-btn" style="height: 28px; padding: 0 14px;" onClick="{{ f.onAdd }}">Add</button>
           </div></sc-if>
         </div></sc-for>
       </div>
