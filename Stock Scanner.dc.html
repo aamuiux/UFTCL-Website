@@ -60,7 +60,7 @@ a:hover { color: var(--blue-700); }
     </div>
 
     <div class="scn-cells" data-screen-label="Scanner selectors">
-      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="15"><select onChange="{{ c.onChange }}" value="{{ c.value }}" aria-label="Scanner condition" style="font: inherit; font-size: 13px; height: 40px; padding: 0 10px; border: 1px solid {{ c.bd }}; background: {{ c.bg }}; color: var(--ink); font-weight: {{ c.fw }}; cursor: pointer; min-width: 0; width: 100%;"><sc-for list="{{ opts }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-for>
+      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="15"><select onChange="{{ c.onChange }}" value="{{ c.value }}" aria-label="Scanner condition" style="font: inherit; font-size: 13px; height: 40px; padding: 0 10px; border: 1px solid {{ c.bd }}; background: {{ c.bg }}; color: var(--ink); font-weight: {{ c.fw }}; cursor: pointer; min-width: 0; width: 100%;"><sc-for list="{{ c.opts }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-for>
     </div>
 
     <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px;">
@@ -188,7 +188,7 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  maSet = [['SMA', 20], ['SMA', 50], ['SMA', 100], ['SMA', 200], ['EMA', 20], ['EMA', 50], ['EMA', 100], ['EMA', 200], ['DEMA', 20], ['DEMA', 50], ['DEMA', 100], ['DEMA', 200], ['TEMA', 20], ['TEMA', 50], ['TEMA', 200]];
+  maSet = [['SMA', 20], ['SMA', 50], ['SMA', 100], ['SMA', 200], ['EMA', 20], ['EMA', 50], ['EMA', 100], ['EMA', 200], ['DEMA', 20], ['DEMA', 50], ['DEMA', 100], ['DEMA', 200], ['TEMA', 20], ['TEMA', 50], ['TEMA', 100], ['TEMA', 200]];
   cf = [
     { name: 'Above N', hx: false, label: (p, n) => `RSI(${p}) above ${n}` },
     { name: 'Below N', hx: false, label: (p, n) => `RSI(${p}) below ${n}` },
@@ -204,7 +204,7 @@ class Component extends DCLogic {
   preGroupList = ['Pattern', 'Fundamental', 'Trend', 'Volatility', 'Bands', 'Oscillators', 'PriceVolume', 'Native', 'Price Action', 'Volume'];
   state = {
     ready: !!window.UFT, sub: 'technical', msg: '', q: '', sort: { k: 'pct', d: -1 },
-    slots: { technical: ['SMA20-below', ...Array(14).fill('')], fundamental: Array(15).fill(''), all: Array(15).fill('') },
+    picks: { SMA20: 'SMA20:below' },
     preGroup: 'Oscillators', preInd: 'RSI (14)', preF: -1, cSel: -1, tf: 'D',
     cGroup: 'Oscillators', cInd: 'RSI', cPeriod: 14,
     cp: [{ n: 40, x: 3 }, { n: 60, x: 3 }, { n: 70, x: 3 }, { n: 30, x: 3 }, { n: 3, x: 3 }, { n: 40, x: 3 }, { n: 3, x: 3 }, { n: 60, x: 3 }],
@@ -221,40 +221,136 @@ class Component extends DCLogic {
   calc(code, tf = 'D') {
     const U = window.UFT; const S = U.bySym[code];
     const raw = U.daily(code, tf === 'D' ? 260 : 1300);
+    // pin the latest two bars to the quote so scanners agree with the results table
+    const rl = raw[raw.length - 1], rp = raw[raw.length - 2];
+    rp.c = S.ycp; rp.h = Math.max(rp.h, S.ycp); rp.l = Math.min(rp.l, S.ycp);
+    rl.o = S.open; rl.h = S.high; rl.l = S.low; rl.c = S.ltp; rl.v = S.volume;
     let bars = raw;
     if (tf !== 'D') {
       const k = tf === 'W' ? 5 : 21; bars = [];
       for (let i = raw.length % k; i < raw.length; i += k) { const g = raw.slice(i, i + k); bars.push({ o: g[0].o, h: Math.max(...g.map(b => b.h)), l: Math.min(...g.map(b => b.l)), c: g[g.length - 1].c, v: g.reduce((a, b) => a + b.v, 0) }); }
     }
     const P52 = { D: 252, W: 52, M: 12 }[tf];
-    const cl = bars.map(b => b.c), hi = bars.map(b => b.h), lo = bars.map(b => b.l), vo = bars.map(b => b.v);
+    const op = bars.map(b => b.o), cl = bars.map(b => b.c), hi = bars.map(b => b.h), lo = bars.map(b => b.l), vo = bars.map(b => b.v);
     const tp = bars.map(b => (b.h + b.l + b.c) / 3);
+    const n = cl.length;
     const last = a => a[a.length - 1], prev = a => a[a.length - 2];
-    const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
-    const sma = (a, p) => mean(a.slice(-p));
-    const ema = (a, p) => { const k = 2 / (p + 1); let e = a[0]; return a.map((x, i) => (e = i ? x * k + e * (1 - k) : x)); };
-    const c = { code, cl, ltp: S.ltp, chgPct: S.changePct, pe: S.pe, eps: S.eps, nav: S.nav, mcap: S.mcap, cat: S.cat, ma: {} };
-    this.maSet.forEach(([t, p]) => {
-      const e1 = ema(cl, p), e2 = ema(e1, p), e3 = ema(e2, p);
-      c.ma[t + p] = t === 'SMA' ? sma(cl, p) : t === 'EMA' ? last(e1) : t === 'DEMA' ? 2 * last(e1) - last(e2) : 3 * last(e1) - 3 * last(e2) + last(e3);
+    const sum = a => a.reduce((s2, x) => s2 + x, 0), mean = a => sum(a) / a.length;
+    const sma = (a, p2) => mean(a.slice(-p2));
+    const ema = (a, p2) => { const k = 2 / (p2 + 1); let e = a[0]; return a.map((x, i) => (e = i ? x * k + e * (1 - k) : x)); };
+    const c = { code, cl, ltp: S.ltp, prevC: cl[n - 2], chgPct: S.changePct, pe: S.pe, eps: S.eps, nav: S.nav, mcap: S.mcap, cat: S.cat, beta: S.beta, director: S.director, board: S.board, dvol: S.volume, ma: {}, maP: {} };
+
+    // moving averages (value now and one bar ago)
+    this.maSet.forEach(([t, p2]) => {
+      const e1 = ema(cl, p2), e2 = ema(e1, p2), e3 = ema(e2, p2);
+      const f = i => t === 'SMA' ? mean(cl.slice(Math.max(0, i - p2 + 1), i + 1)) : t === 'EMA' ? e1[i] : t === 'DEMA' ? 2 * e1[i] - e2[i] : 3 * e1[i] - 3 * e2[i] + e3[i];
+      c.ma[t + p2] = f(n - 1); c.maP[t + p2] = f(n - 2);
     });
+
+    // MACD
     const e12 = ema(cl, 12), e26 = ema(cl, 26);
-    const mac = e12.map((x, i) => x - e26[i]), sig = ema(mac, 9);
-    c.macd = last(mac); c.sig = last(sig); c.macdP = prev(mac); c.sigP = prev(sig);
-    const H14 = Math.max(...hi.slice(-14)), L14 = Math.min(...lo.slice(-14)), R14 = (H14 - L14) || 1;
-    c.stoch = (c.ltp - L14) / R14 * 100;
-    c.wr = (c.ltp - H14) / R14 * 100;
-    const tp14 = tp.slice(-14), tm = mean(tp14), md = mean(tp14.map(x => Math.abs(x - tm)));
-    c.cci = (last(tp) - tm) / ((0.015 * md) || 1);
-    let pos = 0, neg = 0; const n = cl.length;
+    const mac = e12.map((x, i) => x - e26[i]), sig = ema(mac, 9), hist = mac.map((x, i) => x - sig[i]);
+    c.macd = last(mac); c.sig = last(sig); c.macdP = prev(mac); c.sigP = prev(sig); c.hist = last(hist); c.histP = prev(hist);
+
+    // stochastic family and Williams %R
+    const kAt = i => { const H = Math.max(...hi.slice(i - 13, i + 1)), L = Math.min(...lo.slice(i - 13, i + 1)); return (cl[i] - L) / ((H - L) || 1) * 100; };
+    const ks = [0, 1, 2, 3, 4, 5].map(j => kAt(n - 1 - j));
+    c.stoch = ks[0]; c.stochP = ks[1]; c.fD = mean(ks.slice(0, 3)); c.fDP = mean(ks.slice(1, 4));
+    const sK = j => mean(ks.slice(j, j + 3)), sD = j => mean([sK(j), sK(j + 1), sK(j + 2)]);
+    c.sK = sK(0); c.sKP = sK(1); c.sD = sD(0); c.sDP = sD(1);
+    c.wr = ks[0] - 100; c.wrP = ks[1] - 100;
+
+    // CCI, MFI, RSI, StochRSI, Ultimate Oscillator
+    const cciAt = i => { const w = tp.slice(i - 13, i + 1), m = mean(w), md = mean(w.map(x => Math.abs(x - m))); return (tp[i] - m) / ((0.015 * md) || 1); };
+    c.cci = cciAt(n - 1); c.cciP = cciAt(n - 2);
+    let pos = 0, neg = 0;
     for (let i = n - 14; i < n; i++) { const f = tp[i] * vo[i]; if (tp[i] > tp[i - 1]) pos += f; else if (tp[i] < tp[i - 1]) neg += f; }
     c.mfi = neg ? 100 - 100 / (1 + pos / neg) : 100;
     c.rsiS = U.rsiSeries(cl, 14); c.rsi = last(c.rsiS); c.rsiP = prev(c.rsiS);
+    const rw = c.rsiS.slice(-14), rmax = Math.max(...rw), rmin = Math.min(...rw);
+    c.srsi = (c.rsi - rmin) / ((rmax - rmin) || 1);
+    const bp = [], trr = [];
+    for (let i = 1; i < n; i++) { const lw = Math.min(lo[i], cl[i - 1]), hg = Math.max(hi[i], cl[i - 1]); bp.push(cl[i] - lw); trr.push(hg - lw); }
+    const uoAvg = k => sum(bp.slice(-k)) / (sum(trr.slice(-k)) || 1);
+    c.uo = 100 * (4 * uoAvg(7) + 2 * uoAvg(14) + uoAvg(28)) / 7;
+
+    // bands and channels
     const m20 = sma(cl, 20), sd = Math.sqrt(mean(cl.slice(-20).map(x => (x - m20) ** 2)));
-    c.bbU = m20 + 2 * sd; c.bbL = m20 - 2 * sd;
+    c.bbM = m20; c.bbU = m20 + 2 * sd; c.bbL = m20 - 2 * sd; c.bw = (c.bbU - c.bbL) / (m20 || 1) * 100;
+    c.envU = m20 * 1.025; c.envL = m20 * 0.975;
+
+    // ATR (Wilder) and trailing stops
+    const atrSeries = len => {
+      const tr = bars.map((b, i) => i ? Math.max(b.h - b.l, Math.abs(b.h - cl[i - 1]), Math.abs(b.l - cl[i - 1])) : b.h - b.l);
+      const out = []; let a = 0;
+      tr.forEach((x, i) => { if (i < len) { a += x; out.push(i === len - 1 ? a / len : null); } else { a = (out[i - 1] * (len - 1) + x) / len; out.push(a); } });
+      return out;
+    };
+    const a10 = atrSeries(10); c.atr = last(a10); c.atrP = prev(a10);
+    c.kcU = c.ma.EMA20 + 2 * c.atr; c.kcL = c.ma.EMA20 - 2 * c.atr;
+    const trail = (len, mf) => {
+      const atr = atrSeries(len); let dir = 1, fu = null, fl = null, flipped = false, stop = null;
+      for (let i = len; i < n; i++) {
+        const mid = (hi[i] + lo[i]) / 2, m = mf(atr[i], cl[i]); const bu = mid + m * atr[i], bl = mid - m * atr[i]; const pfu = fu, pfl = fl;
+        fu = (pfu == null || bu < pfu || cl[i - 1] > pfu) ? bu : pfu;
+        fl = (pfl == null || bl > pfl || cl[i - 1] < pfl) ? bl : pfl;
+        let nd = dir;
+        if (pfu != null) { if (dir === -1 && cl[i] > pfu) nd = 1; else if (dir === 1 && cl[i] < pfl) nd = -1; }
+        flipped = nd !== dir; dir = nd; stop = dir === 1 ? fl : fu;
+      }
+      return { up: dir === 1, flipped, stop };
+    };
+    c.vts = trail(7, () => 2); c.trail20 = trail(20, () => 3); c.dyn = trail(10, (a, p2) => Math.min(3.5, 1.5 + a / p2 * 50));
+
+    // ADX / DI (Wilder, 14)
+    {
+      const len = 14, pdm = [], mdm = [], tr = [];
+      for (let i = 1; i < n; i++) { const up = hi[i] - hi[i - 1], dn = lo[i - 1] - lo[i]; pdm.push(up > dn && up > 0 ? up : 0); mdm.push(dn > up && dn > 0 ? dn : 0); tr.push(Math.max(hi[i] - lo[i], Math.abs(hi[i] - cl[i - 1]), Math.abs(lo[i] - cl[i - 1]))); }
+      let sT = sum(tr.slice(0, len)), sP = sum(pdm.slice(0, len)), sM = sum(mdm.slice(0, len)); const dx = []; let pd = 0, md = 0;
+      for (let i = len - 1; i < tr.length; i++) {
+        if (i >= len) { sT = sT - sT / len + tr[i]; sP = sP - sP / len + pdm[i]; sM = sM - sM / len + mdm[i]; }
+        pd = 100 * sP / (sT || 1); md = 100 * sM / (sT || 1); dx.push(100 * Math.abs(pd - md) / ((pd + md) || 1));
+      }
+      let adx = mean(dx.slice(0, len)); const arr = [adx];
+      for (let j = len; j < dx.length; j++) { adx = (adx * (len - 1) + dx[j]) / len; arr.push(adx); }
+      c.adx = last(arr); c.adxP = prev(arr); c.pdi = pd; c.mdi = md;
+    }
+
+    // volume
     c.vol = last(vo); c.vma = sma(vo, 20);
-    c.hi20 = Math.max(...hi.slice(-21, -1)); c.lo20 = Math.min(...lo.slice(-21, -1));
-    c.hi52 = Math.max(...hi.slice(-(P52 + 1), -1)); c.lo52 = Math.min(...lo.slice(-(P52 + 1), -1));
+    const obv = []; let acc = 0; cl.forEach((x, i) => { if (i) acc += x > cl[i - 1] ? vo[i] : x < cl[i - 1] ? -vo[i] : 0; obv.push(acc); });
+    c.obv = last(obv); c.obvMa = sma(obv, 20); c.obvUp5 = obv[n - 1] > obv[n - 6]; c.obvDn5 = obv[n - 1] < obv[n - 6]; c.obvHi20 = obv[n - 1] >= Math.max(...obv.slice(-21, -1));
+
+    // price change
+    c.pc5 = (c.ltp / cl[n - 6] - 1) * 100; c.pc20 = (c.ltp / cl[n - 21] - 1) * 100;
+
+    // highs and lows over prior periods
+    const hiN = k => Math.max(...hi.slice(-(k + 1), -1)), loN = k => Math.min(...lo.slice(-(k + 1), -1));
+    c.hi10 = hiN(10); c.lo10 = loN(10); c.hi20 = hiN(20); c.lo20 = loN(20); c.hi50 = hiN(50); c.lo50 = loN(50); c.hi100 = hiN(100); c.lo100 = loN(100);
+    c.hi52 = hiN(P52); c.lo52 = loN(P52);
+    c.histHi = Math.max(...hi.slice(0, -1)); c.histLo = Math.min(...lo.slice(0, -1));
+    c.h1 = hi[n - 1]; c.h2 = hi[n - 2]; c.l1 = lo[n - 1]; c.l2 = lo[n - 2];
+
+    // pivots from the previous bar
+    const pv = (hi[n - 2] + lo[n - 2] + cl[n - 2]) / 3; c.pivot = pv; c.r1 = 2 * pv - lo[n - 2]; c.s1 = 2 * pv - hi[n - 2];
+
+    // candlesticks
+    const cand = i => { const o = op[i], cc = cl[i], h = hi[i], l = lo[i]; return { o, c: cc, body: Math.abs(cc - o), r: (h - l) || 1e-9, up: h - Math.max(o, cc), lw: Math.min(o, cc) - l, bull: cc > o, bear: cc < o }; };
+    const k1 = cand(n - 1), k0 = cand(n - 2);
+    c.doji = k1.body <= 0.1 * k1.r;
+    c.hammer = k1.body > 0 && k1.lw >= 2 * k1.body && k1.up <= 0.15 * k1.r;
+    c.star = k1.body > 0 && k1.up >= 2 * k1.body && k1.lw <= 0.15 * k1.r;
+    c.bullEng = k0.bear && k1.bull && k1.c >= k0.o && k1.o <= k0.c;
+    c.bearEng = k0.bull && k1.bear && k1.c <= k0.o && k1.o >= k0.c;
+    c.mbBull = k1.bull && k1.body >= 0.9 * k1.r; c.mbBear = k1.bear && k1.body >= 0.9 * k1.r;
+
+    // divergence: last 10 bars against the 10 before
+    const W = 10, rs = c.rsiS;
+    const lowR = Math.min(...lo.slice(-W)), lowP = Math.min(...lo.slice(-2 * W, -W)), highR = Math.max(...hi.slice(-W)), highP = Math.max(...hi.slice(-2 * W, -W));
+    c.rsiBullDiv = lowR < lowP && Math.min(...rs.slice(-W)) > Math.min(...rs.slice(-2 * W, -W));
+    c.rsiBearDiv = highR > highP && Math.max(...rs.slice(-W)) < Math.max(...rs.slice(-2 * W, -W));
+    c.macdBullDiv = lowR < lowP && Math.min(...hist.slice(-W)) > Math.min(...hist.slice(-2 * W, -W));
+    c.macdBearDiv = highR > highP && Math.max(...hist.slice(-W)) < Math.max(...hist.slice(-2 * W, -W));
     return c;
   }
 
@@ -264,56 +360,168 @@ class Component extends DCLogic {
     return this._maps[tf];
   }
 
-  techCat() {
-    const out = [];
-    this.maSet.forEach(([t, p]) => {
-      const k = t + p, name = `${t} ${p}`;
-      out.push({ id: `${k}-below`, label: `Price below ${name}`, group: 'Trend', test: c => c.ltp < c.ma[k] });
-      out.push({ id: `${k}-above`, label: `Price above ${name}`, group: 'Trend', test: c => c.ltp > c.ma[k] });
-    });
-    out.push(
-      { id: 'rsi-gt60', label: 'RSI(14) above 60', group: 'Oscillators', test: c => c.rsi > 60 },
-      { id: 'rsi-lt40', label: 'RSI(14) below 40', group: 'Oscillators', test: c => c.rsi < 40 },
-      { id: 'rsi-ob', label: 'RSI(14) overbought (> 70)', group: 'Oscillators', test: c => c.rsi > 70 },
-      { id: 'rsi-os', label: 'RSI(14) oversold (< 30)', group: 'Oscillators', test: c => c.rsi < 30 },
-      { id: 'macd-bull', label: 'MACD above signal', group: 'Oscillators', test: c => c.macd > c.sig },
-      { id: 'macd-bear', label: 'MACD below signal', group: 'Oscillators', test: c => c.macd < c.sig },
-      { id: 'sto-ob', label: 'Stochastic (14,3) overbought (> 80)', group: 'Oscillators', test: c => c.stoch > 80 },
-      { id: 'sto-os', label: 'Stochastic (14,3) oversold (< 20)', group: 'Oscillators', test: c => c.stoch < 20 },
-      { id: 'wr-ob', label: 'William %R overbought (> -20)', group: 'Oscillators', test: c => c.wr > -20 },
-      { id: 'wr-os', label: 'William %R oversold (< -80)', group: 'Oscillators', test: c => c.wr < -80 },
-      { id: 'cci-hi', label: 'CCI(14) above 100', group: 'Oscillators', test: c => c.cci > 100 },
-      { id: 'cci-lo', label: 'CCI(14) below -100', group: 'Oscillators', test: c => c.cci < -100 },
-      { id: 'mfi-hi', label: 'MFI(14) above 80', group: 'Oscillators', test: c => c.mfi > 80 },
-      { id: 'mfi-lo', label: 'MFI(14) below 20', group: 'Oscillators', test: c => c.mfi < 20 },
-      { id: 'bb-up', label: 'Price above upper band BB(20,2)', group: 'Bands', test: c => c.ltp > c.bbU },
-      { id: 'bb-lo', label: 'Price below lower band BB(20,2)', group: 'Bands', test: c => c.ltp < c.bbL },
-      { id: 'vol-spike', label: 'Volume above 2x VMA(20)', group: 'Volume', test: c => c.vol > 2 * c.vma },
-      { id: 'vol-vma', label: 'Volume above VMA(20)', group: 'Volume', test: c => c.vol > c.vma },
-      { id: 'hi20', label: 'New 20-day high', group: 'Price action', test: c => c.ltp >= c.hi20 },
-      { id: 'lo20', label: 'New 20-day low', group: 'Price action', test: c => c.ltp <= c.lo20 },
-      { id: 'hi52', label: '52-week high', group: 'Price action', test: c => c.ltp >= c.hi52 },
-      { id: 'lo52', label: '52-week low', group: 'Price action', test: c => c.ltp <= c.lo52 },
-      { id: 'gain3', label: 'Gainers above 3%', group: 'Price change', test: c => c.chgPct > 3 },
-      { id: 'lose3', label: 'Losers below -3%', group: 'Price change', test: c => c.chgPct < -3 },
-    );
-    return out;
-  }
+  // One entry per scanner cell. Order follows the Amar Stock scanner grid, left to right, top to bottom.
+  indDefs() {
+    if (this._ind) return this._ind;
+    const L = [];
+    const add = (key, name, opts, group = 'tech') => L.push({ key, name, group, opts: opts.map(([id, label, test]) => ({ id: key + ':' + id, label, test })) });
+    const maI = (t, p) => {
+      const k = t + p, nm = (t === 'SMA' || t === 'EMA') ? `${t} ${p}` : `${t} (${p})`;
+      add(k, nm, [
+        ['above', `Price above ${nm}`, c => c.ltp > c.ma[k]],
+        ['below', `Price below ${nm}`, c => c.ltp < c.ma[k]],
+        ['xup', `Price crossed above ${nm}`, c => c.prevC <= c.maP[k] && c.ltp > c.ma[k]],
+        ['xdn', `Price crossed below ${nm}`, c => c.prevC >= c.maP[k] && c.ltp < c.ma[k]],
+        ['near', `Price within 2% of ${nm}`, c => Math.abs(c.ltp / c.ma[k] - 1) < 0.02]]);
+    };
+    const hiloI = (key, name, N, hk, lk, near) => add(key, name, [
+      ['nh', `New ${N} high`, c => c.ltp >= c[hk]],
+      ['nl', `New ${N} low`, c => c.ltp <= c[lk]],
+      ['nearh', `Within ${near}% of ${N} high`, c => c.ltp < c[hk] && c.ltp >= c[hk] * (1 - near / 100)],
+      ['nearl', `Within ${near}% of ${N} low`, c => c.ltp > c[lk] && c.ltp <= c[lk] * (1 + near / 100)]]);
+    const trailI = (key, name, f) => add(key, name, [
+      ['bull', 'Price above trailing stop (uptrend)', c => c[f].up],
+      ['bear', 'Price below trailing stop (downtrend)', c => !c[f].up],
+      ['xup', 'Trend just turned up', c => c[f].up && c[f].flipped],
+      ['xdn', 'Trend just turned down', c => !c[f].up && c[f].flipped]]);
 
-  fundCat() {
-    return [
-      { id: 'pe-lo', label: 'Audited PE below 15', group: 'Fundamental', test: c => c.pe > 0 && c.pe < 15 },
-      { id: 'pe-hi', label: 'Audited PE above 30', group: 'Fundamental', test: c => c.pe > 30 },
-      { id: 'eps-pos', label: 'EPS positive', group: 'Fundamental', test: c => c.eps > 0 },
-      { id: 'nav-disc', label: 'Price below NAV', group: 'Fundamental', test: c => c.ltp < c.nav },
-      { id: 'mcap-big', label: 'Market cap above 10,000 mn', group: 'Fundamental', test: c => c.mcap > 10000 },
-      { id: 'cat-a', label: 'Category A', group: 'Fundamental', test: c => c.cat === 'A' },
-      { id: 'cat-z', label: 'Category Z', group: 'Fundamental', test: c => c.cat === 'Z' },
-    ];
-  }
+    maI('SMA', 20); maI('EMA', 20);
+    add('RSI', 'RSI (14)', [
+      ['ob', 'Overbought (RSI above 70)', c => c.rsi > 70], ['gt60', 'RSI above 60', c => c.rsi > 60], ['gt50', 'RSI above 50', c => c.rsi > 50],
+      ['lt50', 'RSI below 50', c => c.rsi < 50], ['lt40', 'RSI below 40', c => c.rsi < 40], ['os', 'Oversold (RSI below 30)', c => c.rsi < 30],
+      ['eob', 'Just entered overbought zone', c => c.rsi > 70 && c.rsiP <= 70], ['eos', 'Just entered oversold zone', c => c.rsi < 30 && c.rsiP >= 30],
+      ['up', 'RSI rising (above previous day)', c => c.rsi > c.rsiP], ['dn', 'RSI falling (below previous day)', c => c.rsi < c.rsiP]]);
+    add('ADX', 'ADX (14)', [
+      ['t25', 'ADX above 25 (trending)', c => c.adx > 25], ['t40', 'ADX above 40 (strong trend)', c => c.adx > 40], ['w20', 'ADX below 20 (weak trend)', c => c.adx < 20],
+      ['pdi', '+DI above -DI', c => c.pdi > c.mdi], ['mdi', '-DI above +DI', c => c.mdi > c.pdi], ['rise', 'ADX rising', c => c.adx > c.adxP],
+      ['bull', 'ADX above 25 and +DI above -DI', c => c.adx > 25 && c.pdi > c.mdi], ['bear', 'ADX above 25 and -DI above +DI', c => c.adx > 25 && c.mdi > c.pdi]]);
+    add('VOL', 'Volume', [
+      ['v50', 'Volume above 50,000', c => c.dvol > 5e4], ['v100', 'Volume above 100,000', c => c.dvol > 1e5], ['v500', 'Volume above 500,000', c => c.dvol > 5e5],
+      ['v1m', 'Volume above 1 million', c => c.dvol > 1e6], ['v3m', 'Volume above 3 million', c => c.dvol > 3e6], ['lo', 'Volume below 50,000', c => c.dvol < 5e4]]);
 
-  catFor(sub) { const t = this.techCat(), f = this.fundCat(); return sub === 'fundamental' ? f : sub === 'all' ? [...t, ...f] : t; }
-  catMap() { return Object.fromEntries([...this.techCat(), ...this.fundCat()].map(e => [e.id, e])); }
+    maI('SMA', 50); maI('EMA', 50);
+    add('CCI', 'CCI (14)', [
+      ['g100', 'CCI above 100', c => c.cci > 100], ['g200', 'CCI above 200', c => c.cci > 200], ['l100', 'CCI below -100', c => c.cci < -100], ['l200', 'CCI below -200', c => c.cci < -200],
+      ['g0', 'CCI above 0', c => c.cci > 0], ['l0', 'CCI below 0', c => c.cci < 0],
+      ['xup', 'CCI crossed above -100', c => c.cciP <= -100 && c.cci > -100], ['xdn', 'CCI crossed below 100', c => c.cciP >= 100 && c.cci < 100]]);
+    add('ATR', 'ATR (10)', [
+      ['g5', 'ATR above 5% of price', c => c.atr / c.ltp * 100 > 5], ['g3', 'ATR above 3% of price', c => c.atr / c.ltp * 100 > 3], ['l15', 'ATR below 1.5% of price', c => c.atr / c.ltp * 100 < 1.5],
+      ['up', 'ATR rising', c => c.atr > c.atrP], ['dn', 'ATR falling', c => c.atr < c.atrP]]);
+    add('VMA', 'VMA (20)', [
+      ['g1', 'Volume above VMA(20)', c => c.vol > c.vma], ['g15', 'Volume above 1.5x VMA(20)', c => c.vol > 1.5 * c.vma], ['g2', 'Volume above 2x VMA(20)', c => c.vol > 2 * c.vma],
+      ['g3', 'Volume above 3x VMA(20)', c => c.vol > 3 * c.vma], ['l1', 'Volume below VMA(20)', c => c.vol < c.vma], ['l05', 'Volume below 0.5x VMA(20)', c => c.vol < 0.5 * c.vma]]);
+
+    maI('SMA', 100); maI('EMA', 100);
+    add('MFI', 'MFI (14)', [
+      ['g80', 'MFI above 80 (overbought)', c => c.mfi > 80], ['g60', 'MFI above 60', c => c.mfi > 60], ['g50', 'MFI above 50', c => c.mfi > 50],
+      ['l50', 'MFI below 50', c => c.mfi < 50], ['l40', 'MFI below 40', c => c.mfi < 40], ['l20', 'MFI below 20 (oversold)', c => c.mfi < 20]]);
+    add('MACD', 'MACD (26,12,9)', [
+      ['xup', 'Bullish crossover today', c => c.macdP <= c.sigP && c.macd > c.sig], ['xdn', 'Bearish crossover today', c => c.macdP >= c.sigP && c.macd < c.sig],
+      ['above', 'MACD above signal line', c => c.macd > c.sig], ['below', 'MACD below signal line', c => c.macd < c.sig],
+      ['z+', 'MACD above zero', c => c.macd > 0], ['z-', 'MACD below zero', c => c.macd < 0],
+      ['hup', 'Histogram rising', c => c.hist > c.histP], ['hdn', 'Histogram falling', c => c.hist < c.histP]]);
+    add('OBV', 'OVB', [
+      ['above', 'OBV above its 20-day average', c => c.obv > c.obvMa], ['below', 'OBV below its 20-day average', c => c.obv < c.obvMa],
+      ['up5', 'OBV rising over 5 days', c => c.obvUp5], ['dn5', 'OBV falling over 5 days', c => c.obvDn5], ['hi20', 'OBV at a 20-day high', c => c.obvHi20]]);
+
+    maI('SMA', 200); maI('EMA', 200);
+    add('FSTO', 'Fast Stochastic (14,3)', [
+      ['ob', '%K above 80 (overbought)', c => c.stoch > 80], ['os', '%K below 20 (oversold)', c => c.stoch < 20],
+      ['kd+', '%K above %D', c => c.stoch > c.fD], ['kd-', '%K below %D', c => c.stoch < c.fD],
+      ['xup', '%K crossed above %D', c => c.stochP <= c.fDP && c.stoch > c.fD], ['xdn', '%K crossed below %D', c => c.stochP >= c.fDP && c.stoch < c.fD]]);
+    add('BB', 'BB (20,2)', [
+      ['up', 'Price above upper band', c => c.ltp > c.bbU], ['lo', 'Price below lower band', c => c.ltp < c.bbL],
+      ['nu', 'Price within 1% of upper band', c => Math.abs(c.ltp / c.bbU - 1) < 0.01], ['nl', 'Price within 1% of lower band', c => Math.abs(c.ltp / c.bbL - 1) < 0.01],
+      ['sq', 'Squeeze (bandwidth below 6%)', c => c.bw < 6], ['m+', 'Price above middle band', c => c.ltp > c.bbM], ['m-', 'Price below middle band', c => c.ltp < c.bbM]]);
+    add('PCH', 'Price Change', [
+      ['g5', 'Up more than 5% today', c => c.chgPct > 5], ['g2', 'Up more than 2% today', c => c.chgPct > 2], ['up', 'Up today', c => c.chgPct > 0],
+      ['dn', 'Down today', c => c.chgPct < 0], ['l2', 'Down more than 2% today', c => c.chgPct < -2], ['l5', 'Down more than 5% today', c => c.chgPct < -5],
+      ['w5', '5-day change above +5%', c => c.pc5 > 5], ['w-5', '5-day change below -5%', c => c.pc5 < -5],
+      ['m10', '20-day change above +10%', c => c.pc20 > 10], ['m-10', '20-day change below -10%', c => c.pc20 < -10]]);
+
+    add('MA20', 'MA (20)', [
+      ['up', 'SMA 20 rising', c => c.ma.SMA20 > c.maP.SMA20], ['dn', 'SMA 20 falling', c => c.ma.SMA20 < c.maP.SMA20],
+      ['near', 'Price within 1% of SMA 20', c => Math.abs(c.ltp / c.ma.SMA20 - 1) < 0.01],
+      ['a5', 'Price 5% or more above SMA 20', c => c.ltp >= c.ma.SMA20 * 1.05], ['b5', 'Price 5% or more below SMA 20', c => c.ltp <= c.ma.SMA20 * 0.95],
+      ['a50', 'SMA 20 above SMA 50', c => c.ma.SMA20 > c.ma.SMA50], ['b50', 'SMA 20 below SMA 50', c => c.ma.SMA20 < c.ma.SMA50]]);
+    add('XMA', 'Cross MA (20)', [
+      ['pu', 'Price crossed above SMA 20', c => c.prevC <= c.maP.SMA20 && c.ltp > c.ma.SMA20], ['pd', 'Price crossed below SMA 20', c => c.prevC >= c.maP.SMA20 && c.ltp < c.ma.SMA20],
+      ['su', 'SMA 20 crossed above SMA 50', c => c.maP.SMA20 <= c.maP.SMA50 && c.ma.SMA20 > c.ma.SMA50], ['sd', 'SMA 20 crossed below SMA 50', c => c.maP.SMA20 >= c.maP.SMA50 && c.ma.SMA20 < c.ma.SMA50],
+      ['eu', 'EMA 20 crossed above EMA 50', c => c.maP.EMA20 <= c.maP.EMA50 && c.ma.EMA20 > c.ma.EMA50], ['ed', 'EMA 20 crossed below EMA 50', c => c.maP.EMA20 >= c.maP.EMA50 && c.ma.EMA20 < c.ma.EMA50]]);
+    add('SSTO', 'Slow Stochastic (14,3,3)', [
+      ['ob', 'Slow %K above 80 (overbought)', c => c.sK > 80], ['os', 'Slow %K below 20 (oversold)', c => c.sK < 20],
+      ['kd+', 'Slow %K above %D', c => c.sK > c.sD], ['kd-', 'Slow %K below %D', c => c.sK < c.sD],
+      ['xup', 'Slow %K crossed above %D', c => c.sKP <= c.sDP && c.sK > c.sD], ['xdn', 'Slow %K crossed below %D', c => c.sKP >= c.sDP && c.sK < c.sD]]);
+    add('DIV', 'Divergence', [
+      ['rb', 'RSI bullish divergence', c => c.rsiBullDiv], ['rs', 'RSI bearish divergence', c => c.rsiBearDiv],
+      ['mb', 'MACD bullish divergence', c => c.macdBullDiv], ['ms', 'MACD bearish divergence', c => c.macdBearDiv]]);
+    add('PCHN', 'Price Channel', [
+      ['up', 'Breakout above 20-day channel high', c => c.ltp > c.hi20], ['dn', 'Breakdown below 20-day channel low', c => c.ltp < c.lo20],
+      ['uh', 'Price in upper half of the channel', c => c.ltp <= c.hi20 && c.ltp >= (c.hi20 + c.lo20) / 2], ['lh', 'Price in lower half of the channel', c => c.ltp >= c.lo20 && c.ltp < (c.hi20 + c.lo20) / 2]]);
+
+    add('WR', 'William %R (14)', [
+      ['ob', '%R above -20 (overbought)', c => c.wr > -20], ['os', '%R below -80 (oversold)', c => c.wr < -80],
+      ['xup', '%R crossed above -80', c => c.wrP <= -80 && c.wr > -80], ['xdn', '%R crossed below -20', c => c.wrP >= -20 && c.wr < -20]]);
+    add('CNDL', 'Candlestick', [
+      ['doji', 'Doji', c => c.doji], ['ham', 'Hammer', c => c.hammer], ['star', 'Shooting star', c => c.star],
+      ['be', 'Bullish engulfing', c => c.bullEng], ['re', 'Bearish engulfing', c => c.bearEng],
+      ['mb', 'Bullish marubozu', c => c.mbBull], ['mr', 'Bearish marubozu', c => c.mbBear]]);
+    add('SR', 'Sup Res', [
+      ['r1', 'Price above resistance R1', c => c.ltp > c.r1], ['s1', 'Price below support S1', c => c.ltp < c.s1],
+      ['nr', 'Price within 1% of R1 (resistance)', c => Math.abs(c.ltp / c.r1 - 1) < 0.01], ['ns', 'Price within 1% of S1 (support)', c => Math.abs(c.ltp / c.s1 - 1) < 0.01],
+      ['p+', 'Price above pivot', c => c.ltp > c.pivot], ['p-', 'Price below pivot', c => c.ltp < c.pivot]]);
+    add('HHL', 'Hist HiLo', [
+      ['hi', 'At historical high', c => c.ltp >= c.histHi], ['lo', 'At historical low', c => c.ltp <= c.histLo],
+      ['nh', 'Within 5% of historical high', c => c.ltp < c.histHi && c.ltp >= c.histHi * 0.95], ['nl', 'Within 5% of historical low', c => c.ltp > c.histLo && c.ltp <= c.histLo * 1.05]]);
+    add('PRICE', 'Stock Price', [
+      ['l10', 'Price below 10', c => c.ltp < 10], ['10', 'Price 10 to 50', c => c.ltp >= 10 && c.ltp < 50], ['50', 'Price 50 to 100', c => c.ltp >= 50 && c.ltp < 100],
+      ['100', 'Price 100 to 500', c => c.ltp >= 100 && c.ltp < 500], ['g500', 'Price above 500', c => c.ltp >= 500]]);
+
+    add('HLPC', 'HiLo Periodic Compare', [
+      ['hh', 'Higher high than previous day', c => c.h1 > c.h2], ['ll', 'Lower low than previous day', c => c.l1 < c.l2],
+      ['hhhl', 'Higher high and higher low', c => c.h1 > c.h2 && c.l1 > c.l2], ['lhll', 'Lower high and lower low', c => c.h1 < c.h2 && c.l1 < c.l2],
+      ['in', 'Inside day', c => c.h1 <= c.h2 && c.l1 >= c.l2], ['out', 'Outside day', c => c.h1 > c.h2 && c.l1 < c.l2]]);
+    hiloI('HL10', 'HiLo', '10-day', 'hi10', 'lo10', 2);
+    hiloI('HL20', '20D HiLo', '20-day', 'hi20', 'lo20', 2);
+    hiloI('HL50', '50D HiLo', '50-day', 'hi50', 'lo50', 2);
+    hiloI('HL100', '100D HiLo', '100-day', 'hi100', 'lo100', 2);
+
+    hiloI('HL52', '52W HiLo', '52-week', 'hi52', 'lo52', 5);
+    add('SRSI', 'StochRSI(14)', [
+      ['ob', 'StochRSI above 0.8 (overbought)', c => c.srsi > 0.8], ['os', 'StochRSI below 0.2 (oversold)', c => c.srsi < 0.2],
+      ['g5', 'StochRSI above 0.5', c => c.srsi > 0.5], ['l5', 'StochRSI below 0.5', c => c.srsi < 0.5]]);
+    add('UO', 'Ultimate Oscillator (7,14,28)', [
+      ['ob', 'Above 70 (overbought)', c => c.uo > 70], ['os', 'Below 30 (oversold)', c => c.uo < 30], ['g50', 'Above 50', c => c.uo > 50], ['l50', 'Below 50', c => c.uo < 50]]);
+    maI('DEMA', 20); maI('DEMA', 50);
+
+    maI('DEMA', 100); maI('DEMA', 200); maI('TEMA', 20); maI('TEMA', 50); maI('TEMA', 200);
+
+    maI('TEMA', 100);
+    add('ENV', 'Envelope Trading Band (20)', [
+      ['up', 'Price above upper band (+2.5%)', c => c.ltp > c.envU], ['lo', 'Price below lower band (-2.5%)', c => c.ltp < c.envL],
+      ['in', 'Price inside the band', c => c.ltp <= c.envU && c.ltp >= c.envL], ['m+', 'Price above the 20-day average', c => c.ltp > c.bbM]]);
+    add('KC', 'Keltner Channel (20,2)', [
+      ['up', 'Price above upper channel', c => c.ltp > c.kcU], ['lo', 'Price below lower channel', c => c.ltp < c.kcL], ['in', 'Price inside the channel', c => c.ltp <= c.kcU && c.ltp >= c.kcL]]);
+    trailI('VTS', 'VTS (7)', 'vts');
+    trailI('TRAIL', 'Trail Stop (20)', 'trail20');
+
+    trailI('DTRAIL', 'Dynamic Trail Stop (10)', 'dyn');
+
+    // fundamental scanners
+    add('PE', 'Audited PE', [
+      ['l10', 'PE below 10', c => c.pe > 0 && c.pe < 10], ['10', 'PE 10 to 20', c => c.pe >= 10 && c.pe < 20], ['20', 'PE 20 to 30', c => c.pe >= 20 && c.pe < 30],
+      ['g30', 'PE above 30', c => c.pe >= 30], ['none', 'No PE (zero or negative)', c => !(c.pe > 0)]], 'fund');
+    add('EPS', 'EPS', [['pos', 'EPS positive', c => c.eps > 0], ['neg', 'EPS negative', c => c.eps < 0], ['g5', 'EPS above 5', c => c.eps > 5]], 'fund');
+    add('PNAV', 'Price / NAV', [
+      ['l05', 'Price below half of NAV', c => c.ltp < 0.5 * c.nav], ['l1', 'Price below NAV (discount)', c => c.ltp < c.nav], ['g1', 'Price above NAV (premium)', c => c.ltp > c.nav], ['g2', 'Price above 2x NAV', c => c.ltp > 2 * c.nav]], 'fund');
+    add('MCAP', 'Market cap (mn)', [['g50', 'Above 50,000', c => c.mcap > 5e4], ['10', '10,000 to 50,000', c => c.mcap >= 1e4 && c.mcap <= 5e4], ['l10', 'Below 10,000', c => c.mcap < 1e4]], 'fund');
+    add('CAT', 'Category', [['A', 'Category A', c => c.cat === 'A'], ['B', 'Category B', c => c.cat === 'B'], ['N', 'Category N', c => c.cat === 'N'], ['Z', 'Category Z', c => c.cat === 'Z']], 'fund');
+    add('BETA', 'Beta', [['g1', 'Beta above 1 (more volatile than market)', c => c.beta > 1], ['l1', 'Beta below 1', c => c.beta < 1], ['neg', 'Negative beta', c => c.beta < 0]], 'fund');
+    add('DIR', 'Director holding', [['g50', 'Above 50%', c => c.director > 50], ['30', '30% to 50%', c => c.director >= 30 && c.director <= 50], ['l30', 'Below 30%', c => c.director < 30]], 'fund');
+    add('BOARD', 'Board', [['main', 'Main board', c => c.board === 'Main'], ['mf', 'Mutual fund', c => c.board === 'Mutual Fund']], 'fund');
+    this._ind = L;
+    return L;
+  }
 
   preDefs() {
     if (this._pre) return this._pre;
@@ -366,7 +574,7 @@ class Component extends DCLogic {
     }
   }
 
-  setSlot(i, v) { const sub = this.state.sub; this.setState(s => ({ slots: { ...s.slots, [sub]: s.slots[sub].map((x, j) => j === i ? v : x) } })); }
+  setPick(key, v) { this.setState(s2 => { const picks = { ...s2.picks }; if (v) picks[key] = v; else delete picks[key]; return { picks }; }); }
   setCp(idx, key, raw) { const v = this.clampN(raw); this.setState(s => ({ cp: s.cp.map((c, i) => i === idx ? { ...c, [key]: v } : c) })); }
 
   addChip(idx) {
@@ -401,7 +609,7 @@ class Component extends DCLogic {
     const U = window.UFT; if (!U) return {};
     const st = this.state; const C = this.ctxMap(); const lastOf = a => a[a.length - 1];
     const t0 = U.param('tab', 'technical'); const tab = t0 === 'pre' || t0 === 'custom' ? t0 : 'technical';
-    const sub = st.sub; const slots = st.slots[sub]; const catAll = this.catMap();
+    const sub = st.sub;
     const COLS = '110px 180px 72px 72px 72px 72px 72px 72px 72px 72px 68px 84px 96px 48px 80px';
 
     const TABS = [['technical', 'Scanner', null], ['pre', 'Pre scanner', { tab: 'pre' }], ['custom', 'Custom scanner', { tab: 'custom' }]];
@@ -416,17 +624,21 @@ class Component extends DCLogic {
     out.chips = []; out.noChips = false; out.cells = []; out.opts = []; out.total = 0;
 
     if (tab === 'technical') {
-      const active = slots.map((id, i) => ({ id, i, e: catAll[id] })).filter(x => x.e);
-      list = U.stocks.filter(s => active.every(x => x.e.test(C[s.code])));
+      const defs = this.indDefs(); const picks = st.picks;
+      const inds = defs.filter(d => sub === 'all' || (sub === 'fundamental' ? d.group === 'fund' : d.group === 'tech'));
+      const optMap = {}; defs.forEach(d => d.opts.forEach(o => { optMap[o.id] = o; }));
+      const active = inds.filter(d => optMap[picks[d.key]]).map(d => ({ d, o: optMap[picks[d.key]] }));
+      list = U.stocks.filter(s => active.every(x => x.o.test(C[s.code])));
       out.total = list.length; out.noChips = active.length === 0;
-      out.chips = active.map(x => ({ label: x.e.label, onRemove: () => this.setSlot(x.i, '') }));
-      out.cells = slots.map((v, i) => ({ value: v, bg: v ? 'var(--green-t1)' : 'var(--paper)', bd: v ? 'var(--ink)' : 'var(--neutral-300)', fw: v ? 700 : 400, onChange: e => this.setSlot(i, e.target.value) }));
-      out.opts = [{ value: '', label: '— Select scanner —' }, ...this.catFor(sub).map(e => ({ value: e.id, label: e.label }))];
+      out.chips = active.map(x => ({ label: x.o.label, onRemove: () => this.setPick(x.d.key, '') }));
+      out.cells = inds.map(d => { const v = optMap[picks[d.key]] ? picks[d.key] : '';
+        return { value: v, bg: v ? 'color-mix(in srgb, var(--green-700) 16%, var(--paper))' : 'var(--paper)', bd: v ? 'var(--green-700)' : 'var(--neutral-300)', fw: v ? 700 : 400,
+          opts: [{ value: '', label: d.name }, ...d.opts.map(o => ({ value: o.id, label: o.label }))], onChange: e => this.setPick(d.key, e.target.value) }; });
       out.subTabs = [['technical', 'Technical scanners'], ['fundamental', 'Fundamental scanners'], ['all', 'All scanners']].map(([k, label]) => ({ label, bg: k === sub ? 'var(--ink)' : 'var(--paper)', fg: k === sub ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ sub: k }) }));
-      out.onSave = () => { const ok = this.writeStore('uftcl.scanner.' + sub, slots); this.setState({ msg: ok ? 'Scanner saved in this browser.' : 'Could not save in this browser.' }); };
-      out.onLoad = () => { const v = this.readStore('uftcl.scanner.' + sub); if (Array.isArray(v) && v.length === 15) this.setState(s => ({ slots: { ...s.slots, [sub]: v }, msg: 'Scanner loaded.' })); else this.setState({ msg: 'No saved scanner yet.' }); };
+      out.onSave = () => { const ok = this.writeStore('uftcl.scanner.picks', picks); this.setState({ msg: ok ? 'Scanner saved in this browser.' : 'Could not save in this browser.' }); };
+      out.onLoad = () => { const v = this.readStore('uftcl.scanner.picks'); if (v && typeof v === 'object' && !Array.isArray(v)) this.setState({ picks: v, msg: 'Scanner loaded.' }); else this.setState({ msg: 'No saved scanner yet.' }); };
       out.resultTitle = `Total ${list.length} using Day period`;
-      out.footnote = 'Mock data, deterministic per symbol. ADX, ATR, Keltner, Supertrend and candlestick scanners are not wired yet, so they are left out of the list.';
+      out.footnote = 'Mock data, deterministic per symbol. Trail-stop scanners use ATR-based stops: VTS (7) is 2x ATR, Trail Stop (20) is 3x ATR, Dynamic Trail Stop (10) widens as volatility rises.';
     }
 
     if (tab === 'pre') {
