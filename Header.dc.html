@@ -68,10 +68,16 @@ a:hover { color: var(--blue-700); }
                   <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
                     <sc-if value="{{ col.title }}"><div style="font-size: 12px; font-weight: 700; color: var(--text-muted); padding: 0 8px 6px; border-bottom: 1px solid var(--neutral-300); margin-bottom: 4px;">{{ col.title }}</div></sc-if>
                     <sc-for list="{{ col.links }}" as="l">
-                      <a href="{{ l.href }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 32px; padding: 0 8px; color: var(--ink);" style-hover="background: var(--ink); color: var(--paper);">
-                        <span>{{ l.label }}</span>
-                        <sc-if value="{{ l.soon }}"><span style="font-size: 10px; font-weight: 700; color: var(--text-placeholder);">SOON</span></sc-if>
-                      </a>
+                      <div style="position: relative;" onMouseEnter="{{ l.enter }}">
+                        <a href="{{ l.href }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 32px; padding: 0 8px; color: var(--ink);" style-hover="background: var(--ink); color: var(--paper);">
+                          <span>{{ l.label }}</span>
+                          <sc-if value="{{ l.showSoon }}"><span style="font-size: 10px; font-weight: 700; color: var(--text-placeholder);">SOON</span></sc-if>
+                          <sc-if value="{{ l.hasSub }}"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M6 4v8l4.500-4z"></path></svg></sc-if>
+                        </a>
+                        <sc-if value="{{ l.subOpen }}"><div style="position: absolute; left: 100%; top: -1px; min-width: 200px; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset); padding: 8px; display: flex; flex-direction: column; gap: 2px; z-index: 5;">
+                          <sc-for list="{{ l.subs }}" as="x"><a href="{{ x.href }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 32px; padding: 0 8px; color: var(--ink); white-space: nowrap;" style-hover="background: var(--ink); color: var(--paper);"><span>{{ x.label }}</span><span style="font-size: 10px; font-weight: 700; color: var(--text-placeholder);">SOON</span></a></sc-for>
+                        </div></sc-if>
+                      </div>
                     </sc-for>
                   </div>
                 </sc-for>
@@ -172,9 +178,9 @@ a:hover { color: var(--blue-700); }
 </header>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:420},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;price&quot;,&quot;market&quot;,&quot;scanner&quot;,&quot;ipo&quot;,&quot;company&quot;,&quot;news&quot;,&quot;trade&quot;,&quot;about&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:420},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;price&quot;,&quot;market&quot;,&quot;scanner&quot;,&quot;tools&quot;,&quot;ipo&quot;,&quot;company&quot;,&quot;news&quot;,&quot;trade&quot;,&quot;about&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
-  state = { now: new Date(), open: null, drawer: false, login: false, lid: '', lpw: '', showPw: false, remember: true, lerr: {}, w: typeof window !== 'undefined' ? window.innerWidth : 1280, ready: !!window.UFT };
+  state = { now: new Date(), open: null, sub: null, drawer: false, login: false, lid: '', lpw: '', showPw: false, remember: true, lerr: {}, w: typeof window !== 'undefined' ? window.innerWidth : 1280, ready: !!window.UFT };
   componentDidMount() {
     this.t = setInterval(() => this.setState({ now: new Date(), ready: !!window.UFT }), 1000);
     this.onR = () => this.setState({ w: window.innerWidth });
@@ -192,8 +198,10 @@ class Component extends DCLogic {
         { title: 'Charts', links: [L('Stock Chart', 'Stock Chart Tool'), L('Interactive Chart', 'Interactive Chart Tool'), L('MTF Charts', 'MTF Charts'), L('Multiple Charts', 'Multiple Charts'), L('Technical & Fundamental Charts', 'Technical Chart')] },
         { title: 'PE Ratio', links: [L('Market PE Ratio', 'Market PE Ratio'), L('Sector PE Ratio', 'Sector PE Ratio'), L('Category PE Ratio', 'Category PE Ratio'), L('Compare PE Ratio', 'Compare PE Ratio'), L('Compare Sector PE', 'Compare Sector PE'), L('Weighted PE Chart', 'Weighted PE Chart')] },
         { title: 'VPA', links: [L('Market Watch', 'Market Watch'), L('1 Minute VPA', 'VPA'), L('VPA Watch List', 'VPA Watch List'), L('VPA Archive', 'VPA Archive'), L('Market Depth', 'Depth Monitor'), L('Market Depth Monitor', 'Depth Monitor'), L('Minute Map', 'Minute Map')] },
-        { title: 'Analysis', links: [L('Sector Performance', 'Sector Share Price'), L('Order Book / Market Depth', 'Depth Monitor'), L('Historical Data', 'VPA Archive'), L('Chart Gallery'), L('Tools'), L('Alert')] }] },
+        { title: 'Analysis', links: [L('Sector Performance', 'Sector Share Price'), L('Order Book / Market Depth', 'Depth Monitor'), L('Historical Data', 'VPA Archive'), L('Chart Gallery'), L('Alert')] }] },
       { id: 'scanner', label: 'Scanner', groups: [{ links: [L('Stock Scanner', 'Stock Scanner'), L('Pre Scanner', 'Stock Scanner', 'tab=pre'), L('Custom Scanner', 'Stock Scanner', 'tab=custom'), L('Robo Trader (AI)', 'Robo Trader')] }] },
+      { id: 'tools', label: 'Tools', groups: [{ links: [L('Index Analysis'), L('Correlation'), L('52 Week Range'), L('Bar Chart'), L('Pie Chart'), L('Data Download'),
+        { ...L('TA Value'), sub: [L('Moving Averages'), L('Oscillators'), L('Pivot Points')] }, { ...L('Trend'), sub: [L('Trend Direction'), L('Trend Strength')] }, L('Clear Cache'), L('Return Calculator')] }] },
       { id: 'ipo', label: 'IPO', groups: [{ links: [L('Overview', 'IPO'), L('Upcoming IPOs', 'IPO', 'tab=upcoming'), L('Open IPOs', 'IPO', 'tab=open'), L('Past IPOs', 'IPO', 'tab=past'), L('IPO Application', 'IPO', 'tab=open')] }] },
       { id: 'company', label: 'Company Corner', groups: [{ links: [L('Company Profile'), L('Financial Reports'), L('Corporate Actions'), L('Price Sensitive Information')] }] },
       { id: 'news', label: 'Research & News', groups: [{ links: [L('DSE News', 'News Effect Chart'), L('News Effect Chart', 'News Effect Chart'), L('Event Calendar', 'Event Calendar'), L('Brokerage Research Reports'), L('Economic Calendar')] }] },
@@ -235,7 +243,8 @@ class Component extends DCLogic {
         bg: on ? 'var(--ink)' : 'transparent', fg: on ? 'var(--paper)' : 'var(--ink)',
         pos: g.mega ? 'static' : 'relative', left: g.mega ? '24px' : g.right ? 'auto' : '0', right: g.mega ? '24px' : g.right ? '0' : 'auto',
         cols: g.mega ? 'repeat(4, minmax(0, 1fr))' : g.groups && g.groups.length > 1 ? 'repeat(2, minmax(200px, 1fr))' : '1fr',
-        flat: (g.groups || []).flatMap(c => c.links),
+        flat: (g.groups || []).flatMap(c => c.links).flatMap(l => [l, ...(l.sub || []).map(x => ({ ...x, label: l.label + ' · ' + x.label }))]),
+        groups: g.groups && g.groups.map(c => ({ ...c, links: c.links.map(l => ({ ...l, hasSub: !!l.sub, showSoon: !!l.soon && !l.sub, subOpen: this.state.sub === g.id + l.label, subs: l.sub || [], enter: () => this.setState({ sub: l.sub ? g.id + l.label : null }) })) })),
         open: () => !mobile && hasMenu && this.setState({ open: g.id }),
         click: e => { if (hasMenu) { e.preventDefault(); this.setState(s => ({ open: s.open === g.id ? null : g.id })); } } };
     });
@@ -252,7 +261,7 @@ class Component extends DCLogic {
       clock: dk.toLocaleTimeString('en-GB', { hour12: false }), dateLabel: dk.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }),
       status, statusColor: status === 'Market open' ? 'var(--green-700)' : status === 'Pre-open' ? 'var(--neutral-500)' : 'var(--red-700)',
       menu, desktop: !mobile, mobile, drawerOpen: mobile && this.state.drawer, idx, marquee, symbols: U ? U.symbols : [],
-      closeMenu: () => !mobile && this.setState({ open: null }),
+      closeMenu: () => !mobile && this.setState({ open: null, sub: null }),
       toggleDrawer: () => this.setState(s => ({ drawer: !s.drawer })),
       toggleLogin: () => this.setState(s => ({ login: !s.login })), loginOpen: this.state.login,
       ...this.loginVals(),
