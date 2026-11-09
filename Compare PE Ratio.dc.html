@@ -28,21 +28,21 @@ a:hover { color: var(--blue-700); }
   <dc-import name="PESummary" title="Compare PE" hint-size="100%,130px"></dc-import>
 
   <section data-screen-label="Compare PE" style="border: 1px solid var(--ink); display: flex; flex-direction: column;">
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--ink);"><div style="display: flex; flex-direction: column;"><b style="font-size: 18px;">Compare PE ratio</b><span style="font-size: 12px; color: var(--text-muted);">Pick up to {{ max }} securities to compare EPS, earnings and PE side by side · {{ count }} selected</span></div><button onClick="{{ clearAll }}" style="font: inherit; font-size: 13px; height: 32px; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">Clear all</button></div>
-    <div style="overflow-x: auto;"><div style="min-width: 1280px;">
-      <div style="display: grid; grid-template-columns: 200px 130px repeat(13, minmax(86px, 1fr)); background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 700; text-align: right;">
-        <span style="text-align: left; padding: 12px;">Stocks</span><span style="padding: 12px;"></span>
-        <sc-for list="{{ heads }}" as="h"><span style="padding: 12px 10px; display: flex; align-items: flex-end; justify-content: flex-end;">{{ h.label }}</span></sc-for>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--ink);"><div style="display: flex; flex-direction: column;"><b style="font-size: 18px;">Compare PE ratio</b><span style="font-size: 12px; color: var(--text-muted);">Pick up to {{ max }} securities to compare EPS, earnings and PE side by side · {{ count }} selected</span></div><div style="display: flex; gap: 8px; align-items: center;"><button onClick="{{ clearAll }}" style="font: inherit; font-size: 13px; height: 32px; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">Clear all</button><dc-import name="TableSettings" skey="comparepe" cols='[["eps","EPS"],["q1","Q1 EPS"],["q2","Q2 EPS"],["q3","Q3 EPS"],["q4","Q4 EPS"],["shares","Total securities"],["ltp","LTP"],["mcap","Market capital (mn)"],["wmcap","Weighted market capital"],["ann","Annualized EPS"],["earn","Annualized earning (mn)"],["wpe","Weighted PE"],["ape","Annualized PE"]]' locked='[]' hint-size="36px,36px"></dc-import></div></div>
+    <div style="overflow-x: auto;"><div style="min-width: {{ minW }}px; font-size: {{ fs }}px;">
+      <div style="display: grid; grid-template-columns: {{ gridCols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: {{ fsHead }}px; font-weight: 700; text-align: right;">
+        <span style="text-align: left; padding: {{ hpad }}px 12px;">Stocks</span><span style="padding: {{ hpad }}px 12px;"></span>
+        <sc-for list="{{ heads }}" as="h"><span style="padding: {{ hpad }}px 10px; display: flex; align-items: flex-end; justify-content: flex-end;">{{ h.label }}</span></sc-for>
       </div>
       <sc-for list="{{ rows }}" as="r">
-        <div style="display: grid; grid-template-columns: 200px 130px repeat(13, minmax(86px, 1fr)); align-items: center; min-height: 48px; border-bottom: 1px solid var(--neutral-200); background: {{ r.zebra }};">
-          <div style="display: flex; align-items: center; gap: 6px; padding: 0 12px;"><select onChange="{{ r.onChange }}" value="{{ r.code }}" style="font: inherit; font-weight: 700; height: 32px; flex: 1; min-width: 0; padding: 0 8px; border: 1px solid var(--ink); background: var(--paper); color: {{ r.color }}; cursor: pointer;"><sc-for list="{{ symbolOptions }}" as="o"><option value="{{ o.code }}">{{ o.code }}</option></sc-for></select><button onClick="{{ r.onRemove }}" title="Remove" style="width: 28px; height: 32px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">×</button></div>
+        <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; min-height: {{ rowH }}px; border-bottom: 1px solid var(--neutral-200); background: {{ r.zebra }};">
+          <div style="display: flex; align-items: center; gap: 6px; padding: 0 12px;"><select onChange="{{ r.onChange }}" value="{{ r.code }}" style="font: inherit; font-weight: 700; height: {{ ctlH }}px; font-size: {{ fs }}px; flex: 1; min-width: 0; padding: 0 8px; border: 1px solid var(--ink); background: var(--paper); color: {{ r.color }}; cursor: pointer;"><sc-for list="{{ symbolOptions }}" as="o"><option value="{{ o.code }}">{{ o.code }}</option></sc-for></select><button onClick="{{ r.onRemove }}" title="Remove" style="width: 28px; height: {{ ctlH }}px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">×</button></div>
           <div style="display: flex; gap: 2px; padding: 0 12px;"><sc-for list="{{ r.acts }}" as="a"><a href="{{ a.href }}" title="{{ a.title }}" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ a.d }}"></path></svg></a></sc-for></div>
-          <sc-for list="{{ r.cells }}" as="c"><span style="text-align: right; padding: 0 10px; font-family: var(--font-mono); font-size: 13px; color: {{ c.color }};">{{ c.v }}</span></sc-for>
+          <sc-for list="{{ r.cells }}" as="c"><span style="text-align: right; padding: 0 10px; font-family: var(--font-mono); font-size: {{ fs }}px; color: {{ c.color }};">{{ c.v }}</span></sc-for>
         </div>
       </sc-for>
-      <sc-if value="{{ canAdd }}"><div style="display: grid; grid-template-columns: 200px 130px repeat(13, minmax(86px, 1fr)); align-items: center; min-height: 48px; border-bottom: 1px solid var(--neutral-200);">
-        <div style="padding: 0 12px;"><select onChange="{{ onAdd }}" value="" style="font: inherit; height: 32px; width: 100%; padding: 0 8px; border: 1px dashed var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;"><option value="">Select Symbol</option><sc-for list="{{ addOptions }}" as="o"><option value="{{ o.code }}">{{ o.code }}</option></sc-for></select></div>
+      <sc-if value="{{ canAdd }}"><div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; min-height: {{ rowH }}px; border-bottom: 1px solid var(--neutral-200);">
+        <div style="padding: 0 12px;"><select onChange="{{ onAdd }}" value="" style="font: inherit; font-size: {{ fs }}px; height: {{ ctlH }}px; width: 100%; padding: 0 8px; border: 1px dashed var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;"><option value="">Select Symbol</option><sc-for list="{{ addOptions }}" as="o"><option value="{{ o.code }}">{{ o.code }}</option></sc-for></select></div>
         <span></span><sc-for list="{{ heads }}" as="b"><span style="text-align: right; padding: 0 10px; color: var(--text-muted);">–</span></sc-for>
       </div></sc-if>
     </div></div>
@@ -55,20 +55,22 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, codes: ['BRACBANK', 'GP', 'SQURPHARMA', 'RENATA'] };
-  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
-  componentWillUnmount() { clearInterval(this.p); }
+  state = { ts: null, ready: !!window.UFT, codes: ['BRACBANK', 'GP', 'SQURPHARMA', 'RENATA'] };
+  componentDidMount() { this.tsL = e => { const d = e.detail || {}; if (d.skey === 'comparepe') this.setState({ ts: { hidden: d.hidden, compact: d.compact, fs: d.fs } }); }; window.addEventListener('uft-table-settings', this.tsL); if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-table-settings', this.tsL); }
   renderVals() {
     const U = window.UFT; if (!U) return {};
-    const st = this.state; const { fmt } = U; const IN = U.fmtIN; const MAX = 8;
+    const st = this.state; const { fmt } = U; const IN = U.fmtIN; const MAX = 8; const V = U.tsView(st.ts || U.tsLoad('comparepe'));
     const codes = st.codes.filter(c => U.pe.byCode[c]);
     const ICONS = [['Stock chart', 'chart', 'M2 12l4-4 3 3 5-6'], ['1 Minute VPA', 'vpa', 'M3 13V8M6.5 13V4M10 13V9M13.5 13V6'], ['Depth monitor', 'depth', 'M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6'], ['News effect chart', 'effect', 'M3 2.5h10v11H3zM5.5 5.5h5M5.5 8h5M5.5 10.5h3']];
     const neg = v => v < 0 ? 'var(--red-700)' : 'var(--ink)';
+    const HD = [['eps', 'EPS'], ['q1', 'Q1 EPS'], ['q2', 'Q2 EPS'], ['q3', 'Q3 EPS'], ['q4', 'Q4 EPS'], ['shares', 'Total securities'], ['ltp', 'LTP'], ['mcap', 'Market capital (mn)'], ['wmcap', 'Weighted market capital'], ['ann', 'Annualized EPS'], ['earn', 'Annualized earning (mn)'], ['wpe', 'Weighted PE'], ['ape', 'Annualized PE']];
     const rows = codes.map((code, i) => { const r = U.pe.byCode[code]; const A = U.actions(code);
-      const cells = [[fmt(r.eps), neg(r.eps)], [String(r.q1), neg(r.q1)], [String(r.q2), neg(r.q2)], [String(r.q3), neg(r.q3)], [String(r.q4), 'var(--ink)'], [IN(r.shares), 'var(--ink)'], [fmt(r.ltp, 1), 'var(--ink)'], [IN(r.mcap), 'var(--ink)'], [fmt(r.wmcap, 2), 'var(--ink)'], [fmt(r.ann), neg(r.ann)], [IN(r.earn), neg(r.earn)], [fmt(r.wpe), neg(r.wpe)], [fmt(r.ape), neg(r.ape)]].map(([v, color]) => ({ v, color }));
+      const all = { eps: [fmt(r.eps), neg(r.eps)], q1: [String(r.q1), neg(r.q1)], q2: [String(r.q2), neg(r.q2)], q3: [String(r.q3), neg(r.q3)], q4: [String(r.q4), 'var(--ink)'], shares: [IN(r.shares), 'var(--ink)'], ltp: [fmt(r.ltp, 1), 'var(--ink)'], mcap: [IN(r.mcap), 'var(--ink)'], wmcap: [fmt(r.wmcap, 2), 'var(--ink)'], ann: [fmt(r.ann), neg(r.ann)], earn: [IN(r.earn), neg(r.earn)], wpe: [fmt(r.wpe), neg(r.wpe)], ape: [fmt(r.ape), neg(r.ape)] };
+      const cells = HD.filter(h => V.show(h[0])).map(h => ({ v: all[h[0]][0], color: all[h[0]][1] }));
       return { code, color: r.tone < 0 ? 'var(--red-700)' : 'var(--ink)', zebra: i % 2 ? 'var(--neutral-50)' : 'transparent', acts: ICONS.map(([title, key, d]) => ({ title, href: A[key], d })), cells, onChange: e => this.setState({ codes: codes.map((c, j) => j === i ? e.target.value : c) }), onRemove: () => this.setState({ codes: codes.filter((c, j) => j !== i) }) }; });
-    const heads = ['EPS', 'Q1 EPS', 'Q2 EPS', 'Q3 EPS', 'Q4 EPS', 'Total securities', 'LTP', 'Market capital (mn)', 'Weighted market capital', 'Annualized EPS', 'Annualized earning (mn)', 'Weighted PE', 'Annualized PE'].map(label => ({ label }));
-    return { rows, heads, symbolOptions: U.symbols.map(code => ({ code })), canAdd: codes.length < MAX, addOptions: U.symbols.filter(c => !codes.includes(c)).map(code => ({ code })), onAdd: e => { if (e.target.value) this.setState({ codes: [...codes, e.target.value] }); }, clearAll: () => this.setState({ codes: [] }), count: codes.length, max: MAX };
+    const heads = HD.filter(h => V.show(h[0])).map(h => ({ label: h[1] }));
+    return { gridCols: `200px 130px repeat(${heads.length}, minmax(86px, 1fr))`, minW: 340 + heads.length * 96, fs: V.fs, fsHead: V.fsHead, rowH: V.padY === 2 ? 34 : 48, ctlH: V.padY === 2 ? 24 : 32, hpad: V.padY + 4, rows, heads, symbolOptions: U.symbols.map(code => ({ code })), canAdd: codes.length < MAX, addOptions: U.symbols.filter(c => !codes.includes(c)).map(code => ({ code })), onAdd: e => { if (e.target.value) this.setState({ codes: [...codes, e.target.value] }); }, clearAll: () => this.setState({ codes: [] }), count: codes.length, max: MAX };
   }
 }
 </script>

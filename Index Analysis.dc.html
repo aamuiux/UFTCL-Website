@@ -23,7 +23,7 @@ a:hover { color: var(--blue-700); }
 .tl-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
 .tl-btn:hover { background: var(--ink); color: var(--paper); }
 
-.ia-row { display: grid; grid-template-columns: 48px minmax(120px, 1.4fr) minmax(190px, 1.2fr) 90px 150px minmax(200px, 1.6fr); align-items: center; gap: 0 12px; padding: 0 12px; min-height: 40px; font-size: 14px; }
+.ia-row { display: grid; align-items: center; gap: 0 12px; padding: 0 12px; min-height: 40px; font-size: 14px; }
 .ia-lnk { font-size: 12px; padding: 2px 6px; border: 1px solid var(--neutral-300); color: var(--ink); }
 .ia-lnk:hover { border-color: var(--ink); color: var(--blue-700); }
 
@@ -45,11 +45,16 @@ a:hover { color: var(--blue-700); }
   <div role="tablist" aria-label="Order" style="display: flex; border: 1px solid var(--ink);"><sc-for list="{{ views }}" as="t" hint-placeholder-count="2"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" style="font: inherit; height: 36px; padding: 0 14px; border: 0; border-left: {{ t.bl }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
   <input class="tl-ctl" type="search" placeholder="Search stock" aria-label="Search stock" value="{{ q }}" onInput="{{ onQ }}" style="width: 220px; max-width: 100%;">
   <span style="margin-left: auto; font-size: 13px; color: var(--text-muted);">Showing <b style="color: var(--ink);">{{ shown }}</b> of <b style="color: var(--ink);">{{ total }}</b> stocks</span>
+  <dc-import name="TableSettings" skey="index" cols='[["no","#"],["code","Stock"],["links","Quick links"],["ltp","LTP"],["chg","Change"],["pts","Index contribution (pts)"]]' locked='["code"]' hint-size="36px,36px"></dc-import>
 </section>
-<section style="border: 1px solid var(--ink); overflow-x: auto;"><div style="min-width: 900px;">
-  <div class="ia-row" style="background: var(--neutral-100); border-bottom: 1px solid var(--ink); min-height: 44px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;"><span>#</span><span>Stock</span><span>Quick links</span><span style="text-align: right;">LTP</span><span style="text-align: right;">Change</span><span>Index contribution (pts)</span></div>
-  <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12"><div class="ia-row" style="background: {{ r.bg }};"><span style="color: var(--text-muted); font-family: var(--font-mono);">{{ r.n }}</span><a href="{{ r.stock }}" style="font-weight: 700;">{{ r.code }}</a><span style="display: flex; gap: 4px; flex-wrap: wrap;"><a class="ia-lnk" href="{{ r.chart }}">Chart</a><a class="ia-lnk" href="{{ r.vpa }}">VPA</a><a class="ia-lnk" href="{{ r.depth }}">Depth</a><a class="ia-lnk" href="{{ r.effect }}">News</a></span><span style="text-align: right; font-family: var(--font-mono);">{{ r.ltp }}</span><span style="text-align: right; font-family: var(--font-mono); color: {{ r.tone }};">{{ r.chg }}</span>
-    <span style="display: grid; grid-template-columns: 1fr 70px; align-items: center; gap: 8px;"><span style="position: relative; height: 10px; background: var(--neutral-100);"><span style="position: absolute; top: 0; bottom: 0; left: {{ r.barL }}; width: {{ r.barW }}; background: {{ r.tone }};"></span><span style="position: absolute; top: -2px; bottom: -2px; left: 50%; width: 1px; background: var(--neutral-500);"></span></span><b style="text-align: right; font-family: var(--font-mono); color: {{ r.tone }};">{{ r.pts }}</b></span></div></sc-for>
+<section style="border: 1px solid var(--ink); overflow-x: auto;"><div style="min-width: {{ minW }}px; font-size: {{ fs }}px;">
+  <div class="ia-row" style="grid-template-columns: {{ gridCols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); min-height: {{ headH }}px; font-size: {{ fsHead }}px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;"><sc-for list="{{ heads }}" as="h"><span style="text-align: {{ h.al }};">{{ h.label }}</span></sc-for></div>
+  <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12"><div class="ia-row" style="grid-template-columns: {{ gridCols }}; min-height: {{ rowH }}px; background: {{ r.bg }};"><sc-for list="{{ r.cells }}" as="c"><div style="min-width: 0; text-align: {{ c.al }}; font-family: {{ c.ff }}; font-weight: {{ c.fw }}; color: {{ c.color }};">
+    <sc-if value="{{ c.isText }}">{{ c.v }}</sc-if>
+    <sc-if value="{{ c.isLink }}"><a href="{{ c.href }}" style="font-weight: 700;">{{ c.v }}</a></sc-if>
+    <sc-if value="{{ c.isLinks }}"><span style="display: flex; gap: 4px; flex-wrap: wrap;"><a class="ia-lnk" href="{{ c.chart }}">Chart</a><a class="ia-lnk" href="{{ c.vpa }}">VPA</a><a class="ia-lnk" href="{{ c.depth }}">Depth</a><a class="ia-lnk" href="{{ c.effect }}">News</a></span></sc-if>
+    <sc-if value="{{ c.isBar }}"><span style="display: grid; grid-template-columns: 1fr 70px; align-items: center; gap: 8px;"><span style="position: relative; height: 10px; background: var(--neutral-100);"><span style="position: absolute; top: 0; bottom: 0; left: {{ c.barL }}; width: {{ c.barW }}; background: {{ c.color }};"></span><span style="position: absolute; top: -2px; bottom: -2px; left: 50%; width: 1px; background: var(--neutral-500);"></span></span><b style="text-align: right; font-family: var(--font-mono);">{{ c.v }}</b></span></sc-if>
+  </div></sc-for></div></sc-for>
   <sc-if value="{{ none }}"><div style="padding: 32px 16px; text-align: center; color: var(--text-muted);">No stock matches your search.</div></sc-if>
 </div></section>
 
@@ -59,9 +64,9 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, idx: 'DSEX', view: 'drag', q: '' };
-  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
-  componentWillUnmount() { clearInterval(this.p); }
+  state = { ts: null, ready: !!window.UFT, idx: 'DSEX', view: 'drag', q: '' };
+  componentDidMount() { this.tsL = e => { const d = e.detail || {}; if (d.skey === 'index') this.setState({ ts: { hidden: d.hidden, compact: d.compact, fs: d.fs } }); }; window.addEventListener('uft-table-settings', this.tsL); if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-table-settings', this.tsL); }
   universe(U, idx) {
     const all = U.stocks.slice();
     if (idx === 'DS30') return all.sort((a, b) => b.mcap - a.mcap).slice(0, 30);
@@ -70,7 +75,7 @@ class Component extends DCLogic {
   }
   renderVals() {
     const U = window.UFT; if (!U) return {};
-    const st = this.state; const { fmt, sign, tone } = U; const IX = U.indices[st.idx];
+    const st = this.state; const { fmt, sign, tone } = U; const IX = U.indices[st.idx]; const V = U.tsView(st.ts || U.tsLoad('index'));
     const list = this.universe(U, st.idx); const tm = list.reduce((a, s) => a + s.mcap, 0);
     const raw = list.map(s => ({ s, w: s.mcap / tm, pts: s.changePct / 100 * (s.mcap / tm) * IX.prev })); const resid = IX.change - raw.reduce((t, x) => t + x.pts, 0);
     const pts = raw.map(x => ({ s: x.s, pts: x.pts + x.w * resid }));
@@ -78,16 +83,18 @@ class Component extends DCLogic {
     const maxAbs = Math.max(...pts.map(x => Math.abs(x.pts)), 0.01);
     const q = st.q.trim().toUpperCase();
     const sorted = pts.slice().sort((a, b) => st.view === 'drag' ? a.pts - b.pts : b.pts - a.pts);
-    const rows = sorted.map((x, i) => ({ ...x, n: i + 1 })).filter(x => !q || x.s.code.includes(q)).map((x, i) => { const a = U.actions(x.s.code); const w = Math.abs(x.pts) / maxAbs * 50;
-      return { n: x.n, code: x.s.code, stock: a.stock, chart: a.chart, vpa: a.vpa, depth: a.depth, effect: a.effect, ltp: fmt(x.s.ltp, 1), chg: `${sign(x.s.change, 1)}(${sign(x.s.changePct)}%)`, tone: tone(x.s.change),
-        pts: sign(U.round(x.pts, 2)), barL: (x.pts >= 0 ? 50 : 50 - w) + '%', barW: w + '%', bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)' }; });
+    const DEFS = [['no', '#', 'left', '48px'], ['code', 'Stock', 'left', 'minmax(120px, 1.4fr)'], ['links', 'Quick links', 'left', 'minmax(190px, 1.2fr)'], ['ltp', 'LTP', 'right', '90px'], ['chg', 'Change', 'right', '150px'], ['pts', 'Index contribution (pts)', 'left', 'minmax(200px, 1.6fr)']].filter(d => V.show(d[0]));
+    const rows = sorted.map((x, i) => ({ ...x, n: i + 1 })).filter(x => !q || x.s.code.includes(q)).map((x, i) => { const a = U.actions(x.s.code); const w = Math.abs(x.pts) / maxAbs * 50; const col = tone(x.pts); const mono = (v, extra) => ({ isText: true, v, al: 'right', ff: 'var(--font-mono)', fw: 400, color: 'var(--ink)', ...(extra || {}) });
+      const cell = { no: mono(x.n, { al: 'left', color: 'var(--text-muted)' }), code: { isLink: true, v: x.s.code, href: a.stock, al: 'left', ff: 'var(--font-sans)', fw: 400, color: 'var(--ink)' }, links: { isLinks: true, chart: a.chart, vpa: a.vpa, depth: a.depth, effect: a.effect, al: 'left', ff: 'var(--font-sans)', fw: 400, color: 'var(--ink)' }, ltp: mono(fmt(x.s.ltp, 1)), chg: mono(`${sign(x.s.change, 1)}(${sign(x.s.changePct)}%)`, { color: tone(x.s.change) }),
+        pts: { isBar: true, v: sign(U.round(x.pts, 2)), barL: (x.pts >= 0 ? 50 : 50 - w) + '%', barW: w + '%', color: col, al: 'left', ff: 'var(--font-sans)', fw: 400 } };
+      return { cells: DEFS.map(d => cell[d[0]]), bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)' }; });
     const cards = [
       { label: IX.name, value: fmt(IX.value, 2), tone: tone(IX.change), note: `${sign(IX.change)} (${sign(IX.pct)}%) vs previous close` },
       { label: 'Gainers lifting', value: '+' + fmt(sum(up), 2), tone: 'var(--green-700)', note: `${up.length} stocks` },
       { label: 'Losers dragging', value: sign(sum(dn)), tone: 'var(--red-700)', note: `${dn.length} stocks` },
       { label: 'Net contribution', value: sign(sum(pts)), tone: tone(sum(pts)), note: 'Points added to or removed from the index' }];
     const tab = (k, label, cur, set, i) => ({ label, sel: cur === k ? 'true' : 'false', bg: cur === k ? 'var(--ink)' : 'var(--paper)', fg: cur === k ? 'var(--paper)' : 'var(--ink)', bl: i ? '1px solid var(--ink)' : '0', onClick: () => set(k) });
-    return { cards, rows, none: rows.length === 0, shown: rows.length, total: list.length, q: st.q, onQ: e => this.setState({ q: e.target.value }),
+    return { gridCols: DEFS.map(d => d[3]).join(' '), heads: DEFS.map(d => ({ label: d[1], al: d[2] })), minW: Math.max(420, DEFS.length * 150), fs: V.fs, fsHead: V.fsHead, rowH: V.rowH, headH: V.headH, cards, rows, none: rows.length === 0, shown: rows.length, total: list.length, q: st.q, onQ: e => this.setState({ q: e.target.value }),
       idxTabs: ['DSEX', 'DSES', 'DS30'].map((k, i) => tab(k, k, st.idx, v => this.setState({ idx: v }), i)),
       views: [['drag', 'Top drags first'], ['lift', 'Top lifts first']].map(([k, l], i) => tab(k, l, st.view, v => this.setState({ view: v }), i)) };
   }

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="uftcl-data.js"></script>
+</helmet>
+<div style="position: relative; display: inline-block; font-family: var(--font-sans); color: var(--ink);">
+  <button onClick="{{ toggle }}" aria-label="Table settings" aria-haspopup="true" aria-expanded="{{ openStr }}" title="Table settings" style="width: 36px; height: 36px; box-sizing: border-box; border: 1px solid var(--ink); background: {{ gearBg }}; color: {{ gearFg }}; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.2"></circle><path d="M8 1.500v2M8 12.500v2M1.500 8h2M12.500 8h2M3.400 3.400l1.400 1.400M11.200 11.200l1.400 1.400M12.600 3.400l-1.400 1.400M4.800 11.200l-1.400 1.400"></path></svg></button>
+  <sc-if value="{{ open }}"><div>
+    <div onClick="{{ toggle }}" style="position: fixed; inset: 0; z-index: 70;"></div>
+    <div role="dialog" aria-label="Table settings" style="position: absolute; right: 0; top: 42px; z-index: 71; width: 290px; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset); text-align: left;">
+      <div style="padding: 10px 12px; border-bottom: 1px solid var(--neutral-300); display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;">Density</span>
+        <button onClick="{{ onCompact }}" aria-pressed="{{ compactStr }}" style="font: inherit; font-size: 13px; display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 0; cursor: pointer; text-align: left; color: var(--ink);"><span style="flex-shrink: 0; width: 18px; height: 18px; box-sizing: border-box; border: 1px solid var(--ink); background: {{ compactBg }}; color: var(--paper); display: inline-flex; align-items: center; justify-content: center; font-size: 12px;">{{ compactMark }}</span>Compact rows (less padding, shorter rows)</button>
+      </div>
+      <div style="padding: 10px 12px; border-bottom: 1px solid var(--neutral-300); display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;">Font size</span>
+        <div role="group" aria-label="Font size" style="display: flex;"><sc-for list="{{ sizes }}" as="z"><button onClick="{{ z.onClick }}" aria-pressed="{{ z.on }}" style="font: inherit; font-size: 13px; flex: 1; height: 32px; border: 1px solid var(--ink); border-left: {{ z.bl }}; background: {{ z.bg }}; color: {{ z.fg }}; cursor: pointer;">{{ z.label }}</button></sc-for></div>
+      </div>
+      <sc-if value="{{ hasCols }}"><div>
+        <div style="padding: 10px 12px 4px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;">Columns</span><span style="display: flex; gap: 12px;"><button onClick="{{ onAll }}" style="font: inherit; font-size: 12px; border: 0; background: none; padding: 0; text-decoration: underline; cursor: pointer; color: var(--ink);">Show all</button></span></div>
+        <div style="max-height: 230px; overflow: auto; padding: 2px 0 6px;"><sc-for list="{{ colRows }}" as="c"><label style="display: flex; align-items: center; gap: 10px; padding: 5px 12px; cursor: pointer; font-size: 13px;"><input type="checkbox" checked="{{ c.on }}" disabled="{{ c.locked }}" onChange="{{ c.toggle }}" style="margin: 0;">{{ c.label }}</label></sc-for></div>
+      </div></sc-if>
+      <div style="padding: 8px 12px; border-top: 1px solid var(--neutral-300); text-align: right;"><button onClick="{{ onReset }}" style="font: inherit; font-size: 12px; border: 0; background: none; padding: 0; text-decoration: underline; cursor: pointer; color: var(--ink);">Reset table settings</button></div>
+    </div>
+  </div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:80,&quot;height&quot;:60},&quot;skey&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;table&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;cols&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;[]&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;locked&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;[]&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, open: false, set: { hidden: [], compact: false, fs: 'sm' } };
+  componentDidMount() { const load = () => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true, set: window.UFT.tsLoad(this.props.skey || 'table') }); return true; } return false; }; if (!load()) this.p = setInterval(load, 50);
+    this.onKey = e => { if (e.key === 'Escape') this.setState(s => (s.open ? { open: false } : null)); }; window.addEventListener('keydown', this.onKey); }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('keydown', this.onKey); }
+  parse(v) { try { const a = JSON.parse(v || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  apply(next) { const key = this.props.skey || 'table'; this.setState({ set: next }); try { localStorage.setItem('uftcl.tbl.' + key, JSON.stringify(next)); } catch (e) { /* storage unavailable */ } window.dispatchEvent(new CustomEvent('uft-table-settings', { detail: { skey: key, ...next } })); }
+  renderVals() {
+    const st = this.state; const cols = this.parse(this.props.cols); const locked = this.parse(this.props.locked); const set = st.set;
+    const SZ = [['lg', 'lg'], ['sm', 'sm'], ['xs', 'xs'], ['xxs', 'xxs']];
+    return { open: st.open, openStr: st.open ? 'true' : 'false', toggle: () => this.setState(s => ({ open: !s.open })), gearBg: st.open ? 'var(--ink)' : 'var(--paper)', gearFg: st.open ? 'var(--paper)' : 'var(--ink)',
+      compactStr: set.compact ? 'true' : 'false', compactBg: set.compact ? 'var(--ink)' : 'var(--paper)', compactMark: set.compact ? '✓' : '', onCompact: () => this.apply({ ...set, compact: !set.compact }),
+      sizes: SZ.map(([k, l], i) => ({ label: l, on: set.fs === k ? 'true' : 'false', bg: set.fs === k ? 'var(--ink)' : 'var(--paper)', fg: set.fs === k ? 'var(--paper)' : 'var(--ink)', bl: i ? '0' : '1px solid var(--ink)', onClick: () => this.apply({ ...set, fs: k }) })),
+      hasCols: cols.length > 0, onAll: () => this.apply({ ...set, hidden: [] }),
+      colRows: cols.map(([k, l]) => ({ label: l, on: !set.hidden.includes(k), locked: locked.includes(k), toggle: () => this.apply({ ...set, hidden: set.hidden.includes(k) ? set.hidden.filter(x => x !== k) : [...set.hidden, k] }) })),
+      onReset: () => this.apply({ hidden: [], compact: false, fs: 'sm' }) };
+  }
+}
+</script>
+</body>
+</html>

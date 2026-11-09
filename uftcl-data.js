@@ -208,5 +208,9 @@
     const pad = n => String(n).padStart(2, '0');
     return (sdCache = { names, values, dates: days.map(d => `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`), short: days.map(d => `${pad(d.getUTCDate())} Nov`) });
   }
-  window.UFT = { sectorDaily, chartBars, rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
+  // per-table display settings (compact rows, font size, hidden columns), shared by TableSettings and the pages
+  const TS_FS = { lg: 15, sm: 13, xs: 12, xxs: 11 };
+  function tsLoad(key) { try { const o = JSON.parse(localStorage.getItem('uftcl.tbl.' + key) || 'null'); if (o) return { hidden: Array.isArray(o.hidden) ? o.hidden : [], compact: !!o.compact, fs: TS_FS[o.fs] ? o.fs : 'sm' }; } catch (e) { /* storage unavailable */ } return { hidden: [], compact: false, fs: 'sm' }; }
+  function tsView(t) { const fs = TS_FS[t.fs] || 13; const c = !!t.compact; return { fs, fsHead: Math.max(11, fs - 1), rowH: c ? 26 : 40, headH: c ? 30 : 42, padY: c ? 2 : 8, icon: c ? 20 : 24, spark: c ? 16 : 24, show: k => !t.hidden.includes(k) }; }
+  window.UFT = { tsLoad, tsView, sectorDaily, chartBars, rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
 })();

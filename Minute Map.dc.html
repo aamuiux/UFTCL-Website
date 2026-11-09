@@ -52,21 +52,23 @@ a:hover { color: var(--blue-700); }
     </div>
   </section>
 
+  <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-bottom: -12px;"><span style="font-size: 13px; color: var(--text-muted);">Ranking tables</span><dc-import name="TableSettings" skey="minutemap" cols='[["no","No"],["scrip","Scrip"],["acts","Actions"],["ltp","LTP"],["metric","Value / volume / trades"],["chg","Change"]]' locked='["scrip"]' hint-size="36px,36px"></dc-import></div>
   <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 24px; align-items: start;">
     <sc-for list="{{ tables }}" as="tb" hint-placeholder-count="2">
       <div data-screen-label="Ranking" style="border: 1px solid var(--ink); min-width: 0;">
         <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">{{ tb.title }}</div>
-        <div style="display: grid; grid-template-columns: 36px minmax(0, 1.3fr) 72px 1fr 1fr 1.3fr; padding: 8px 12px; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--ink); gap: 6px;"><span>No</span><span>Scrip</span><span>Actions</span><span style="text-align: right;">LTP</span><span style="text-align: right;">{{ metricHead }}</span><span style="text-align: right;">Change</span></div>
+        <div style="font-size: {{ fs }}px;">
+        <div style="display: grid; grid-template-columns: {{ gridCols }}; padding: {{ hpad }}px 12px; font-size: {{ fsHead }}px; color: var(--text-muted); border-bottom: 1px solid var(--ink); gap: 6px;"><sc-for list="{{ heads }}" as="h"><span style="text-align: {{ h.al }};">{{ h.label }}</span></sc-for></div>
         <sc-for list="{{ tb.rows }}" as="r" hint-placeholder-count="20">
-          <div style="display: grid; grid-template-columns: 36px minmax(0, 1.3fr) 72px 1fr 1fr 1.3fr; padding: 0 12px; height: 34px; align-items: center; gap: 6px; border-bottom: 1px solid var(--neutral-200); font-size: 13px;" style-hover="background: var(--neutral-100);">
-            <span style="color: var(--text-muted); font-family: var(--font-mono);">{{ r.n }}</span>
-            <a href="{{ r.watch }}" style="font-weight: 700; color: {{ r.color }}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ r.code }}</a>
-            <div style="display: flex; gap: 2px;"><a href="{{ r.chart }}" title="Stock chart" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 12l4-4 3 3 5-6"></path></svg></a><a href="{{ r.vpa }}" title="1 minute VPA" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M3 13V8M6.5 13V4M10 13V9M13.5 13V6"></path></svg></a></div>
-            <span style="text-align: right; font-family: var(--font-mono);">{{ r.ltp }}</span>
-            <span style="text-align: right; font-family: var(--font-mono); font-weight: 700;">{{ r.metric }}</span>
-            <span style="text-align: right; font-family: var(--font-mono); color: {{ r.color }};">{{ r.chg }}</span>
+          <div style="display: grid; grid-template-columns: {{ gridCols }}; padding: 0 12px; min-height: {{ rowH }}px; align-items: center; gap: 6px; border-bottom: 1px solid var(--neutral-200);" style-hover="background: var(--neutral-100);">
+            <sc-for list="{{ r.cells }}" as="c"><div style="min-width: 0; text-align: {{ c.al }}; font-family: {{ c.ff }}; font-weight: {{ c.fw }}; color: {{ c.color }};">
+              <sc-if value="{{ c.isText }}">{{ c.v }}</sc-if>
+              <sc-if value="{{ c.isLink }}"><a href="{{ c.href }}" style="font-weight: 700; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ c.v }}</a></sc-if>
+              <sc-if value="{{ c.isActs }}"><div style="display: flex; gap: 2px;"><a href="{{ c.chart }}" title="Stock chart" style="width: {{ icon }}px; height: {{ icon }}px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 12l4-4 3 3 5-6"></path></svg></a><a href="{{ c.vpa }}" title="1 minute VPA" style="width: {{ icon }}px; height: {{ icon }}px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M3 13V8M6.5 13V4M10 13V9M13.5 13V6"></path></svg></a></div></sc-if>
+            </div></sc-for>
           </div>
         </sc-for>
+        </div>
       </div>
     </sc-for>
   </section>
@@ -78,12 +80,12 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, metric: 'value', hover: null };
-  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
-  componentWillUnmount() { clearInterval(this.p); }
+  state = { ts: null, ready: !!window.UFT, metric: 'value', hover: null };
+  componentDidMount() { this.tsL = e => { const d = e.detail || {}; if (d.skey === 'minutemap') this.setState({ ts: { hidden: d.hidden, compact: d.compact, fs: d.fs } }); }; window.addEventListener('uft-table-settings', this.tsL); if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-table-settings', this.tsL); }
   renderVals() {
     const U = window.UFT; if (!U) return {};
-    const st = this.state; const { fmt, fmtInt, sign, tone } = U;
+    const st = this.state; const { fmt, fmtInt, sign, tone } = U; const V = U.tsView(st.ts || U.tsLoad('minutemap'));
     const M = st.metric;
     const META = { value: ['Value Map', 'value', 'Value (mn)'], volume: ['Volume Map', 'volume', 'Volume'], trades: ['Trade Map', 'trades', 'Trades'] };
     // last-minute activity per security (deterministic)
@@ -123,11 +125,14 @@ class Component extends DCLogic {
     // ranking tables
     const ranked = lm.slice().sort((a, b) => size(b) - size(a));
     const fmtM = o => M === 'value' ? fmt(o.value) : M === 'volume' ? fmtInt(o.volume) : fmtInt(o.trades);
-    const mk = (list, off) => list.map((o, i) => ({ n: off + i + 1, code: o.s.code, color: o.s.change === 0 ? 'var(--ink)' : tone(o.s.change), ltp: fmt(o.s.ltp, 1), metric: fmtM(o), chg: `${sign(o.s.change, 1)} (${sign(o.s.changePct)}%)`, watch: U.href('Market Watch', { symbol: o.s.code }), chart: U.actions(o.s.code).chart, vpa: U.actions(o.s.code).vpa }));
+    const RD = [['no', 'No', 'left', '36px'], ['scrip', 'Scrip', 'left', 'minmax(0, 1.3fr)'], ['acts', 'Actions', 'left', '72px'], ['ltp', 'LTP', 'right', '1fr'], ['metric', META[M][2], 'right', '1fr'], ['chg', 'Change', 'right', '1.3fr']].filter(d => V.show(d[0]));
+    const mk = (list, off) => list.map((o, i) => { const col = o.s.change === 0 ? 'var(--ink)' : tone(o.s.change); const A = U.actions(o.s.code); const mono = (v, extra) => ({ isText: true, v, al: 'right', ff: 'var(--font-mono)', fw: 400, color: 'var(--ink)', ...(extra || {}) });
+      const cell = { no: mono(off + i + 1, { al: 'left', color: 'var(--text-muted)' }), scrip: { isLink: true, v: o.s.code, href: U.href('Market Watch', { symbol: o.s.code }), al: 'left', ff: 'var(--font-sans)', fw: 700, color: col }, acts: { isActs: true, chart: A.chart, vpa: A.vpa, al: 'left', ff: 'var(--font-sans)', fw: 400, color: 'var(--ink)' }, ltp: mono(fmt(o.s.ltp, 1)), metric: mono(fmtM(o), { fw: 700 }), chg: mono(`${sign(o.s.change, 1)} (${sign(o.s.changePct)}%)`, { color: col }) };
+      return { cells: RD.map(d => cell[d[0]]) }; });
     const half = Math.ceil(ranked.length / 2); const label = META[M][0].replace(' Map', '');
     const tables = [{ title: `Last minute top ${ranked.length} ${label.toLowerCase()}`, rows: mk(ranked.slice(0, half), 0) }, { title: `Last minute top ${ranked.length} ${label.toLowerCase()} (continued)`, rows: mk(ranked.slice(half), half) }];
     const tabs = Object.entries(META).map(([k, [l]]) => ({ label: l, bd: M === k ? 'var(--ink)' : 'var(--neutral-300)', bg: M === k ? 'var(--ink)' : 'var(--paper)', fg: M === k ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ metric: k, hover: null }) }));
-    return { tabs, sectors, tiles, tip, onLeave: () => this.setState({ hover: null }), tables, metricHead: META[M][2], metricLabel: META[M][2].toLowerCase().replace(' (mn)', ''), total: U.stocks.length, asOf: '14:09', scale: [-5, -3.75, -2.5, -1.25, 0, 1.25, 2.5, 3.75, 5].map(p => U.heat(p)) };
+    return { gridCols: RD.map(d => d[3]).join(' '), heads: RD.map(d => ({ label: d[1], al: d[2] })), fs: V.fs, fsHead: V.fsHead, rowH: V.padY === 2 ? 26 : 34, hpad: V.padY, icon: V.padY === 2 ? 20 : 24, tabs, sectors, tiles, tip, onLeave: () => this.setState({ hover: null }), tables, metricHead: META[M][2], metricLabel: META[M][2].toLowerCase().replace(' (mn)', ''), total: U.stocks.length, asOf: '14:09', scale: [-5, -3.75, -2.5, -1.25, 0, 1.25, 2.5, 3.75, 5].map(p => U.heat(p)) };
   }
 }
 </script>

@@ -106,41 +106,25 @@ a:hover { color: var(--blue-700); }
           <input value="{{ q }}" onInput="{{ onQ }}" placeholder="Filter by trading code" style="flex: 1; min-width: 0; height: 30px; border: 0; outline: none; font: inherit; background: transparent; color: var(--ink);">
         </div>
         <span style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">{{ shown }}</span>
+        <dc-import name="TableSettings" skey="latest" cols='[["no","#"],["code","Trading code"],["acts","Actions"],["ltp","LTP"],["high","High"],["low","Low"],["close","Close"],["ycp","YCP"],["change","Change"],["pct","Change %"],["trades","Trade"],["value","Value (mn)"],["volume","Volume"],["trend","5 day trend"]]' locked='["code"]' hint-size="36px,36px"></dc-import>
       </div>
     </div>
     <div style="overflow-x: auto;">
-      <div style="display: table; width: 100%; min-width: 1120px; border-collapse: collapse; font-size: 13px;">
-        <div style="display: table-header-group;"><div style="display: table-row; font-size: 12px; color: var(--text-muted);">
-          <sc-for list="{{ cols }}" as="c" hint-placeholder-count="14"><div style="display: table-cell; vertical-align: middle; text-align: {{ c.align }}; padding: 0; border-bottom: 1px solid var(--ink); background: var(--neutral-50); position: sticky; top: 0;"><button onClick="{{ c.sort }}" style="font: inherit; color: {{ c.fg }}; font-weight: {{ c.weight }}; background: none; border: 0; height: 36px; padding: 0 10px; cursor: pointer; width: 100%; text-align: {{ c.align }}; white-space: nowrap;">{{ c.label }}{{ c.arrow }}</button></div></sc-for>
-        </div></div>
-        <div style="display: table-row-group;">
-          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="20">
-            <div style="display: table-row;" style-hover="background: var(--neutral-100);">
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); font-family: var(--font-mono); color: var(--text-muted);">{{ r.n }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200);"><a href="{{ r.a.stock }}" style="font-weight: 700;">{{ r.code }}</a> <span style="font-size: 11px; padding: 0 3px; border: 1px solid var(--neutral-400); color: var(--text-muted);">{{ r.cat }}</span></div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200);">
-                <div style="display: flex; gap: 2px;">
-                  <a href="{{ r.a.chart }}" title="Stock chart" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 12l4-4 3 3 5-6"></path></svg></a>
-                  <a href="{{ r.a.vpa }}" title="VPA" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M3 13V8M6.5 13V4M10 13V9M13.5 13V6"></path></svg></a>
-                  <a href="{{ r.a.archive }}" title="VPA archive" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2.5 3h11v3h-11zM3.5 6v7h9V6M6.5 9h3"></path></svg></a>
-                  <a href="{{ r.a.depth }}" title="Depth monitor" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6"></path></svg></a>
-                  <a href="{{ r.a.effect }}" title="News effect chart" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M3 2.5h10v11H3zM5.5 5.5h5M5.5 8h5M5.5 10.5h3"></path></svg></a>
-                </div>
-              </div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono); font-weight: 700;">{{ r.ltp }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.high }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.low }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.close }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.ycp }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono); color: {{ r.color }};">{{ r.change }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);"><span style="display: inline-block; min-width: 60px; padding: 1px 4px; background: {{ r.bg }}; color: {{ r.fg }};">{{ r.pct }}</span></div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.trades }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.value }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); text-align: right; font-family: var(--font-mono);">{{ r.volume }}</div>
-              <div style="display: table-cell; vertical-align: middle; padding: 6px 10px; border-bottom: 1px solid var(--neutral-200); width: 110px;"><svg viewBox="0 0 100 24" preserveAspectRatio="none" style="width: 100px; height: 24px; display: block;"><path d="{{ r.spark }}" fill="none" stroke="{{ r.color }}" stroke-width="1.25" vector-effect="non-scaling-stroke"></path></svg></div>
-            </div>
-          </sc-for>
+      <div style="min-width: {{ minW }}px; font-size: {{ fs }}px;">
+        <div style="display: grid; grid-template-columns: {{ gridCols }}; background: var(--neutral-50); border-bottom: 1px solid var(--ink); font-size: {{ fsHead }}px; color: var(--text-muted); position: sticky; top: 0;">
+          <sc-for list="{{ cols }}" as="c" hint-placeholder-count="14"><button onClick="{{ c.sort }}" style="font: inherit; font-size: inherit; color: {{ c.fg }}; font-weight: {{ c.weight }}; background: none; border: 0; height: {{ headH }}px; padding: 0 10px; cursor: pointer; width: 100%; text-align: {{ c.align }}; white-space: nowrap;">{{ c.label }}{{ c.arrow }}</button></sc-for>
         </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="20">
+          <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; min-height: {{ rowH }}px; border-bottom: 1px solid var(--neutral-200);" style-hover="background: var(--neutral-100);">
+            <sc-for list="{{ r.cells }}" as="c"><div style="padding: {{ padY }}px 10px; min-width: 0; text-align: {{ c.al }}; font-family: {{ c.ff }}; font-weight: {{ c.fw }}; color: {{ c.color }};">
+              <sc-if value="{{ c.isText }}">{{ c.v }}</sc-if>
+              <sc-if value="{{ c.isCode }}"><a href="{{ c.href }}" style="font-weight: 700;">{{ c.v }}</a> <span style="font-size: 11px; padding: 0 3px; border: 1px solid var(--neutral-400); color: var(--text-muted);">{{ c.cat }}</span></sc-if>
+              <sc-if value="{{ c.isActs }}"><div style="display: flex; gap: 2px;"><sc-for list="{{ c.acts }}" as="a"><a href="{{ a.href }}" title="{{ a.title }}" style="width: {{ icon }}px; height: {{ icon }}px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ a.d }}"></path></svg></a></sc-for></div></sc-if>
+              <sc-if value="{{ c.isPct }}"><span style="display: inline-block; min-width: 60px; padding: 1px 4px; background: {{ c.bg }}; color: {{ c.fg }};">{{ c.v }}</span></sc-if>
+              <sc-if value="{{ c.isSpark }}"><svg viewBox="0 0 100 24" preserveAspectRatio="none" style="width: 100px; height: {{ spark }}px; display: block;"><path d="{{ c.spark }}" fill="none" stroke="{{ c.color }}" stroke-width="1.25" vector-effect="non-scaling-stroke"></path></svg></sc-if>
+            </div></sc-for>
+          </div>
+        </sc-for>
       </div>
       <sc-if value="{{ empty }}"><div style="padding: 32px 16px; color: var(--text-muted);">No instruments match these filters.</div></sc-if>
     </div>
@@ -152,9 +136,9 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, filter: (window.UFT && window.UFT.param('filter', 'all')) || 'all', cat: 'all', sector: 'all', q: '', sort: 'code', dir: 1, band: null };
-  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true, filter: window.UFT.param('filter', 'all') }); } }, 50); }
-  componentWillUnmount() { clearInterval(this.p); }
+  state = { ts: null, ready: !!window.UFT, filter: (window.UFT && window.UFT.param('filter', 'all')) || 'all', cat: 'all', sector: 'all', q: '', sort: 'code', dir: 1, band: null };
+  componentDidMount() { this.tsL = e => { const d = e.detail || {}; if (d.skey === 'latest') this.setState({ ts: { hidden: d.hidden, compact: d.compact, fs: d.fs } }); }; window.addEventListener('uft-table-settings', this.tsL); if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true, filter: window.UFT.param('filter', 'all') }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-table-settings', this.tsL); }
   renderVals() {
     const U = window.UFT; if (!U) return {};
     const st = this.state; const { fmt, fmtInt, sign, tone } = U; const S = U.stocks;
@@ -167,10 +151,19 @@ class Component extends DCLogic {
     const hist = labels.map((label, i) => ({ label, n: counts[i], h: (counts[i] / cmax * 100) + '%', bg: i < 5 ? U.DOWN : i === 5 ? 'var(--neutral-400)' : U.UP, outline: st.band === i ? '1px solid var(--ink)' : 'none', tip: `${counts[i]} instruments`, pick: () => this.setState(s => ({ band: s.band === i ? null : i, filter: 'all' })) }));
     let list = S.filter(F[st.filter]).filter(s => st.cat === 'all' || s.cat === st.cat).filter(s => st.sector === 'all' || s.sector === st.sector).filter(s => !st.q || s.code.includes(st.q.toUpperCase())).filter(s => st.band == null || bandOf(s.changePct) === st.band);
     list = list.slice().sort((a, b) => { const x = a[st.sort], y = b[st.sort]; return (typeof x === 'string' ? x.localeCompare(y) : x - y) * st.dir; });
-    const colDef = [['#', null, 'left'], ['Trading code', 'code', 'left'], ['Actions', null, 'left'], ['LTP', 'ltp', 'right'], ['High', 'high', 'right'], ['Low', 'low', 'right'], ['Close', 'close', 'right'], ['YCP', 'ycp', 'right'], ['Change', 'change', 'right'], ['Change %', 'changePct', 'right'], ['Trade', 'trades', 'right'], ['Value (mn)', 'value', 'right'], ['Volume', 'volume', 'right'], ['5 day trend', null, 'left']];
-    const cols = colDef.map(([label, key, align]) => ({ label, align, arrow: key && st.sort === key ? (st.dir > 0 ? ' ↑' : ' ↓') : '', fg: key && st.sort === key ? 'var(--ink)' : 'var(--text-muted)', weight: key && st.sort === key ? 700 : 400, sort: () => key && this.setState(s => ({ sort: key, dir: s.sort === key ? -s.dir : (key === 'code' ? 1 : -1) })) }));
-    const rows = list.map((s, i) => { const d = U.daily(s.code, 20).slice(-20).map(b => b.c);
-      return { n: i + 1, code: s.code, cat: s.cat, a: U.actions(s.code), ltp: fmt(s.ltp, 1), high: fmt(s.high, 1), low: fmt(s.low, 1), close: fmt(s.close, 1), ycp: fmt(s.ycp, 1), change: sign(s.change, 1), pct: sign(s.changePct) + '%', color: tone(s.change), bg: U.heat(s.changePct), fg: U.heatText(s.changePct), trades: fmtInt(s.trades), value: fmt(s.value, 3), volume: fmtInt(s.volume), spark: U.linePath(d, 100, 24, { pad: 2 }).line }; });
+    const V = U.tsView(st.ts || U.tsLoad('latest'));
+    const DEFS = [['no', '#', null, 'left', '52px'], ['code', 'Trading code', 'code', 'left', 'minmax(150px, 1.2fr)'], ['acts', 'Actions', null, 'left', '150px'], ['ltp', 'LTP', 'ltp', 'right', 'minmax(76px, 1fr)'], ['high', 'High', 'high', 'right', 'minmax(76px, 1fr)'], ['low', 'Low', 'low', 'right', 'minmax(76px, 1fr)'], ['close', 'Close', 'close', 'right', 'minmax(76px, 1fr)'], ['ycp', 'YCP', 'ycp', 'right', 'minmax(76px, 1fr)'], ['change', 'Change', 'change', 'right', 'minmax(76px, 1fr)'], ['pct', 'Change %', 'changePct', 'right', 'minmax(96px, 1fr)'], ['trades', 'Trade', 'trades', 'right', 'minmax(76px, 1fr)'], ['value', 'Value (mn)', 'value', 'right', 'minmax(90px, 1fr)'], ['volume', 'Volume', 'volume', 'right', 'minmax(96px, 1fr)'], ['trend', '5 day trend', null, 'left', '124px']];
+    const vis = DEFS.filter(d => V.show(d[0]));
+    const cols = vis.map(([id, label, key, align]) => ({ label, align, arrow: key && st.sort === key ? (st.dir > 0 ? ' ↑' : ' ↓') : '', fg: key && st.sort === key ? 'var(--ink)' : 'var(--text-muted)', weight: key && st.sort === key ? 700 : 400, sort: () => key && this.setState(s => ({ sort: key, dir: s.sort === key ? -s.dir : (key === 'code' ? 1 : -1) })) }));
+    const ICON = { chart: ['Stock chart', 'M2 12l4-4 3 3 5-6'], vpa: ['VPA', 'M3 13V8M6.5 13V4M10 13V9M13.5 13V6'], archive: ['VPA archive', 'M2.5 3h11v3h-11zM3.5 6v7h9V6M6.5 9h3'], depth: ['Depth monitor', 'M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6'], effect: ['News effect chart', 'M3 2.5h10v11H3zM5.5 5.5h5M5.5 8h5M5.5 10.5h3'] };
+    const num = (v, extra) => ({ isText: true, v, al: 'right', ff: 'var(--font-mono)', fw: 400, color: 'var(--ink)', ...(extra || {}) });
+    const rows = list.map((s, i) => { const d = U.daily(s.code, 20).slice(-20).map(b => b.c); const A = U.actions(s.code); const col = tone(s.change);
+      const cell = { no: { isText: true, v: i + 1, al: 'left', ff: 'var(--font-mono)', fw: 400, color: 'var(--text-muted)' }, code: { isCode: true, v: s.code, cat: s.cat, href: A.stock, al: 'left', ff: 'var(--font-sans)', fw: 400, color: 'var(--ink)' },
+        acts: { isActs: true, al: 'left', ff: 'var(--font-sans)', fw: 400, color: 'var(--ink)', acts: Object.keys(ICON).map(k => ({ href: A[k], title: ICON[k][0], d: ICON[k][1] })) },
+        ltp: num(fmt(s.ltp, 1), { fw: 700 }), high: num(fmt(s.high, 1)), low: num(fmt(s.low, 1)), close: num(fmt(s.close, 1)), ycp: num(fmt(s.ycp, 1)), change: num(sign(s.change, 1), { color: col }),
+        pct: { isPct: true, v: sign(s.changePct) + '%', bg: U.heat(s.changePct), fg: U.heatText(s.changePct), al: 'right', ff: 'var(--font-mono)', fw: 400, color: 'var(--ink)' }, trades: num(fmtInt(s.trades)), value: num(fmt(s.value, 3)), volume: num(fmtInt(s.volume)),
+        trend: { isSpark: true, spark: U.linePath(d, 100, 24, { pad: 2 }).line, color: col, al: 'left', ff: 'var(--font-sans)', fw: 400 } };
+      return { cells: vis.map(([id]) => cell[id]) }; });
     const cats = ['A', 'B', 'N', 'Z']; const tv = S.reduce((a, s) => a + s.value, 0);
     const catShare = cats.map((c, i) => { const v = S.filter(s => s.cat === c).reduce((a, s) => a + s.value, 0); return { label: `Category ${c}`, value: fmt(v * 2.9) + ' mn', pct: (v / tv * 100).toFixed(1) + '%', w: (v / tv * 100) + '%', bg: ['var(--ink)', 'var(--neutral-600)', 'var(--neutral-400)', 'var(--neutral-200)'][i] }; });
     const B = U.breadth; const gv = S.filter(s => s.change > 0).reduce((a, s) => a + s.value, 0), lv = S.filter(s => s.change < 0).reduce((a, s) => a + s.value, 0); const bp = gv / (gv + lv) * 100;
@@ -179,7 +172,7 @@ class Component extends DCLogic {
     const breadthCards = [{ arrow: '▲', n: B.adv, label: 'Gainers', c: U.UP }, { arrow: '▼', n: B.dec, label: 'Losers', c: U.DOWN }, { arrow: '■', n: B.unch, label: 'Unchanged', c: 'var(--blue-700)' }].map(b => ({ ...b, w: (b.n / B.total * 100) + '%' }));
     return {
       idxCards, totalsCards, breadthCards, buyW: bp + '%', buyP: bp.toFixed(2) + '%', sellP: (100 - bp).toFixed(2) + '%',
-      hist, catShare, cols, rows, empty: rows.length === 0, q: st.q, onQ: e => this.setState({ q: e.target.value }),
+      hist, catShare, cols, rows, gridCols: vis.map(d => d[4]).join(' '), minW: Math.max(520, vis.length * 100), fs: V.fs, fsHead: V.fsHead, rowH: V.rowH, headH: V.headH, padY: V.padY, icon: V.icon, spark: V.spark, empty: rows.length === 0, q: st.q, onQ: e => this.setState({ q: e.target.value }),
       shown: `${rows.length} of ${S.length} instruments`,
       filterTabs: [['all', 'All'], ['gainers', 'Gainers'], ['losers', 'Losers'], ['unchanged', 'Unchanged']].map(([v, l]) => tab('filter', v, l, { count: S.filter(F[v]).length })),
       catTabs: [['all', 'All'], ['A', 'A'], ['B', 'B'], ['N', 'N'], ['Z', 'Z']].map(([v, l]) => tab('cat', v, l)),

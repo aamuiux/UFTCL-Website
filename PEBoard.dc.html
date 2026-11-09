@@ -27,23 +27,22 @@
     <sc-if value="{{ isMarket }}"><div style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 520px; min-width: 0;"><sc-for list="{{ chips }}" as="c" hint-placeholder-count="10"><button onClick="{{ c.onClick }}" style="font: inherit; font-size: 13px; height: 32px; padding: 0 12px; border: 1px solid {{ c.bd }}; background: {{ c.bg }}; color: {{ c.fg }}; cursor: pointer;" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);">{{ c.label }}</button></sc-for></div></sc-if>
     <sc-if value="{{ showExpand }}"><div style="display: flex; gap: 4px; flex: 1 1 300px;"><button onClick="{{ expandAll }}" style="font: inherit; font-size: 13px; height: 32px; padding: 0 12px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">Expand all</button><button onClick="{{ collapseAll }}" style="font: inherit; font-size: 13px; height: 32px; padding: 0 12px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;" style-hover="background: var(--ink); color: var(--paper);">Collapse all</button></div></sc-if>
     <sc-if value="{{ isMarket }}"><label style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 1px solid var(--ink); min-width: 240px;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.500 10.500L14 14"></path></svg><input value="{{ q }}" onInput="{{ onSearch }}" placeholder="Search instrument" style="font: inherit; border: 0; outline: none; background: transparent; color: var(--ink); width: 100%;"></label></sc-if>
-    <sc-if value="{{ isTable }}"><button onClick="{{ toggleGear }}" title="Columns" aria-label="Choose columns" style="width: 36px; height: 36px; border: 1px solid var(--ink); background: {{ gearBg }}; color: {{ gearFg }}; cursor: pointer; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="M2 4h12M2 8h12M2 12h12"></path><circle cx="10" cy="4" r="1.500" fill="var(--paper)"></circle><circle cx="5" cy="8" r="1.500" fill="var(--paper)"></circle><circle cx="11" cy="12" r="1.500" fill="var(--paper)"></circle></svg></button></sc-if>
+    <sc-if value="{{ isTable }}"><dc-import name="TableSettings" skey="pe" cols='[["q1","Q1 EPS"],["q2","Q2 EPS"],["q3","Q3 EPS"],["q4","Q4 EPS"],["ltp","LTP"],["ann","Annualized EPS"],["wpe","Weighted PE"],["ape","Annualized PE"]]' locked='[]' hint-size="36px,36px"></dc-import></sc-if>
   </div>
-  <sc-if value="{{ gearOpen }}"><div style="display: flex; flex-wrap: wrap; gap: 6px 10px; padding: 10px 12px; border: 1px solid var(--ink);"><span style="font-size: 12px; color: var(--text-muted); align-self: center;">Show columns</span><sc-for list="{{ colToggles }}" as="c"><button onClick="{{ c.onClick }}" style="font: inherit; font-size: 12px; height: 28px; padding: 0 10px; border: 1px solid var(--ink); background: {{ c.bg }}; color: {{ c.fg }}; cursor: pointer;">{{ c.label }}</button></sc-for></div></sc-if>
 
   <sc-if value="{{ isMarket }}">
     <div data-screen-label="PE table" style="border: 1px solid var(--ink); overflow-x: auto;">
-      <div style="min-width: {{ minW }}px;">
-        <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;">
-          <button onClick="{{ codeHead.onClick }}" style="font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-align: left; border: 0; background: transparent; color: var(--ink); cursor: pointer; height: 40px; padding: 0 12px;">Trading code {{ codeHead.arrow }}</button>
+      <div style="min-width: {{ minW }}px; font-size: {{ fs }}px;">
+        <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: {{ fsHead }}px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;">
+          <button onClick="{{ codeHead.onClick }}" style="font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-align: left; border: 0; background: transparent; color: var(--ink); cursor: pointer; height: {{ headH }}px; padding: 0 12px;">Trading code {{ codeHead.arrow }}</button>
           <span style="padding: 0 12px;">Actions</span>
-          <sc-for list="{{ head }}" as="h"><button onClick="{{ h.onClick }}" style="font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; border: 0; background: transparent; color: var(--ink); cursor: pointer; height: 40px; padding: 0 12px;">{{ h.label }} {{ h.arrow }}</button></sc-for>
+          <sc-for list="{{ head }}" as="h"><button onClick="{{ h.onClick }}" style="font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; border: 0; background: transparent; color: var(--ink); cursor: pointer; height: {{ headH }}px; padding: 0 12px;">{{ h.label }} {{ h.arrow }}</button></sc-for>
         </div>
         <sc-for list="{{ rows }}" as="r">
-          <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; height: 38px; border-bottom: 1px solid var(--neutral-200); background: {{ r.zebra }};" style-hover="background: var(--neutral-100);">
+          <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; min-height: {{ rowH }}px; border-bottom: 1px solid var(--neutral-200); background: {{ r.zebra }};" style-hover="background: var(--neutral-100);">
             <a href="{{ r.stock }}" style="padding: 0 12px; font-weight: 700; color: {{ r.color }};">{{ r.code }}</a>
             <div style="display: flex; gap: 2px; padding: 0 12px;"><sc-for list="{{ r.acts }}" as="a"><a href="{{ a.href }}" title="{{ a.title }}" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ a.d }}"></path></svg></a></sc-for></div>
-            <sc-for list="{{ r.cells }}" as="c"><span style="text-align: right; padding: 0 12px; font-family: var(--font-mono); font-size: 13px; color: {{ c.color }};">{{ c.v }}</span></sc-for>
+            <sc-for list="{{ r.cells }}" as="c"><span style="text-align: right; padding: 0 12px; font-family: var(--font-mono); font-size: {{ fs }}px; color: {{ c.color }};">{{ c.v }}</span></sc-for>
           </div>
         </sc-for>
         <sc-if value="{{ noRows }}"><div style="padding: 32px 16px; text-align: center; color: var(--text-muted);">No instruments match your search.</div></sc-if>
@@ -75,17 +74,17 @@
 
             <sc-if value="{{ isTableGroup }}">
               <div style="border: 1px solid var(--ink); overflow-x: auto;">
-                <div style="min-width: {{ minW }}px;">
-                  <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;">
-                    <button onClick="{{ codeHead.onClick }}" style="font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-align: left; border: 0; background: transparent; color: var(--ink); cursor: pointer; height: 40px; padding: 0 12px;">Trading code {{ codeHead.arrow }}</button>
+                <div style="min-width: {{ minW }}px; font-size: {{ fs }}px;">
+                  <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: {{ fsHead }}px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;">
+                    <button onClick="{{ codeHead.onClick }}" style="font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-align: left; border: 0; background: transparent; color: var(--ink); cursor: pointer; height: {{ headH }}px; padding: 0 12px;">Trading code {{ codeHead.arrow }}</button>
                     <span style="padding: 0 12px;">Actions</span>
-                    <sc-for list="{{ head }}" as="h"><button onClick="{{ h.onClick }}" style="font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; border: 0; background: transparent; color: var(--ink); cursor: pointer; height: 40px; padding: 0 12px;">{{ h.label }} {{ h.arrow }}</button></sc-for>
+                    <sc-for list="{{ head }}" as="h"><button onClick="{{ h.onClick }}" style="font: inherit; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; border: 0; background: transparent; color: var(--ink); cursor: pointer; height: {{ headH }}px; padding: 0 12px;">{{ h.label }} {{ h.arrow }}</button></sc-for>
                   </div>
                   <sc-for list="{{ g.rows }}" as="r">
-                    <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; height: 38px; border-bottom: 1px solid var(--neutral-200); background: {{ r.zebra }};" style-hover="background: var(--neutral-100);">
+                    <div style="display: grid; grid-template-columns: {{ gridCols }}; align-items: center; min-height: {{ rowH }}px; border-bottom: 1px solid var(--neutral-200); background: {{ r.zebra }};" style-hover="background: var(--neutral-100);">
                       <a href="{{ r.stock }}" style="padding: 0 12px; font-weight: 700; color: {{ r.color }};">{{ r.code }}</a>
                       <div style="display: flex; gap: 2px; padding: 0 12px;"><sc-for list="{{ r.acts }}" as="a"><a href="{{ a.href }}" title="{{ a.title }}" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ a.d }}"></path></svg></a></sc-for></div>
-                      <sc-for list="{{ r.cells }}" as="c"><span style="text-align: right; padding: 0 12px; font-family: var(--font-mono); font-size: 13px; color: {{ c.color }};">{{ c.v }}</span></sc-for>
+                      <sc-for list="{{ r.cells }}" as="c"><span style="text-align: right; padding: 0 12px; font-family: var(--font-mono); font-size: {{ fs }}px; color: {{ c.color }};">{{ c.v }}</span></sc-for>
                     </div>
                   </sc-for>
                 </div>
@@ -100,18 +99,18 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:600},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;market&quot;,&quot;sector&quot;,&quot;category&quot;,&quot;weighted&quot;],&quot;default&quot;:&quot;market&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, sorts: [], hidden: [], sector: 'All', q: '', open: {}, gearOpen: false, noticeA: true, noticeB: true };
-  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
-  componentWillUnmount() { clearInterval(this.p); }
+  state = { ts: null, ready: !!window.UFT, sorts: [], sector: 'All', q: '', open: {}, gearOpen: false, noticeA: true, noticeB: true };
+  componentDidMount() { this.tsL = e => { const d = e.detail || {}; if (d.skey === 'pe') this.setState({ ts: { hidden: d.hidden, compact: d.compact, fs: d.fs } }); }; window.addEventListener('uft-table-settings', this.tsL); if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-table-settings', this.tsL); }
   renderVals() {
     const U = window.UFT; if (!U) return {};
     const st = this.state; const { fmt } = U; const IN = U.fmtIN; const mode = this.props.mode || 'market'; const PE = U.pe;
     const isMarket = mode === 'market', isWeighted = mode === 'weighted', isAcc = mode !== 'market';
     const COLS = [['q1', 'Q1 EPS'], ['q2', 'Q2 EPS'], ['q3', 'Q3 EPS'], ['q4', 'Q4 EPS'], ['ltp', 'LTP'], ['ann', 'Annualized EPS'], ['wpe', 'Weighted PE'], ['ape', 'Annualized PE']];
-    const vis = COLS.filter(([k]) => !st.hidden.includes(k));
+    const TSV = U.tsLoad('pe'); const ts = st.ts || TSV; const V = U.tsView(ts); const vis = COLS.filter(([k]) => V.show(k));
     const val = (r, k) => k === 'wpe' ? (isMarket ? r.wpe : r.gwpe) : k === 'code' ? r.code : r[k];
     const shown = (r, k) => { const v = val(r, k); if (k === 'ltp') return fmt(v, 1); if (k === 'q1' || k === 'q2' || k === 'q3' || k === 'q4') return v === 0 ? '0' : String(v); return fmt(v, 2); };
-    const gridCols = `150px 150px repeat(${vis.length}, minmax(96px, 1fr))`; const minW = 300 + vis.length * 110;
+    const gridCols = `150px 150px repeat(${vis.length}, minmax(96px, 1fr))`; const minW = 300 + vis.length * 100;
     const toggleSort = k => this.setState(s => { const cur = s.sorts.find(x => x.k === k); if (!cur) return { sorts: [...s.sorts, { k, d: 1 }] }; if (cur.d === 1) return { sorts: s.sorts.map(x => x.k === k ? { k, d: -1 } : x) }; return { sorts: s.sorts.filter(x => x.k !== k) }; });
     const arrow = k => { const i = st.sorts.findIndex(x => x.k === k); if (i < 0) return ''; return (st.sorts[i].d === 1 ? '▲' : '▼') + (st.sorts.length > 1 ? i + 1 : ''); };
     const head = vis.map(([k, label]) => ({ label, arrow: arrow(k), onClick: () => toggleSort(k) }));
@@ -142,10 +141,9 @@ class Component extends DCLogic {
         return { title: g.name === 'A' || g.name === 'B' || g.name === 'Z' || g.name === 'N' || g.name === 'Y' ? 'Category - ' + g.name : g.name, open, rot: open ? 90 : 0, pos: g.pos, neg: g.neg, posW: (g.pos / tot * 100) + '%', pe: fmt(g.pe), wpe: fmt(g.wpe), mcap: IN(g.mcap), earn: IN(g.earn), slices, legend, rows: open && !isWeighted ? sortRows(g.rows).map(mkRow) : [], onToggle: () => this.setState(s => ({ open: isWeighted ? (open ? { _none: false } : { [g.name]: true }) : { ...s.open, [g.name]: !open } })) };
       });
     }
-    const colToggles = COLS.map(([k, label]) => { const on = !st.hidden.includes(k); return { label, bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState(s => ({ hidden: s.hidden.includes(k) ? s.hidden.filter(x => x !== k) : [...s.hidden, k] })) }; });
     const notices = isMarket ? [st.noticeA && { text: 'You can sort table columns by clicking the column title, and choose more columns from the settings button.', onClose: () => this.setState({ noticeA: false }) }, st.noticeB && { text: 'Sort by one or more columns: click several column titles in turn, and click the same title again to change the order or remove the sort.', onClose: () => this.setState({ noticeB: false }) }].filter(Boolean) : [];
     const names = (mode === 'category' ? PE.cats : PE.sectors).map(g => g.name);
-    return { isMarket, isAcc, isWeighted, showExpand: isAcc && !isWeighted, isTable: !isWeighted, isTableGroup: !isWeighted, notices, chips, head, codeHead, gridCols, minW, rows, noRows, groups, colToggles, gearOpen: st.gearOpen, gearBg: st.gearOpen ? 'var(--ink)' : 'var(--paper)', gearFg: st.gearOpen ? 'var(--paper)' : 'var(--ink)', toggleGear: () => this.setState(s => ({ gearOpen: !s.gearOpen })),
+    return { isMarket, isAcc, isWeighted, showExpand: isAcc && !isWeighted, isTable: !isWeighted, isTableGroup: !isWeighted, notices, chips, head, codeHead, gridCols, minW, rows, noRows, groups, fs: V.fs, fsHead: V.fsHead, rowH: V.rowH, headH: V.headH,
       q: st.q, onSearch: e => this.setState({ q: e.target.value }), expandAll: () => this.setState({ open: Object.fromEntries(names.map(n => [n, true])) }), collapseAll: () => this.setState({ open: Object.fromEntries(names.map(n => [n, false])) }) };
   }
 }
