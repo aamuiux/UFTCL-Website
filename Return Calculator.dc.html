@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Return calculator — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.tl-ctl { font: inherit; font-size: 13px; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.tl-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tl-btn:hover { background: var(--ink); color: var(--paper); }
+
+
+
+
+.rc-lab { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); min-width: 0; }
+.rc-in { font: inherit; font-size: 15px; font-weight: 400; letter-spacing: 0; text-transform: none; height: 42px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.rc-in[readonly] { background: var(--neutral-100); border-color: var(--neutral-400); }
+.rc-chip { font: inherit; font-size: 12px; height: 28px; padding: 0 10px; border: 1px solid var(--neutral-400); background: var(--paper); color: var(--ink); cursor: pointer; }
+.rc-chip:hover { border-color: var(--ink); }
+.rc-tgl { font: inherit; font-size: 13px; height: 34px; padding: 0 12px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.rc-box { border: 1px solid var(--ink); }
+.rc-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; }
+.rc-head span { font-weight: 400; font-size: 12px; color: var(--text-muted); }
+.rc-tr { display: grid; grid-template-columns: minmax(150px, 1.2fr) minmax(180px, 1.6fr) 110px 100px 100px minmax(150px, 1fr) 100px; gap: 0 12px; align-items: center; padding: 0 16px; min-height: 42px; font-size: 14px; }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="tools" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Return calculator</h1>
+  <div style="color: var(--text-muted);">See what an investment in a stock would be worth today, with dividends and bonus shares included.</div>
+</section>
+
+<sc-if value="{{ hasGap }}"><div role="note" style="display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; background: oklch(96% 0.05 90); border: 1px solid oklch(80% 0.1 85); font-size: 14px; line-height: 20px;"><span aria-hidden="true">▲</span><span><b>Gap years</b> — {{ gapText }}</span></div></sc-if>
+
+<section class="rc-box" data-screen-label="Inputs">
+  <div class="rc-head">Return calculator<span>Includes dividends and bonus shares</span></div>
+  <div style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 16px; position: relative;">
+    <label class="rc-lab">Stock<input class="rc-in" list="rc-syms" placeholder="Stock" value="{{ stock }}" onChange="{{ onStock }}" aria-label="Stock"></label><datalist id="rc-syms"><sc-for list="{{ symbols }}" as="s"><option value="{{ s }}"></option></sc-for></datalist>
+    <label class="rc-lab">Buy date<input class="rc-in" type="date" value="{{ buyDate }}" max="{{ maxDate }}" onChange="{{ onBuyDate }}"></label>
+    <label class="rc-lab">Shares<input class="rc-in" type="number" min="1" placeholder="e.g. 1000" value="{{ sharesIn }}" onChange="{{ onShares }}"></label>
+    <label class="rc-lab">Or amount ৳<input class="rc-in" type="number" min="0" value="{{ amountIn }}" onChange="{{ onAmount }}"></label>
+    <div class="rc-lab"><span style="display: flex; justify-content: space-between; align-items: center;">Buy price<button class="rc-chip" onClick="{{ onHist }}" style="height: 20px; font-size: 11px; padding: 0 8px;" aria-expanded="{{ histStr }}">History</button></span><input class="rc-in" readonly value="{{ buyPriceLabel }}" aria-label="Buy price" style="border-color: {{ buyBd }};"></div>
+    <label class="rc-lab">Price today<input class="rc-in" readonly value="{{ todayLabel }}"></label>
+    <sc-if value="{{ histOpen }}"><div>
+      <div onClick="{{ onHist }}" style="position: fixed; inset: 0; z-index: 40;"></div>
+      <div role="dialog" aria-label="Price history" style="position: absolute; right: 16px; top: 100px; z-index: 41; width: 260px; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset);">
+        <div style="padding: 8px 12px; border-bottom: 1px solid var(--ink); font-size: 13px; font-weight: 700;">Closing prices near your buy date</div>
+        <sc-for list="{{ histRows }}" as="h"><button onClick="{{ h.pick }}" style="font: inherit; display: flex; justify-content: space-between; width: 100%; padding: 8px 12px; border: 0; border-top: 1px solid var(--neutral-200); background: {{ h.bg }}; cursor: pointer; font-size: 13px;"><span>{{ h.date }}</span><b style="font-family: var(--font-mono);">{{ h.close }}</b></button></sc-for>
+      </div>
+    </div></sc-if>
+  </div>
+  <div style="padding: 0 16px 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;">
+    <div role="group" aria-label="Dividend treatment" style="display: flex;"><sc-for list="{{ modes }}" as="m"><button class="rc-tgl" onClick="{{ m.onClick }}" aria-pressed="{{ m.on }}" style="background: {{ m.bg }}; color: {{ m.fg }}; font-weight: {{ m.fw }}; border-left: {{ m.bl }};">{{ m.label }}</button></sc-for></div>
+    <button class="rc-tgl" onClick="{{ onTax }}" aria-pressed="{{ taxStr }}"><span style="width: 16px; height: 16px; box-sizing: border-box; border: 1px solid var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; background: {{ taxBg }}; color: var(--paper);">{{ taxMark }}</span>Deduct withholding tax</button>
+    <button class="rc-tgl" onClick="{{ onBench }}" aria-pressed="{{ benchStr }}"><span style="width: 16px; height: 16px; box-sizing: border-box; border: 1px solid var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; background: {{ benchBg }}; color: var(--paper);">{{ benchMark }}</span>Compare with DSEX / T-bond</button>
+  </div>
+  <div style="padding: 12px 16px; border-top: 1px solid var(--neutral-200); display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center;">
+    <span style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-muted);">BUY DATE</span><sc-for list="{{ spans }}" as="c"><button class="rc-chip" onClick="{{ c.onClick }}" style="background: {{ c.bg }}; color: {{ c.fg }}; border-color: {{ c.bd }};">{{ c.label }}</button></sc-for></span>
+    <span style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-muted);">AMOUNT</span><sc-for list="{{ amounts }}" as="c"><button class="rc-chip" onClick="{{ c.onClick }}" style="background: {{ c.bg }}; color: {{ c.fg }}; border-color: {{ c.bd }};">{{ c.label }}</button></sc-for></span>
+  </div>
+  <div style="padding: 0 16px 12px; font-size: 12px; color: var(--text-muted); line-height: 18px;">{{ footnote }}</div>
+</section>
+
+<sc-if value="{{ empty }}"><section class="rc-box" style="padding: 40px 16px; text-align: center; color: var(--text-muted);">{{ emptyText }}</section></sc-if>
+
+<sc-if value="{{ hasRes }}"><div style="display: flex; flex-direction: column; gap: 20px;">
+  <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+    <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div class="rc-box" style="padding: 12px 16px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted); text-transform: uppercase;">{{ k.label }}</span><span style="font-family: var(--font-mono); font-size: 26px; font-weight: 700; color: {{ k.tone }};">{{ k.value }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ k.note }}</span></div></sc-for>
+  </section>
+  <section class="rc-box"><div class="rc-head">Entitlement timeline<span>by record date</span></div><div style="padding: 16px; display: flex; flex-wrap: wrap; gap: 8px;">
+    <sc-for list="{{ timeline }}" as="t"><div style="min-width: 108px; padding: 8px 12px; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }}; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11px; font-family: var(--font-mono); opacity: 0.8;">{{ t.date }}</span><b>{{ t.label }}</b><span style="font-size: 12px;">{{ t.sub }}</span></div></sc-for>
+  </div></section>
+  <sc-if value="{{ showBench }}"><section class="rc-box"><div class="rc-head">Benchmark comparison<span>annualised return, same dates</span></div><div style="padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+    <sc-for list="{{ bench }}" as="b"><div style="display: grid; grid-template-columns: 170px 1fr 90px; align-items: center; gap: 12px; font-size: 13px;"><span>{{ b.label }}</span><span style="height: 14px; background: var(--neutral-100); position: relative;"><span style="position: absolute; inset: 0 auto 0 0; width: {{ b.w }}; background: {{ b.c }};"></span></span><b style="text-align: right; font-family: var(--font-mono);">{{ b.v }}</b></div></sc-for>
+    <span style="font-size: 12px; color: var(--text-muted);">T-bond is an assumed flat 10.4% a year, reinvested, used as a fixed-deposit style proxy.</span>
+  </div></section></sc-if>
+  <section class="rc-box"><div class="rc-head">Year-by-year breakdown<span>{{ yearSub }}</span></div>
+    <sc-if value="{{ noEvents }}"><div style="padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 14px;">{{ noEventsText }}</div></sc-if>
+    <sc-if value="{{ hasEvents }}"><div style="overflow-x: auto;"><div style="min-width: 760px;">
+      <div class="rc-tr" style="grid-template-columns: 70px 110px 90px 90px 130px 110px 110px; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;"><span>Year</span><span>Record date</span><span style="text-align: right;">Cash %</span><span style="text-align: right;">Bonus %</span><span style="text-align: right;">Cash received</span><span style="text-align: right;">Shares after</span><span style="text-align: right;">Close price</span></div>
+      <sc-for list="{{ events }}" as="e"><div class="rc-tr" style="grid-template-columns: 70px 110px 90px 90px 130px 110px 110px; border-top: 1px solid var(--neutral-200); background: {{ e.bg }}; font-family: var(--font-mono);"><b>{{ e.year }}</b><span>{{ e.date }}</span><span style="text-align: right;">{{ e.cash }}</span><span style="text-align: right;">{{ e.bonus }}</span><span style="text-align: right;">{{ e.recv }}</span><span style="text-align: right;">{{ e.shares }}</span><span style="text-align: right;">{{ e.price }}</span></div></sc-for>
+    </div></div></sc-if>
+  </section>
+</div></sc-if>
+
+<sc-if value="{{ hasTop }}"><section class="rc-box"><div class="rc-head">Top performers, same window<span>same dividend and tax settings, 1,000 shares</span></div>
+  <div style="overflow-x: auto;"><div style="min-width: 900px;">
+    <div class="rc-tr" style="background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;"><span>Stock</span><span>Company</span><span style="text-align: right;">Total return</span><span style="text-align: right;">CAGR</span><span style="text-align: right;">XIRR</span><span style="text-align: right;">Buy → today</span><span style="text-align: right;">Bonus / 100 sh</span></div>
+    <sc-for list="{{ top }}" as="t"><div class="rc-tr" style="border-top: 1px solid var(--neutral-200); background: {{ t.bg }};"><a href="{{ t.href }}" style="font-weight: 700;">#{{ t.n }} · {{ t.code }}</a><span style="color: var(--neutral-700);">{{ t.name }}</span><b style="text-align: right; font-family: var(--font-mono); color: {{ t.tone }};">{{ t.tr }}</b><span style="text-align: right; font-family: var(--font-mono); color: {{ t.tone }};">{{ t.cagr }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ t.xirr }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ t.path }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ t.bonus }}</span></div></sc-for>
+  </div></div>
+  <div style="padding: 10px 16px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--neutral-200);">Ranked by total return over the same window and settings, using the instruments in our universe.</div>
+</section></sc-if>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, stock: '', buy: '', shares: '', amount: '50000', mode: 'cash', tax: true, bench: true, hist: false };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  // deterministic mock dividend / bonus declarations per stock and year
+  events(U, code, ts1) { const out = []; for (let y = 2021; y <= 2026; y++) { const r = U.rng(U.hash(code) + y * 13); if (r() < 0.2) continue; const cash = [5, 10, 15, 20, 25, 30, 40][Math.floor(r() * 7)]; const bonus = r() < 0.3 ? [5, 10, 15][Math.floor(r() * 3)] : 0;
+    const ts = Date.UTC(y, 3 + Math.floor(r() * 6), 1 + Math.floor(r() * 27)); if (ts <= ts1) out.push({ y, ts, cash, bonus }); } return out; }
+  xirr(flows) { const t0 = flows[0].t; const f = r => flows.reduce((a, x) => a + x.v / Math.pow(1 + r, (x.t - t0) / 31557600000), 0); let lo = -0.99, hi = 50; if (f(lo) * f(hi) > 0) return NaN; for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; if (f(lo) * f(m) <= 0) hi = m; else lo = m; } return (lo + hi) / 2; }
+  run(U, code, buyTs, o) {
+    const bars = U.chartBars(code, 'D'); const last = bars[bars.length - 1]; let bi = 0; bars.forEach((b, i) => { if (b.ts <= buyTs) bi = i; }); const buy = bars[bi];
+    const sh0 = o.shares > 0 ? Math.floor(o.shares) : Math.floor(o.amount / buy.c); if (!(sh0 > 0)) return null; const invested = sh0 * buy.c;
+    const priceAt = ts => { let p = buy; bars.forEach(b => { if (b.ts <= ts) p = b; }); return p.c; };
+    let sh = sh0, cashHeld = 0, mult = 1; const flows = [{ t: buy.ts, v: -invested }]; const evs = [];
+    this.events(U, code, last.ts).filter(e => e.ts > buy.ts).forEach(e => { const px = priceAt(e.ts); let recv = sh * 10 * e.cash / 100; if (o.tax) recv *= 0.9; let bonusSh = Math.floor(sh * e.bonus / 100); mult *= 1 + e.bonus / 100;
+      if (o.mode === 'reinvest') { const b = Math.floor(recv / px); sh += b; cashHeld += recv - b * px; } else { cashHeld += recv; flows.push({ t: e.ts, v: recv }); } sh += bonusSh; evs.push({ ...e, recv, shares: sh, px }); });
+    const value = sh * last.c + cashHeld; flows.push({ t: last.ts, v: o.mode === 'reinvest' ? value : sh * last.c });
+    const yrs = Math.max((last.ts - buy.ts) / 31557600000, 1 / 365); const tr = value / invested - 1;
+    return { code, buy, last, sh0, sh, invested, value, gain: value - invested, tr, yrs, cagr: Math.pow(value / invested, 1 / yrs) - 1, xirr: this.xirr(flows), evs, bonusPer100: (mult - 1) * 100 };
+  }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const f = (v, d = 2) => U.fmt(v, d); const pc = v => (v >= 0 ? '+' : '') + f(v * 100) + '%'; const money = v => '৳' + Math.round(v).toLocaleString('en-US');
+    const ref = U.chartBars('DSEX', 'D'); const lastTs = ref[ref.length - 1].ts; const ymd = ts => new Date(ts).toISOString().slice(0, 10); const dmy = b => b.t;
+    const defBuy = ymd(Date.UTC(2025, 10, 9)); const buyStr = st.buy || defBuy; const buyTs = new Date(buyStr + 'T00:00:00Z').getTime();
+    const code = st.stock.trim().toUpperCase(); const valid = !!U.bySym[code];
+    const opts = { shares: Number(st.shares) || 0, amount: Number(st.amount) || 0, mode: st.mode, tax: st.tax };
+    const R = valid ? this.run(U, code, buyTs, opts) : null;
+    const dayMs = 86400000; const firstTs = ref[0].ts;
+    const setBuy = ts => this.setState({ buy: ymd(Math.max(ts, firstTs)) });
+    const spans = [['1Y', 1], ['3Y', 3], ['5Y', 5], ['Max', 99]].map(([l, y]) => { const ts = y === 99 ? firstTs : Math.round(lastTs - y * 365.25 * dayMs); const on = ymd(Math.max(ts, firstTs)) === buyStr; return { label: l, onClick: () => setBuy(ts), bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'var(--neutral-400)' }; });
+    const amounts = [['50,000', 50000], ['1 lakh', 100000], ['5 lakh', 500000], ['10 lakh', 1000000]].map(([l, v]) => { const on = !opts.shares && Number(st.amount) === v; return { label: l, onClick: () => this.setState({ amount: String(v), shares: '' }), bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'var(--neutral-400)' }; });
+    let out = { stock: st.stock, symbols: U.symbols, buyDate: buyStr, maxDate: ymd(lastTs), sharesIn: st.shares, amountIn: st.amount, spans, amounts,
+      onStock: e => this.setState({ stock: e.target.value.toUpperCase() }), onBuyDate: e => this.setState({ buy: e.target.value }), onShares: e => this.setState({ shares: e.target.value, amount: e.target.value ? '' : st.amount }), onAmount: e => this.setState({ amount: e.target.value, shares: e.target.value ? '' : st.shares }),
+      modes: [['cash', 'Dividends kept as cash'], ['reinvest', 'Dividends reinvested']].map(([k, l], i) => ({ label: l, on: st.mode === k ? 'true' : 'false', bg: st.mode === k ? 'var(--ink)' : 'var(--paper)', fg: st.mode === k ? 'var(--paper)' : 'var(--ink)', fw: st.mode === k ? 700 : 400, bl: i ? '0' : '1px solid var(--ink)', onClick: () => this.setState({ mode: k }) })),
+      onTax: () => this.setState(s => ({ tax: !s.tax })), taxStr: st.tax ? 'true' : 'false', taxBg: st.tax ? 'var(--ink)' : 'var(--paper)', taxMark: st.tax ? '✓' : '',
+      onBench: () => this.setState(s => ({ bench: !s.bench })), benchStr: st.bench ? 'true' : 'false', benchBg: st.bench ? 'var(--ink)' : 'var(--paper)', benchMark: st.bench ? '✓' : '',
+      onHist: () => this.setState(s => ({ hist: !s.hist })), histStr: st.hist ? 'true' : 'false', histOpen: st.hist && !!R, histRows: [],
+      buyPriceLabel: R ? '৳' + f(R.buy.c) : '', buyBd: R ? 'var(--orange-t1)' : 'var(--neutral-400)', todayLabel: R ? '৳' + f(R.last.c) : '',
+      footnote: R ? `Buy price is the close on ${dmy(R.buy)} (nearest prior session) and isn't editable. Price today is the close on ${dmy(R.last)}. ${opts.shares ? '' : money(opts.amount - R.invested) + ' of the amount couldn\'t buy a whole share and was excluded.'}` : 'Pick a stock, a buy date, and either a number of shares or an amount.',
+      empty: !R, emptyText: !st.stock ? 'Select a stock to begin — pick a stock, buy date and shares or amount to see your return.' : !valid ? `"${st.stock}" is not a listed instrument. Choose a trading code from the list.` : 'Enter a number of shares or an amount large enough to buy at least one share.',
+      hasRes: !!R, hasGap: false, gapText: '', hasTop: !!R };
+    if (R) {
+      out.histRows = bars => [];
+      const bars = U.chartBars(code, 'D'); const idx = bars.indexOf(R.buy); out.histRows = bars.slice(Math.max(0, idx - 3), idx + 4).map(b => ({ date: dmy(b), close: f(b.c), bg: b === R.buy ? 'var(--neutral-100)' : 'var(--paper)', pick: () => this.setState({ buy: ymd(b.ts), hist: false }) }));
+      const years = []; for (let y = new Date(R.buy.ts).getUTCFullYear(); y <= 2025; y++) years.push(y); const gaps = years.filter(y => !R.evs.some(e => e.y === y));
+      out.hasGap = gaps.length > 0 && R.evs.length > 0 || (gaps.length > 0 && years.length > 0); out.gapText = `no dividend record found for ${gaps.join(', ')}.`; out.hasGap = gaps.length > 0;
+      out.kpis = [{ label: 'Total value today', value: money(R.value), tone: 'var(--ink)', note: `${R.sh.toLocaleString('en-US')} sh × ৳${f(R.last.c)}` }, { label: 'Total gain', value: (R.gain >= 0 ? '+' : '−') + money(Math.abs(R.gain)), tone: R.gain >= 0 ? 'var(--green-700)' : 'var(--red-700)', note: `on ${money(R.invested)} invested` },
+        { label: 'XIRR', value: isNaN(R.xirr) ? '—' : pc(R.xirr), tone: R.xirr >= 0 ? 'var(--green-700)' : 'var(--red-700)', note: 'CAGR ' + pc(R.cagr).replace('+', '') }, { label: 'Holding period', value: f(R.yrs, 1) + ' yrs', tone: 'var(--ink)', note: pc(R.tr) + ' over the period' }];
+      out.timeline = [{ date: dmy(R.buy), label: 'BUY', sub: R.sh0.toLocaleString('en-US') + ' sh', bg: 'var(--ink)', fg: 'var(--paper)', bd: 'var(--ink)' },
+        ...R.evs.map(e => ({ date: new Date(e.ts).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }), label: [e.cash ? e.cash + '% cash' : '', e.bonus ? e.bonus + '% bonus' : ''].filter(Boolean).join(' + '), sub: R.evs.length ? e.shares.toLocaleString('en-US') + ' sh' : '', bg: 'oklch(96% 0.04 150)', fg: 'var(--ink)', bd: 'var(--green-700)' })),
+        { date: dmy(R.last), label: 'NOW', sub: R.sh.toLocaleString('en-US') + ' sh', bg: 'oklch(96% 0.03 27)', fg: 'var(--ink)', bd: 'var(--red-700)' }];
+      const ref0 = ref.filter(b => b.ts <= R.buy.ts).pop() || ref[0]; const dsex = Math.pow(ref[ref.length - 1].c / ref0.c, 1 / R.yrs) - 1; const tb = 0.104; const mx = Math.max(R.cagr, dsex, tb, 0.01);
+      out.showBench = st.bench; out.bench = [['This holding (CAGR)', R.cagr, 'var(--blue-700)'], ['DSEX index', dsex, 'var(--neutral-600)'], ['10Y T-bond (assumed)', tb, 'var(--orange-t1)']].map(([l, v, c]) => ({ label: l, v: pc(v) + '/yr', c, w: Math.max(0, v / mx * 100) + '%' }));
+      out.yearSub = `${code} · ${dmy(R.buy)} to ${dmy(R.last)}`; out.hasEvents = R.evs.length > 0; out.noEvents = !R.evs.length; out.noEventsText = `No dividend or bonus declared for ${code} after ${dmy(R.buy)}. The return above is price movement alone.`;
+      out.events = R.evs.map((e, i) => ({ year: e.y, date: new Date(e.ts).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }), cash: e.cash ? e.cash + '%' : '—', bonus: e.bonus ? e.bonus + '%' : '—', recv: money(e.recv), shares: e.shares.toLocaleString('en-US'), price: f(e.px), bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)' }));
+      const all = U.stocks.map(s => this.run(U, s.code, buyTs, { shares: 1000, amount: 0, mode: st.mode, tax: st.tax })).filter(Boolean).sort((a, b) => b.tr - a.tr).slice(0, 5);
+      out.top = all.map((r, i) => ({ n: i + 1, code: r.code, href: U.href('Stock Chart', { symbol: r.code }), name: U.company(r.code), tr: pc(r.tr), cagr: pc(r.cagr), xirr: isNaN(r.xirr) ? '—' : pc(r.xirr), tone: r.tr >= 0 ? 'var(--green-700)' : 'var(--red-700)', path: `৳${f(r.buy.c)} → ৳${f(r.last.c)}`, bonus: f(r.bonusPer100, 1), bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)' }));
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>

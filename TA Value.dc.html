@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>TA value — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.tl-ctl { font: inherit; font-size: 13px; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.tl-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tl-btn:hover { background: var(--ink); color: var(--paper); }
+
+
+
+
+.tv-row { display: grid; align-items: center; gap: 0 12px; padding: 0 12px; min-height: 40px; font-size: 14px; }
+.tv-lnk { font-size: 12px; padding: 2px 6px; border: 1px solid var(--neutral-300); color: var(--ink); }
+.tv-lnk:hover { border-color: var(--ink); color: var(--blue-700); }
+.tv-slot { font: inherit; font-size: 13px; height: 32px; width: 100%; box-sizing: border-box; padding: 0 8px; border: 1px solid var(--neutral-400); background: var(--paper); color: var(--ink); min-width: 0; }
+.tv-slot:focus { border-color: var(--ink); }
+.tv-chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 4px 0 10px; border: 1px solid var(--ink); font-size: 12px; font-weight: 700; }
+.tv-chip button { font: inherit; width: 20px; height: 20px; border: 0; background: transparent; cursor: pointer; font-size: 15px; line-height: 1; color: var(--ink); }
+.tv-chip button:hover { background: var(--ink); color: var(--paper); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="tools" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">TA value</h1>
+  <div style="color: var(--text-muted);">Technical indicator values for every instrument, with the indicators and settings you choose.</div>
+</section>
+
+<div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; height: 36px; padding: 0 16px; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+
+<section style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;">
+  <sc-if value="{{ isAll }}"><input class="tl-ctl" type="search" placeholder="Search trading code" aria-label="Search trading code" value="{{ q }}" onInput="{{ onQ }}" style="width: 240px; max-width: 100%;"></sc-if>
+  <sc-if value="{{ isSector }}"><label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700;">Sector<select class="tl-ctl" value="{{ sector }}" onChange="{{ onSector }}" style="min-width: 220px;"><sc-for list="{{ sectorOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o }}">{{ o }}</option></sc-for></select></label></sc-if>
+  <sc-if value="{{ isCustom }}"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; border: 1px solid var(--ink); padding: 8px 12px; flex: 1; min-width: 280px;"><b style="font-size: 13px; margin-right: 4px;">My list</b>
+    <sc-for list="{{ chips }}" as="c"><span class="tv-chip">{{ c.code }}<button onClick="{{ c.onRemove }}" aria-label="{{ c.label }}">×</button></span></sc-for>
+    <select class="tl-ctl" aria-label="Add instrument" value="" onChange="{{ onAdd }}" style="height: 28px; font-size: 12px;"><option value="">+ Add instrument</option><sc-for list="{{ addOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for></select>
+    <sc-if value="{{ hasChips }}"><button class="tl-btn" onClick="{{ clearChips }}" style="height: 28px; font-size: 12px;">Clear list</button></sc-if></div></sc-if>
+  <span style="margin-left: auto; font-size: 13px; color: var(--text-muted);">{{ countLabel }}</span>
+</section>
+
+<section style="border: 1px solid var(--ink); overflow-x: auto;"><div style="min-width: 1100px;">
+  <div class="tv-row" style="grid-template-columns: {{ gridCols }}; align-items: stretch; padding-top: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--neutral-300);">
+    <div style="display: flex; align-items: center; font-weight: 700; font-size: 16px;">{{ scopeTitle }}</div><span></span>
+    <sc-for list="{{ slots }}" as="s" hint-placeholder-count="8"><div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;"><select class="tv-slot" aria-label="Indicator {{ s.n }}" value="{{ s.ind }}" onChange="{{ s.onInd }}"><option value="">-Select-</option><sc-for list="{{ s.opts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select><input class="tv-slot" aria-label="Settings for indicator {{ s.n }}" value="{{ s.params }}" onChange="{{ s.onParams }}" placeholder="{{ s.ph }}" disabled="{{ s.off }}"></div></sc-for>
+  </div>
+  <div class="tv-row" style="grid-template-columns: {{ gridCols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); min-height: 40px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;"><span>Trading code</span><span></span><sc-for list="{{ slots }}" as="s"><span style="text-align: right;">{{ s.head }}</span></sc-for></div>
+  <sc-for list="{{ rows }}" as="r" hint-placeholder-count="14"><div class="tv-row" style="grid-template-columns: {{ gridCols }}; background: {{ r.bg }};"><a href="{{ r.stock }}" style="font-weight: 700; color: var(--blue-700);">{{ r.code }}</a><span style="display: flex; gap: 4px;"><a class="tv-lnk" href="{{ r.chart }}">Chart</a><a class="tv-lnk" href="{{ r.vpa }}">VPA</a><a class="tv-lnk" href="{{ r.depth }}">Depth</a></span><sc-for list="{{ r.cells }}" as="c"><span style="text-align: right; font-family: var(--font-mono); color: {{ c.fg }};">{{ c.v }}</span></sc-for></div></sc-for>
+  <sc-if value="{{ none }}"><div style="padding: 32px 16px; text-align: center; color: var(--text-muted);">{{ noneText }}</div></sc-if>
+</div></section>
+<div style="font-size: 12px; color: var(--text-muted);">Values use daily bars up to the last session. Pick an indicator in a column header and edit its settings, for example 14 for RSI or 12,26,9 for MACD.</div>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, tab: null, q: '', sector: 'Bank', list: ['GP', 'BRACBANK', 'SQURPHARMA', 'BATBC', 'ROBI'], slots: [{ ind: 'RSI', p: '14' }, { ind: 'MACD', p: '12,26,9' }, { ind: 'SlowSTO', p: '14,3,3' }, { ind: '', p: '' }, { ind: '', p: '' }, { ind: '', p: '' }, { ind: '', p: '' }, { ind: '', p: '' }] };
+  IND = { RSI: { l: 'RSI', p: '14' }, MACD: { l: 'MACD', p: '12,26,9' }, SlowSTO: { l: 'SlowSTO', p: '14,3,3' }, SMA: { l: 'SMA', p: '20' }, EMA: { l: 'EMA', p: '20' }, CCI: { l: 'CCI', p: '20' }, MFI: { l: 'MFI', p: '14' }, ATR: { l: 'ATR', p: '14' }, WILLR: { l: 'Williams %R', p: '14' }, ROC: { l: 'ROC', p: '12' }, MOM: { l: 'Momentum', p: '10' }, BBPB: { l: 'Bollinger %B', p: '20,2' } };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  sma(a, n) { const o = []; let s = 0; a.forEach((v, i) => { s += v; if (i >= n) s -= a[i - n]; o.push(i >= n - 1 ? s / n : NaN); }); return o; }
+  ema(a, n) { const k = 2 / (n + 1); const o = []; let e = a[0]; a.forEach((v, i) => { e = i ? v * k + e * (1 - k) : v; o.push(e); }); return o; }
+  calc(bars, ind, ps) {
+    const c = bars.map(b => b.c), h = bars.map(b => b.h), l = bars.map(b => b.l), v = bars.map(b => b.v), n = c.length - 1; const p = ps.length ? ps : [14];
+    const hh = (a, k, i) => Math.max(...a.slice(i - k + 1, i + 1)), ll = (a, k, i) => Math.min(...a.slice(i - k + 1, i + 1));
+    const tp = bars.map(b => (b.h + b.l + b.c) / 3);
+    switch (ind) {
+      case 'RSI': { const k = p[0]; let g = 0, d = 0; for (let i = 1; i <= k; i++) { const x = c[i] - c[i - 1]; if (x > 0) g += x; else d -= x; } g /= k; d /= k; for (let i = k + 1; i <= n; i++) { const x = c[i] - c[i - 1]; g = (g * (k - 1) + Math.max(x, 0)) / k; d = (d * (k - 1) + Math.max(-x, 0)) / k; } return d === 0 ? 100 : 100 - 100 / (1 + g / d); }
+      case 'MACD': { const f = this.ema(c, p[0] || 12), s = this.ema(c, p[1] || 26); return f[n] - s[n]; }
+      case 'SlowSTO': { const k = p[0] || 14, sm = p[2] || 3; const fast = []; for (let i = k - 1; i <= n; i++) { const H = hh(h, k, i), L = ll(l, k, i); fast.push(H === L ? 50 : (c[i] - L) / (H - L) * 100); } const s = this.sma(fast, sm); return s[s.length - 1]; }
+      case 'SMA': return this.sma(c, p[0] || 20)[n];
+      case 'EMA': return this.ema(c, p[0] || 20)[n];
+      case 'CCI': { const k = p[0] || 20; const m = this.sma(tp, k)[n]; const md = tp.slice(n - k + 1).reduce((a, x) => a + Math.abs(x - m), 0) / k; return md ? (tp[n] - m) / (0.015 * md) : 0; }
+      case 'MFI': { const k = p[0] || 14; let pos = 0, neg = 0; for (let i = n - k + 1; i <= n; i++) { const flow = tp[i] * v[i]; if (tp[i] > tp[i - 1]) pos += flow; else if (tp[i] < tp[i - 1]) neg += flow; } return neg === 0 ? 100 : 100 - 100 / (1 + pos / neg); }
+      case 'ATR': { const k = p[0] || 14; let a = 0; for (let i = n - k + 1; i <= n; i++) a += Math.max(h[i] - l[i], Math.abs(h[i] - c[i - 1]), Math.abs(l[i] - c[i - 1])); return a / k; }
+      case 'WILLR': { const k = p[0] || 14; const H = hh(h, k, n), L = ll(l, k, n); return H === L ? -50 : (H - c[n]) / (H - L) * -100; }
+      case 'ROC': { const k = p[0] || 12; return (c[n] / c[n - k] - 1) * 100; }
+      case 'MOM': { const k = p[0] || 10; return c[n] - c[n - k]; }
+      case 'BBPB': { const k = p[0] || 20, m = p[1] || 2; const mean = this.sma(c, k)[n]; const sd = Math.sqrt(c.slice(n - k + 1).reduce((a, x) => a + (x - mean) ** 2, 0) / k); return sd ? (c[n] - (mean - m * sd)) / (2 * m * sd) : 0.5; }
+    } return NaN;
+  }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const tab = st.tab || (['sector', 'custom'].includes(U.param('tab', '')) ? U.param('tab', '') : 'all');
+    const sectors = [...new Set(U.stocks.map(s => s.sector))].sort(); const q = st.q.trim().toUpperCase();
+    let list = tab === 'sector' ? U.stocks.filter(s => s.sector === st.sector) : tab === 'custom' ? st.list.map(c => U.bySym[c]).filter(Boolean) : U.stocks.filter(s => !q || s.code.includes(q));
+    list = list.slice().sort((a, b) => a.code.localeCompare(b.code));
+    const active = st.slots.map((s, i) => ({ ...s, i })).filter(s => s.ind); const cache = {};
+    const rows = list.map((s, i) => { const a = U.actions(s.code); const bars = U.chartBars(s.code, 'D').slice(-400);
+      return { code: s.code, stock: a.stock, chart: a.chart, vpa: a.vpa, depth: a.depth, bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)',
+        cells: st.slots.map(sl => { if (!sl.ind) return { v: '0', fg: 'var(--neutral-400)' }; const ps = sl.p.split(',').map(x => parseFloat(x)).filter(x => !isNaN(x)); const val = this.calc(bars, sl.ind, ps); return { v: isNaN(val) ? '—' : U.fmt(val, 2), fg: 'var(--ink)' }; }) }; });
+    const setSlot = (i, patch) => this.setState(s => ({ slots: s.slots.map((x, k) => k === i ? { ...x, ...patch } : x) }));
+    const slots = st.slots.map((sl, i) => ({ n: i + 1, ind: sl.ind, params: sl.p, ph: sl.ind ? this.IND[sl.ind].p : '', off: !sl.ind, head: sl.ind ? this.IND[sl.ind].l : 'Indi' + (i + 1), opts: Object.keys(this.IND).map(k => ({ v: k, l: this.IND[k].l })),
+      onInd: e => setSlot(i, { ind: e.target.value, p: e.target.value ? this.IND[e.target.value].p : '' }), onParams: e => setSlot(i, { p: e.target.value }) }));
+    const T = [['all', 'TA value'], ['sector', 'Sector TA value'], ['custom', 'Custom TA value']];
+    const go = k => { this.setState({ tab: k }); try { history.replaceState(null, '', k === 'all' ? 'TA%20Value.dc.html' : 'TA%20Value.dc.html?tab=' + k); } catch (e) { /* no history */ } };
+    return { tabs: T.map(([k, l]) => ({ label: l, sel: tab === k ? 'true' : 'false', bg: tab === k ? 'var(--ink)' : 'var(--paper)', fg: tab === k ? 'var(--paper)' : 'var(--ink)', bd: tab === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => go(k) })),
+      isAll: tab === 'all', isSector: tab === 'sector', isCustom: tab === 'custom', q: st.q, onQ: e => this.setState({ q: e.target.value }), sector: st.sector, sectorOpts: sectors, onSector: e => this.setState({ sector: e.target.value }),
+      chips: st.list.map(c => ({ code: c, label: 'Remove ' + c, onRemove: () => this.setState(s => ({ list: s.list.filter(x => x !== c) })) })), hasChips: st.list.length > 0, clearChips: () => this.setState({ list: [] }),
+      addOpts: U.symbols.filter(c => !st.list.includes(c)), onAdd: e => { const c = e.target.value; if (c) this.setState(s => ({ list: [...s.list, c] })); },
+      countLabel: rows.length + ' instruments', gridCols: 'minmax(130px, 1.1fr) 170px repeat(8, minmax(96px, 1fr))', scopeTitle: tab === 'sector' ? st.sector : tab === 'custom' ? 'My list' : 'All instruments',
+      slots, rows, none: rows.length === 0, noneText: tab === 'custom' ? 'Your list is empty. Add instruments above.' : 'No instrument matches your search.' };
+  }
+}
+</script>
+</body>
+</html>

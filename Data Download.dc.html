@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Data download — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.tl-ctl { font: inherit; font-size: 13px; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.tl-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tl-btn:hover { background: var(--ink); color: var(--paper); }
+
+
+
+
+.dd-th { font: inherit; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 0; background: transparent; color: var(--ink); cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px; width: 100%; }
+.dd-row { display: grid; align-items: center; gap: 0 12px; padding: 0 12px; min-height: 38px; font-size: 14px; }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="tools" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Data download</h1>
+  <div style="color: var(--text-muted);">Download today's trading data for every instrument, or end-of-day files for past sessions.</div>
+</section>
+
+<div role="tablist" style="display: flex; gap: 4px;"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; height: 36px; padding: 0 16px; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+
+<sc-if value="{{ isLive }}"><section style="display: flex; flex-direction: column; gap: 12px;">
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; position: relative;">
+    <input class="tl-ctl" type="search" placeholder="Search trading code" aria-label="Search trading code" value="{{ q }}" onInput="{{ onQ }}" style="width: 240px; max-width: 100%;">
+    <select class="tl-ctl" aria-label="Category" value="{{ cat }}" onChange="{{ onCat }}"><sc-for list="{{ catOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+    <span style="font-size: 13px; color: var(--text-muted);">{{ countLabel }}</span>
+    <span style="flex: 1;"></span>
+    <button class="tl-btn" onClick="{{ onCols }}" aria-haspopup="true" aria-expanded="{{ colsStr }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 8h12M2 13h12"></path></svg>Select columns</button>
+    <button class="tl-btn" onClick="{{ onDownload }}" style="background: var(--ink); color: var(--paper);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M4.500 7L8 10.500 11.500 7M2 13.500h12"></path></svg>Download CSV</button>
+    <sc-if value="{{ colsOpen }}"><div>
+      <div onClick="{{ onCols }}" style="position: fixed; inset: 0; z-index: 40;"></div>
+      <div role="dialog" aria-label="Select columns" style="position: absolute; right: 0; top: 44px; z-index: 41; width: 260px; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset);">
+        <div style="display: flex; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--ink); font-size: 13px; font-weight: 700;"><span>Columns</span><span style="display: flex; gap: 12px; font-weight: 400;"><button onClick="{{ onAll }}" style="font: inherit; border: 0; background: none; text-decoration: underline; cursor: pointer; padding: 0;">All</button><button onClick="{{ onDefault }}" style="font: inherit; border: 0; background: none; text-decoration: underline; cursor: pointer; padding: 0;">Reset</button></span></div>
+        <div style="max-height: 320px; overflow: auto; padding: 4px 0;"><sc-for list="{{ colOpts }}" as="c" hint-placeholder-count="14"><label style="display: flex; align-items: center; gap: 10px; padding: 6px 12px; cursor: pointer; font-size: 13px;"><input type="checkbox" checked="{{ c.on }}" onChange="{{ c.toggle }}" style="margin: 0;">{{ c.label }}</label></sc-for></div>
+      </div>
+    </div></sc-if>
+  </div>
+  <div style="border: 1px solid var(--ink); overflow-x: auto;"><div style="min-width: {{ minW }};">
+    <div class="dd-row" style="grid-template-columns: {{ gridCols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); min-height: 44px;"><sc-for list="{{ heads }}" as="h" hint-placeholder-count="14"><button class="dd-th" onClick="{{ h.sort }}" style="justify-content: {{ h.just }};" aria-label="Sort by {{ h.label }}">{{ h.label }}<span style="font-size: 10px; opacity: {{ h.op }};">{{ h.arrow }}</span></button></sc-for></div>
+    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="14"><div class="dd-row" style="grid-template-columns: {{ gridCols }}; background: {{ r.bg }}; color: {{ r.fg }};"><sc-for list="{{ r.cells }}" as="c"><span style="text-align: {{ c.al }}; font-family: {{ c.ff }}; font-weight: {{ c.fw }};">{{ c.v }}</span></sc-for></div></sc-for>
+    <sc-if value="{{ none }}"><div style="padding: 32px 16px; text-align: center; color: var(--text-muted);">No instrument matches your filters.</div></sc-if>
+  </div></div>
+</section></sc-if>
+
+<sc-if value="{{ isEod }}"><section style="display: flex; flex-direction: column; gap: 12px;">
+  <div style="border: 1px solid var(--ink); padding: 12px 16px; display: flex; flex-direction: column; gap: 4px;"><b>End-of-day CSV files</b><span style="color: var(--text-muted); max-width: 760px; line-height: 20px;">One file per trading session with the open, high, low, close, volume, value and trades of every instrument. Files are built in your browser from the stored session data.</span></div>
+  <div style="border: 1px solid var(--ink);">
+    <div class="dd-row" style="grid-template-columns: minmax(160px, 1.5fr) 110px 120px 140px; background: var(--neutral-100); border-bottom: 1px solid var(--ink); min-height: 44px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;"><span>Session</span><span style="text-align: right;">Instruments</span><span style="text-align: right;">Turnover (mn)</span><span style="text-align: right;">File</span></div>
+    <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="15"><div class="dd-row" style="grid-template-columns: minmax(160px, 1.5fr) 110px 120px 140px; background: {{ s.bg }};"><span><b>{{ s.date }}</b> <span style="color: var(--text-muted); font-size: 13px;">{{ s.day }}</span></span><span style="text-align: right; font-family: var(--font-mono);">{{ s.n }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ s.value }}</span><span style="text-align: right;"><button class="tl-btn" onClick="{{ s.onDownload }}" style="height: 28px; font-size: 12px; padding: 0 10px;">Download CSV</button></span></div></sc-for>
+  </div>
+</section></sc-if>
+<div role="status" style="font-size: 13px; color: var(--text-muted); min-height: 18px;">{{ note }}</div>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, tab: null, q: '', cat: 'all', sortK: 'code', sortDir: 1, cols: null, colsOpen: false, note: '' };
+  COLS = [
+    { k: 'code', l: 'Trading code', al: 'left', w: 'minmax(130px, 1.3fr)' }, { k: 'ltp', l: 'LTP', f: s => s.ltp, d: 1 }, { k: 'pct', l: '%', f: s => s.changePct, d: 2 }, { k: 'open', l: 'Open', f: s => s.open, d: 1 },
+    { k: 'high', l: 'High', f: s => s.high, d: 1 }, { k: 'low', l: 'Low', f: s => s.low, d: 1 }, { k: 'close', l: 'Close', f: s => s.close, d: 1 }, { k: 'ycp', l: 'YCP', f: s => s.ycp, d: 1 },
+    { k: 'chg', l: 'Change', f: s => s.change, d: 1 }, { k: 'trade', l: 'Trade', f: s => s.trades, d: 0 }, { k: 'value', l: 'Value (mn)', f: s => s.value, d: 2 }, { k: 'volume', l: 'Volume', f: s => s.volume, d: 0 },
+    { k: 'cat', l: 'Cat', f: s => s.cat, txt: true, al: 'center' }, { k: 'pe', l: 'Audited PE', f: s => s.pe, d: 2 }, { k: 'sector', l: 'Sector', f: s => s.sector, txt: true, al: 'left', w: 'minmax(160px, 1.4fr)' }];
+  DEF = ['code', 'ltp', 'pct', 'open', 'high', 'low', 'close', 'ycp', 'chg', 'trade', 'value', 'volume', 'cat', 'pe'];
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  csv(rows, head) { return [head, ...rows].map(r => r.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(',')).join('\r\n'); }
+  save(name, text) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); } catch (e) { /* download blocked */ } }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const tab = st.tab || (U.param('tab', '') === 'eod' ? 'eod' : 'live'); const vis = st.cols || this.DEF; const cols = this.COLS.filter(c => vis.includes(c.k));
+    const q = st.q.trim().toUpperCase();
+    const val = (c, s) => c.k === 'code' ? s.code : c.f(s);
+    const list = U.stocks.filter(s => (!q || s.code.includes(q)) && (st.cat === 'all' || s.cat === st.cat)).sort((a, b) => { const c = this.COLS.find(x => x.k === st.sortK) || this.COLS[0]; const x = val(c, a), y = val(c, b); return (typeof x === 'string' ? x.localeCompare(y) : x - y) * st.sortDir; });
+    const rows = list.map((s, i) => ({ bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)', fg: s.change > 0 ? 'var(--green-700)' : s.change < 0 ? 'var(--red-700)' : 'var(--ink)',
+      cells: cols.map(c => c.k === 'code' ? { v: s.code, al: 'left', ff: 'var(--font-sans)', fw: 700 } : c.txt ? { v: c.f(s), al: c.al, ff: 'var(--font-sans)', fw: 400 } : { v: U.fmt(c.f(s), c.d), al: 'right', ff: 'var(--font-mono)', fw: 400 }) }));
+    const heads = cols.map(c => ({ label: c.l, just: c.al === 'left' ? 'flex-start' : c.al === 'center' ? 'center' : 'flex-end', arrow: st.sortDir > 0 ? '▲' : '▼', op: st.sortK === c.k ? 1 : 0, sort: () => this.setState(s => ({ sortK: c.k, sortDir: s.sortK === c.k ? -s.sortDir : 1 })) }));
+    // EOD sessions: newest first, from stored daily bars
+    const ref = U.daily('GP', 30).slice().reverse();
+    const sessions = ref.slice(0, 20).map((b, i) => { const total = U.stocks.reduce((a, s) => { const d = U.daily(s.code, 30); return a + d[d.length - 1 - i].value; }, 0);
+      return { date: U.dateStr(b.date), day: b.date.toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' }), n: U.stocks.length, value: U.fmt(total, 2), bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)',
+        onDownload: () => { const body = U.stocks.map(s => { const d = U.daily(s.code, 30); const x = d[d.length - 1 - i]; return [s.code, b.date.toISOString().slice(0, 10), x.o, x.h, x.l, x.c, x.v, x.value, x.trades]; });
+          this.save('eod-' + b.date.toISOString().slice(0, 10) + '.csv', this.csv(body, ['code', 'date', 'open', 'high', 'low', 'close', 'volume', 'value_mn', 'trades'])); this.setState({ note: 'Downloaded eod-' + b.date.toISOString().slice(0, 10) + '.csv (' + body.length + ' rows).' }); } }; });
+    const toggle = k => this.setState(s => { const cur = s.cols || this.DEF; return { cols: cur.includes(k) ? cur.filter(x => x !== k) : this.COLS.map(c => c.k).filter(x => cur.includes(x) || x === k) }; });
+    return { tabs: [['live', 'Data download'], ['eod', 'EOD CSV download']].map(([k, l]) => ({ label: l, sel: tab === k ? 'true' : 'false', bg: tab === k ? 'var(--ink)' : 'var(--paper)', fg: tab === k ? 'var(--paper)' : 'var(--ink)', bd: tab === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => { this.setState({ tab: k, note: '' }); try { history.replaceState(null, '', k === 'eod' ? 'Data%20Download.dc.html?tab=eod' : 'Data%20Download.dc.html'); } catch (e) { /* no history */ } } })),
+      isLive: tab === 'live', isEod: tab === 'eod', note: st.note, sessions,
+      q: st.q, onQ: e => this.setState({ q: e.target.value }), cat: st.cat, onCat: e => this.setState({ cat: e.target.value }), catOpts: [{ v: 'all', l: 'All categories' }, ...['A', 'B', 'N', 'Z'].map(c => ({ v: c, l: 'Category ' + c }))],
+      countLabel: `${rows.length} of ${U.stocks.length} instruments`, rows, heads, none: rows.length === 0, gridCols: cols.map(c => c.w || 'minmax(104px, 1fr)').join(' '), minW: Math.max(640, cols.length * 112 + 80) + 'px',
+      colsOpen: st.colsOpen, colsStr: st.colsOpen ? 'true' : 'false', onCols: () => this.setState(s => ({ colsOpen: !s.colsOpen })), onAll: () => this.setState({ cols: this.COLS.map(c => c.k) }), onDefault: () => this.setState({ cols: null }),
+      colOpts: this.COLS.map(c => ({ label: c.l, on: vis.includes(c.k), toggle: () => toggle(c.k) })),
+      onDownload: () => { const body = list.map(s => cols.map(c => c.k === 'code' ? s.code : c.txt ? c.f(s) : c.f(s))); this.save('data-download.csv', this.csv(body, cols.map(c => c.l))); this.setState({ note: 'Downloaded data-download.csv with ' + body.length + ' rows and ' + cols.length + ' columns.' }); } };
+  }
+}
+</script>
+</body>
+</html>
