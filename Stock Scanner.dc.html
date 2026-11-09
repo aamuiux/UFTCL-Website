@@ -46,11 +46,6 @@ a:hover { color: var(--blue-700); }
     <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3"><a href="{{ t.href }}" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border: 1px solid {{ t.bd }}; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; background: {{ t.bg }}; color: {{ t.fg }};" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);">{{ t.label }}</a></sc-for>
   </nav>
 
-  <section data-screen-label="Scanner header" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px;">
-    <div style="display: flex; flex-direction: column; gap: 2px;"><b style="font-size: 18px;">{{ title }}</b><span style="font-size: 12px; color: var(--text-muted);">{{ subtitle }}</span></div>
-    <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">Day period · {{ universe }} securities</span>
-  </section>
-
   <sc-if value="{{ isTech }}">
   <section data-screen-label="Technical scanners" style="display: flex; flex-direction: column; gap: 16px;">
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
@@ -406,9 +401,6 @@ class Component extends DCLogic {
       universe: U.stocks.length, msg: st.msg, hasMsg: !!st.msg, q: st.q,
       onQ: e => this.setState({ q: e.target.value }),
     };
-
-    const TITLE = { technical: ['Technical scanners', 'Combine up to 15 conditions. A security must match every one of them.'], pre: ['Pre scanner', 'Browse indicator values and see how many securities meet each condition.'], custom: ['Custom scanner', 'Build RSI conditions, run them together, and save the set in this browser.'] };
-    out.title = TITLE[tab][0]; out.subtitle = TITLE[tab][1];
 
     let list = U.stocks, xOf = null, xFmt = null, showX = false, xLabel = '', emptyText = 'No securities match these conditions.';
     out.chips = []; out.noChips = false; out.cells = []; out.opts = []; out.total = 0;
