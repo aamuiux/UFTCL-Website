@@ -28,31 +28,67 @@
         <div role="group" aria-label="Font size" style="display: flex;"><sc-for list="{{ sizes }}" as="z"><button onClick="{{ z.onClick }}" aria-pressed="{{ z.on }}" style="font: inherit; font-size: 13px; flex: 1; height: 32px; border: 1px solid var(--ink); border-left: {{ z.bl }}; background: {{ z.bg }}; color: {{ z.fg }}; cursor: pointer;">{{ z.label }}</button></sc-for></div>
       </div>
       <sc-if value="{{ hasCols }}"><div>
-        <div style="padding: 10px 12px 4px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;">Columns</span><span style="display: flex; gap: 12px;"><button onClick="{{ onAll }}" style="font: inherit; font-size: 12px; border: 0; background: none; padding: 0; text-decoration: underline; cursor: pointer; color: var(--ink);">Show all</button></span></div>
+        <div style="padding: 10px 12px 4px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;">Columns</span><button onClick="{{ onOpenModal }}" style="font: inherit; font-size: 12px; border: 0; background: none; padding: 0; text-decoration: underline; cursor: pointer; color: var(--ink);">Open column manager</button></div>
         <div style="max-height: 230px; overflow: auto; padding: 2px 0 6px;"><sc-for list="{{ colRows }}" as="c"><label style="display: flex; align-items: center; gap: 10px; padding: 5px 12px; cursor: pointer; font-size: 13px;"><input type="checkbox" checked="{{ c.on }}" disabled="{{ c.locked }}" onChange="{{ c.toggle }}" style="margin: 0;">{{ c.label }}</label></sc-for></div>
       </div></sc-if>
       <div style="padding: 8px 12px; border-top: 1px solid var(--neutral-300); text-align: right;"><button onClick="{{ onReset }}" style="font: inherit; font-size: 12px; border: 0; background: none; padding: 0; text-decoration: underline; cursor: pointer; color: var(--ink);">Reset table settings</button></div>
+    </div>
+  </div></sc-if>
+  <sc-if value="{{ modalOpen }}"><div>
+    <div onClick="{{ onCancel }}" style="position: fixed; inset: 0; z-index: 90; background: oklch(0% 0 0 / 0.5);"></div>
+    <div role="dialog" aria-modal="true" aria-labelledby="ts-modal-title" style="position: fixed; z-index: 91; left: 50%; top: 40px; transform: translateX(-50%); width: 900px; max-width: calc(100vw - 24px); max-height: calc(100vh - 80px); display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset); text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--neutral-300);"><b id="ts-modal-title" style="font-size: 20px;">Select columns</b><button onClick="{{ onCancel }}" aria-label="Close" style="font: inherit; width: 36px; height: 36px; border: 1px solid var(--neutral-300); background: var(--paper); font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink);">×</button></div>
+      <div style="overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;"><b style="font-size: 16px;">Columns</b><span style="color: var(--neutral-700); line-height: 22px; max-width: 720px; font-size: 14px;">Choose which columns this table shows. The first column is always included.</span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;"><sc-for list="{{ presets }}" as="p"><button onClick="{{ p.onClick }}" aria-pressed="{{ p.on }}" style="font: inherit; font-size: 14px; height: 36px; padding: 0 14px; border: 1px solid {{ p.bd }}; background: {{ p.bg }}; color: {{ p.fg }}; font-weight: {{ p.fw }}; cursor: pointer;">{{ p.label }}</button></sc-for></div>
+        <input type="search" placeholder="Filter columns" aria-label="Filter columns" value="{{ filter }}" onInput="{{ onFilter }}" style="font: inherit; font-size: 14px; height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); width: 260px; max-width: 100%;">
+        <div style="display: flex; justify-content: space-between; gap: 16px; align-items: baseline; background: var(--neutral-50); border: 1px solid var(--neutral-200); padding: 10px 12px; font-size: 12px;"><span style="min-width: 0; line-height: 18px;"><span style="color: var(--text-muted); letter-spacing: 0.06em; margin-right: 8px;">SHOWING</span>{{ showing }}</span><span style="font-family: var(--font-mono); color: var(--text-muted); white-space: nowrap;">{{ countOf }}</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 12px;"><span style="font-size: 12px; letter-spacing: 0.08em; color: var(--text-muted); text-transform: uppercase;">Columns</span><span style="flex: 1; height: 1px; background: var(--neutral-200);"></span><button onClick="{{ onAllDraft }}" style="font: inherit; font-size: 12px; border: 0; background: none; padding: 0; text-decoration: underline; cursor: pointer; color: var(--ink);">{{ allLabel }}</button></div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;"><sc-for list="{{ chips }}" as="c"><button onClick="{{ c.toggle }}" disabled="{{ c.locked }}" aria-pressed="{{ c.on }}" style="font: inherit; font-size: 14px; height: 36px; padding: 0 14px; border: 1px solid {{ c.bd }}; background: {{ c.bg }}; color: {{ c.fg }}; font-weight: {{ c.fw }}; cursor: {{ c.cursor }}; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;"><span aria-hidden="true" style="font-size: 12px;">{{ c.mark }}</span>{{ c.label }}</button></sc-for></div>
+          <sc-if value="{{ noChips }}"><div style="color: var(--text-muted); font-size: 14px;">No column matches "{{ filter }}".</div></sc-if>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; padding: 14px 24px; border-top: 1px solid var(--neutral-300);">
+        <button onClick="{{ onResetDraft }}" style="font: inherit; font-size: 14px; height: 36px; padding: 0 14px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer;">Reset to defaults</button>
+        <span style="display: flex; align-items: center; gap: 12px;"><span role="status" style="font-size: 13px; color: var(--text-muted);">{{ draftNote }}</span><button onClick="{{ onCancel }}" style="font: inherit; font-size: 14px; height: 36px; padding: 0 14px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer;">Cancel</button><button onClick="{{ onSave }}" style="font: inherit; font-size: 14px; height: 36px; padding: 0 18px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font-weight: 700; cursor: pointer;">Save</button></span>
+      </div>
     </div>
   </div></sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:80,&quot;height&quot;:60},&quot;skey&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;table&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;cols&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;[]&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;locked&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;[]&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, open: false, set: { hidden: [], compact: false, fs: 'sm' } };
+  state = { ready: !!window.UFT, modal: false, draft: null, filter: '', open: false, set: { hidden: [], compact: false, fs: 'sm' } };
   componentDidMount() { const load = () => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true, set: window.UFT.tsLoad(this.props.skey || 'table') }); return true; } return false; }; if (!load()) this.p = setInterval(load, 50);
-    this.onKey = e => { if (e.key === 'Escape') this.setState(s => (s.open ? { open: false } : null)); }; window.addEventListener('keydown', this.onKey); }
+    this.onKey = e => { if (e.key === 'Escape') this.setState(s => (s.modal ? { modal: false, draft: null, filter: '' } : s.open ? { open: false } : null)); }; window.addEventListener('keydown', this.onKey); }
   componentWillUnmount() { clearInterval(this.p); window.removeEventListener('keydown', this.onKey); }
   parse(v) { try { const a = JSON.parse(v || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
   apply(next) { const key = this.props.skey || 'table'; this.setState({ set: next }); try { localStorage.setItem('uftcl.tbl.' + key, JSON.stringify(next)); } catch (e) { /* storage unavailable */ } window.dispatchEvent(new CustomEvent('uft-table-settings', { detail: { skey: key, ...next } })); }
+  modalVals(cols, locked, set) {
+    const st = this.state; const all = cols.map(c => c[0]); const draft = st.draft || all.filter(k => !set.hidden.includes(k)); const fq = st.filter.trim().toLowerCase();
+    const withLocked = keys => all.filter(k => keys.includes(k) || locked.includes(k)); const setDraft = keys => this.setState({ draft: withLocked(keys) });
+    const free = all.filter(k => !locked.includes(k)); const allOn = free.every(k => draft.includes(k));
+    const chips = cols.filter(c => !fq || c[1].toLowerCase().includes(fq)).map(([k, l]) => { const on = draft.includes(k); const lock = locked.includes(k);
+      return { label: l, on: on ? 'true' : 'false', locked: lock, mark: lock ? '🔒' : on ? '✓' : '+', bg: lock ? 'var(--neutral-100)' : on ? 'var(--ink)' : 'var(--paper)', fg: lock ? 'var(--neutral-600)' : on ? 'var(--paper)' : 'var(--ink)', bd: lock ? 'var(--neutral-300)' : on ? 'var(--ink)' : 'var(--neutral-300)', fw: on && !lock ? 700 : 400, cursor: lock ? 'default' : 'pointer', toggle: () => setDraft(on ? draft.filter(x => x !== k) : [...draft, k]) }; });
+    const sameSet = (a, b) => a.length === b.length && a.every(k => b.includes(k));
+    const presets = [['Default', all], ['Essential', all.slice(0, Math.max(locked.length + 3, 4))]].map(([label, keys]) => { const on = sameSet(draft, withLocked(keys)); return { label, on: on ? 'true' : 'false', bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'var(--neutral-300)', fw: on ? 700 : 400, onClick: () => setDraft(keys) }; });
+    const cur = all.filter(k => !set.hidden.includes(k)); const dirty = !sameSet(draft, cur);
+    return { presets, chips, noChips: chips.length === 0, filter: st.filter, onFilter: e => this.setState({ filter: e.target.value }), allLabel: allOn ? 'clear all' : 'select all', onAllDraft: () => setDraft(allOn ? draft.filter(k => !free.includes(k)) : all),
+      showing: draft.map(k => cols.find(c => c[0] === k)[1].toUpperCase()).join(' · '), countOf: `${draft.length}/${all.length}`, draftNote: dirty ? 'Unsaved changes' : 'All changes saved',
+      onResetDraft: () => setDraft(all), onSave: () => { this.setState({ modal: false, draft: null, filter: '' }); this.apply({ ...set, hidden: all.filter(k => !draft.includes(k)) }); } };
+  }
   renderVals() {
     const st = this.state; const cols = this.parse(this.props.cols); const locked = this.parse(this.props.locked); const set = st.set;
     const SZ = [['lg', 'lg'], ['sm', 'sm'], ['xs', 'xs'], ['xxs', 'xxs']];
     return { open: st.open, openStr: st.open ? 'true' : 'false', toggle: () => this.setState(s => ({ open: !s.open })), gearBg: st.open ? 'var(--ink)' : 'var(--paper)', gearFg: st.open ? 'var(--paper)' : 'var(--ink)',
       compactStr: set.compact ? 'true' : 'false', compactBg: set.compact ? 'var(--ink)' : 'var(--paper)', compactMark: set.compact ? '✓' : '', onCompact: () => this.apply({ ...set, compact: !set.compact }),
       sizes: SZ.map(([k, l], i) => ({ label: l, on: set.fs === k ? 'true' : 'false', bg: set.fs === k ? 'var(--ink)' : 'var(--paper)', fg: set.fs === k ? 'var(--paper)' : 'var(--ink)', bl: i ? '0' : '1px solid var(--ink)', onClick: () => this.apply({ ...set, fs: k }) })),
-      hasCols: cols.length > 0, onAll: () => this.apply({ ...set, hidden: [] }),
+      hasCols: cols.length > 0,
       colRows: cols.map(([k, l]) => ({ label: l, on: !set.hidden.includes(k), locked: locked.includes(k), toggle: () => this.apply({ ...set, hidden: set.hidden.includes(k) ? set.hidden.filter(x => x !== k) : [...set.hidden, k] }) })),
-      onReset: () => this.apply({ hidden: [], compact: false, fs: 'sm' }) };
+      onReset: () => this.apply({ hidden: [], compact: false, fs: 'sm' }),
+      onOpenModal: () => this.setState({ modal: true, open: false, filter: '', draft: cols.map(c => c[0]).filter(k => !set.hidden.includes(k)) }), modalOpen: st.modal, onCancel: () => this.setState({ modal: false, draft: null, filter: '' }),
+      ...this.modalVals(cols, locked, set) };
   }
 }
 </script>
