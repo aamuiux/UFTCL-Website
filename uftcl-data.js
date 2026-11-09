@@ -192,8 +192,8 @@
         const k = IX.value / raw[raw.length - 1].c; raw.forEach(b => { b.o = round(b.o * k, 2); b.h = round(b.h * k, 2); b.l = round(b.l * k, 2); b.c = round(b.c * k, 2); });
         const rl = raw[raw.length - 1], rp = raw[raw.length - 2]; rp.c = IX.prev; rp.h = Math.max(rp.h, IX.prev); rp.l = Math.min(rp.l, IX.prev); rl.o = IX.open; rl.h = IX.high; rl.l = IX.low; rl.c = IX.value;
       }
-      const grp = k => { const g = []; for (let i = raw.length % k; i < raw.length; i += k) { const sl = raw.slice(i, i + k); g.push({ o: sl[0].o, h: Math.max(...sl.map(b => b.h)), l: Math.min(...sl.map(b => b.l)), c: sl[sl.length - 1].c, v: sl.reduce((a, b) => a + b.v, 0), t: fmtD(sl[sl.length - 1].date) }); } return g; };
-      out = tf === 'W' ? grp(5) : tf === 'M' ? grp(21) : raw.map(b => ({ o: b.o, h: b.h, l: b.l, c: b.c, v: b.v, t: fmtD(b.date) }));
+      const grp = k => { const g = []; for (let i = raw.length % k; i < raw.length; i += k) { const sl = raw.slice(i, i + k); g.push({ o: sl[0].o, h: Math.max(...sl.map(b => b.h)), l: Math.min(...sl.map(b => b.l)), c: sl[sl.length - 1].c, v: sl.reduce((a, b) => a + b.v, 0), t: fmtD(sl[sl.length - 1].date), ts: sl[sl.length - 1].date.getTime() }); } return g; };
+      out = tf === 'W' ? grp(5) : tf === 'M' ? grp(21) : raw.map(b => ({ o: b.o, h: b.h, l: b.l, c: b.c, v: b.v, t: fmtD(b.date), ts: b.date.getTime() }));
     }
     return (chartCache[key] = out);
   }

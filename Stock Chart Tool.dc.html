@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Stock Chart — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+
+  <section data-screen-label="Quote strip" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding: 12px 16px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; min-width: 0;">
+      <b style="font-size: 18px;">{{ name }}</b>
+      <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">{{ code }} · {{ meta }}</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px;">
+      <div style="display: flex; align-items: baseline; gap: 10px; font-family: var(--font-mono);"><b style="font-size: 22px;">{{ ltp }}</b><span style="font-size: 14px; color: {{ tone }};">{{ chg }}</span></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <a href="{{ pageHref }}" style="height: 36px; padding: 0 14px; border: 1px solid var(--ink); display: inline-flex; align-items: center; font-weight: 700; font-size: 13px;" style-hover="background: var(--ink); color: var(--paper);">{{ pageLabel }}</a>
+        <a href="{{ interactiveHref }}" style="height: 36px; padding: 0 14px; border: 1px solid var(--ink); display: inline-flex; align-items: center; font-weight: 700; font-size: 13px;" style-hover="background: var(--ink); color: var(--paper);">Interactive chart</a>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="ChartPane" mode="full" code="DSEX" tf="D" dates="1" overlays="ema50,ma20" panes="volume,macd" urlsym="1" sync="0" height="780px" hint-size="100%,780px"></dc-import>
+
+  <dc-import name="SymbolIndex" page="Stock Chart Tool" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, code: null };
+  componentDidMount() {
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50);
+    this.onSym = e => { const d = e.detail || {}; if (d.code) this.setState({ code: d.code }); };
+    window.addEventListener('uft-chart-symbol', this.onSym);
+  }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-chart-symbol', this.onSym); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const q = (U.param('symbol', '') || '').toUpperCase(); const init = U.bySym[q] || U.indices[q] ? q : 'DSEX';
+    const code = this.state.code || init; const S = U.bySym[code]; const IX = U.indices[code]; const { fmt, sign, tone } = U;
+    const NAMES = { DSEX: 'Dhaka Stock Exchange Broad Index', DSES: 'DSE Shariah Index', DS30: 'DSE 30 Index' };
+    const v = S ? S.ltp : IX.value, ch = S ? S.change : IX.change, pc = S ? S.changePct : IX.pct;
+    return { code, name: S ? U.company(code) : NAMES[code], meta: S ? `${S.sector} · Category ${S.cat}` : 'Index', ltp: fmt(v, S ? 1 : 2), chg: `${sign(ch)} (${sign(pc)}%)`, tone: tone(ch),
+      pageHref: S ? U.href('Stock Chart', { symbol: code }) : U.href('Market Watch', { symbol: code }), pageLabel: S ? 'Open instrument page' : 'Open market watch',
+      interactiveHref: U.href('Interactive Chart Tool', { symbol: code }) };
+  }
+}
+</script>
+</body>
+</html>

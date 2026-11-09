@@ -11,25 +11,32 @@
 <link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
 <script src="uftcl-data.js"></script>
 <style>
+.cp-dark { --paper: #131722; --ink: #d1d4dc; --neutral-50: #1b1f2b; --neutral-100: #1e222d; --neutral-200: #2a2e39; --neutral-300: #363a45; --neutral-400: #4c525e; --neutral-500: #787b86; --neutral-700: #b2b5be; --text-muted: #868993; --blue-700: #5b9cf6; }
 .cp-sel { font: inherit; font-size: 13px; height: 32px; box-sizing: border-box; padding: 0 8px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; min-width: 0; }
 .cp-seg { display: flex; border: 1px solid var(--ink); }
 .cp-seg button { font: inherit; font-size: 12px; height: 30px; padding: 0 10px; border: 0; border-right: 1px solid var(--ink); cursor: pointer; }
 .cp-seg button:last-child { border-right: 0; }
 .cp-btn { font: inherit; font-size: 12px; font-weight: 700; height: 32px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .cp-btn:hover { background: var(--ink); color: var(--paper); }
+.cp-btn:disabled { opacity: 0.35; cursor: default; }
+.cp-btn:disabled:hover { background: var(--paper); color: var(--ink); }
 .cp-menu { position: absolute; top: 36px; left: 0; z-index: 30; min-width: 200px; background: var(--paper); border: 1px solid var(--ink); }
+.cp-menu-r { left: auto; right: 0; }
 .cp-row { font: inherit; font-size: 13px; width: 100%; box-sizing: border-box; height: 34px; padding: 0 12px; border: 0; border-bottom: 1px solid var(--neutral-200); background: var(--paper); color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; }
 .cp-row:hover { background: var(--neutral-50); }
 .cp-box { width: 14px; height: 14px; box-sizing: border-box; border: 1px solid var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: var(--paper); line-height: 1; flex-shrink: 0; }
+.cp-tool { width: 34px; height: 34px; box-sizing: border-box; border: 1px solid transparent; background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.cp-tool:hover { background: var(--neutral-100); }
 </style>
 </helmet>
-<section data-screen-label="Chart pane" style="position: {{ pos }}; inset: {{ inset }}; z-index: {{ z }}; height: {{ rootH }}; background: var(--paper); border: 1px solid var(--ink); display: flex; flex-direction: column; min-width: 0; min-height: 0; box-sizing: border-box; font-family: var(--font-sans); color: var(--ink); font-size: 13px;">
+<section class="{{ themeCls }}" data-screen-label="Chart pane" style="position: {{ pos }}; inset: {{ inset }}; z-index: {{ z }}; height: {{ rootH }}; background: var(--paper); border: 1px solid var(--ink); display: flex; flex-direction: column; min-width: 0; min-height: 0; box-sizing: border-box; font-family: var(--font-sans); color: var(--ink); font-size: 13px;">
 
   <div data-screen-label="Chart toolbar" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 8px 10px; border-bottom: 1px solid var(--neutral-300);">
     <select class="cp-sel" onChange="{{ onSymbol }}" value="{{ code }}" aria-label="Symbol" style="font-weight: 700; min-width: {{ symMin }};">
       <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o.code }}">{{ o.code }}</option></sc-for>
     </select>
-    <sc-if value="{{ isFull }}"><div class="cp-seg" aria-label="Range"><sc-for list="{{ rangeTabs }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.onClick }}" style="background: {{ r.bg }}; color: {{ r.fg }};">{{ r.label }}</button></sc-for></div></sc-if>
+    <sc-if value="{{ showRange }}"><div class="cp-seg" aria-label="Range"><sc-for list="{{ rangeTabs }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.onClick }}" style="background: {{ r.bg }}; color: {{ r.fg }};">{{ r.label }}</button></sc-for></div></sc-if>
+    <sc-if value="{{ showDates }}"><div style="display: flex; align-items: center; gap: 6px;"><input type="date" class="cp-sel" aria-label="From date" value="{{ from }}" min="{{ dMin }}" max="{{ dMax }}" onChange="{{ onFrom }}"><span style="color: var(--text-muted);">to</span><input type="date" class="cp-sel" aria-label="To date" value="{{ to }}" min="{{ dMin }}" max="{{ dMax }}" onChange="{{ onTo }}"></div></sc-if>
     <sc-if value="{{ isFull }}"><div style="position: relative;">
       <button class="cp-btn" onClick="{{ onOvMenu }}" aria-haspopup="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 12l4-5 3 3 4-6 3 4"></path></svg>Overlays<svg width="8" height="8" viewBox="0 0 8 8"><path d="M1 2.5l3 3 3-3" fill="none" stroke="currentColor"></path></svg></button>
       <sc-if value="{{ menuOv }}"><div><div onClick="{{ closeMenu }}" style="position: fixed; inset: 0; z-index: 29;"></div><div class="cp-menu"><sc-for list="{{ ovOpts }}" as="m" hint-placeholder-count="4"><button class="cp-row" onClick="{{ m.onToggle }}"><span style="display: flex; align-items: center; gap: 8px;"><span style="width: 14px; height: 3px; background: {{ m.col }};"></span>{{ m.label }}</span><span class="cp-box" style="background: {{ m.bg }};">{{ m.mark }}</span></button></sc-for></div></div></sc-if>
@@ -40,79 +47,118 @@
     </div></sc-if>
     <div class="cp-seg" aria-label="Chart type"><sc-for list="{{ typeTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div>
     <select class="cp-sel" onChange="{{ onTf }}" value="{{ tf }}" aria-label="Timeframe" style="width: 62px;"><sc-for list="{{ tfOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
+    <sc-if value="{{ canDraw }}"><button class="cp-btn" onClick="{{ onTheme }}" aria-label="Switch theme" title="Switch theme">{{ themeLabel }}</button></sc-if>
+    <sc-if value="{{ canDraw }}"><div style="display: flex; gap: 4px;">
+      <button class="cp-btn" onClick="{{ onUndo }}" disabled="{{ noUndo }}" aria-label="Undo" title="Undo" style="width: 32px; padding: 0;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3L2.500 6.500 6 10M3 6.500h6.500a4 4 0 010 8H7"></path></svg></button>
+      <button class="cp-btn" onClick="{{ onRedo }}" disabled="{{ noRedo }}" aria-label="Redo" title="Redo" style="width: 32px; padding: 0;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3l3.500 3.500L10 10M13 6.500H6.500a4 4 0 000 8H9"></path></svg></button>
+    </div></sc-if>
     <span style="flex: 1;"></span>
+    <sc-if value="{{ canDraw }}"><button class="cp-btn" onClick="{{ onSave }}" title="Save drawings and settings in this browser"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.500 2.500h8l3 3v8h-11zM5 2.500v4h5v-4M5 13.500v-4h6v4"></path></svg>{{ saveLabel }}</button></sc-if>
+    <sc-if value="{{ isFull }}"><div style="position: relative;">
+      <button class="cp-btn" onClick="{{ onSetMenu }}" aria-label="Chart settings" title="Chart settings" aria-haspopup="true" style="width: 32px; padding: 0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+      <sc-if value="{{ menuSet }}"><div><div onClick="{{ closeMenu }}" style="position: fixed; inset: 0; z-index: 29;"></div><div class="cp-menu cp-menu-r"><sc-for list="{{ setOpts }}" as="m" hint-placeholder-count="3"><button class="cp-row" onClick="{{ m.onToggle }}"><span>{{ m.label }}</span><span class="cp-box" style="background: {{ m.bg }};">{{ m.mark }}</span></button></sc-for></div></div></sc-if>
+    </div></sc-if>
     <button class="cp-btn" onClick="{{ onFull }}" aria-label="{{ fullLabel }}" title="{{ fullLabel }}" style="width: 32px; padding: 0;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="{{ fullIcon }}"></path></svg></button>
   </div>
 
-  <div style="padding: 8px 10px 4px; display: flex; flex-direction: column; gap: 3px;">
-    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px;"><b style="font-size: {{ titleFs }};">{{ title }}</b><span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">{{ dateLabel }}</span></div>
-    <div style="display: flex; flex-wrap: wrap; gap: 2px 12px; font-family: var(--font-mono); font-size: 12px;"><span style="color: var(--text-muted);">O <span style="color: {{ cc }};">{{ o }}</span></span><span style="color: var(--text-muted);">H <span style="color: {{ cc }};">{{ h }}</span></span><span style="color: var(--text-muted);">L <span style="color: {{ cc }};">{{ l }}</span></span><span style="color: var(--text-muted);">C <span style="color: {{ cc }};">{{ c }}</span></span><span style="color: {{ cc }};">{{ chg }}</span><span style="color: var(--text-muted);">Vol <span style="color: var(--ink);">{{ vol }}</span></span></div>
-    <div style="display: flex; flex-wrap: wrap; gap: 0 12px; font-family: var(--font-mono); font-size: 11px;"><sc-for list="{{ legend }}" as="g" hint-placeholder-count="2"><span style="color: {{ g.col }};">{{ g.label }} {{ g.v }}</span></sc-for></div>
-  </div>
+  <div style="display: flex; flex: 1; min-height: 0;">
+    <sc-if value="{{ canDraw }}"><div data-screen-label="Drawing tools" style="width: 44px; flex-shrink: 0; box-sizing: border-box; border-right: 1px solid var(--neutral-300); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0;">
+      <sc-for list="{{ tools }}" as="t" hint-placeholder-count="6"><button class="cp-tool" onClick="{{ t.onClick }}" title="{{ t.title }}" aria-label="{{ t.title }}" aria-pressed="{{ t.on }}" style="background: {{ t.bg }}; color: {{ t.fg }}; border-color: {{ t.bd }};"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.d }}"></path></svg></button></sc-for>
+      <span style="width: 24px; height: 1px; background: var(--neutral-300); margin: 4px 0;"></span>
+      <sc-for list="{{ tools2 }}" as="t" hint-placeholder-count="3"><button class="cp-tool" onClick="{{ t.onClick }}" title="{{ t.title }}" aria-label="{{ t.title }}" aria-pressed="{{ t.on }}" style="background: {{ t.bg }}; color: {{ t.fg }}; border-color: {{ t.bd }};"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.d }}"></path></svg></button></sc-for>
+    </div></sc-if>
 
-  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 58px; flex: 1; min-height: {{ minPlot }}; position: relative;">
-    <div style="position: relative; min-width: 0; cursor: crosshair;" onMouseMove="{{ onMove }}" onMouseLeave="{{ onLeave }}">
-      <svg viewBox="0 0 1000 400" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;" aria-label="Price chart">
-        <sc-for list="{{ grid }}" as="g" hint-placeholder-count="5"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" stroke-width="1" vector-effect="non-scaling-stroke"></line></sc-for>
-        <sc-for list="{{ vols }}" as="v" hint-placeholder-count="40"><rect x="{{ v.x }}" y="{{ v.y }}" width="{{ v.w }}" height="{{ v.h }}" fill="{{ v.col }}" opacity="0.45"></rect></sc-for>
-        <sc-for list="{{ candles }}" as="k" hint-placeholder-count="40"><line x1="{{ k.cx }}" x2="{{ k.cx }}" y1="{{ k.hy }}" y2="{{ k.ly }}" stroke="{{ k.col }}" stroke-width="1" vector-effect="non-scaling-stroke"></line><rect x="{{ k.x }}" y="{{ k.y }}" width="{{ k.w }}" height="{{ k.h }}" fill="{{ k.col }}"></rect></sc-for>
-        <path d="{{ linePath }}" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
-        <sc-for list="{{ overlays }}" as="p" hint-placeholder-count="2"><path d="{{ p.d }}" fill="none" stroke="{{ p.col }}" stroke-width="1.2" vector-effect="non-scaling-stroke"></path></sc-for>
-        <line x1="0" x2="1000" y1="{{ lastY }}" y2="{{ lastY }}" stroke="{{ lastCol }}" stroke-width="1" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></line>
-      </svg>
-      <sc-if value="{{ showHover }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hoverLeft }}; width: 1px; background: var(--neutral-500); pointer-events: none;"></div></sc-if>
-      <div style="position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); font-family: var(--font-sans-b); font-size: {{ wmFs }}; letter-spacing: 0.08em; color: var(--neutral-200); opacity: 0.55; pointer-events: none; white-space: nowrap;" aria-hidden="true">UFTCL</div>
-    </div>
-    <div style="position: relative; border-left: 1px solid var(--neutral-300); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
-      <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="5"><span style="position: absolute; left: 6px; top: {{ t.top }}; transform: translateY(-50%);">{{ t.label }}</span></sc-for>
-      <span style="position: absolute; left: 0; right: 0; top: {{ lastTop }}; transform: translateY(-50%); background: {{ lastCol }}; color: var(--paper); padding: 1px 6px; font-weight: 700;">{{ lastLabel }}</span>
-    </div>
-  </div>
+    <div style="flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column;">
+      <div style="padding: 8px 10px 4px; display: flex; flex-direction: column; gap: 3px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px;"><b style="font-size: {{ titleFs }};">{{ title }}</b><span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">{{ dateLabel }}</span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 2px 12px; font-family: var(--font-mono); font-size: 12px;"><span style="color: var(--text-muted);">O <span style="color: {{ cc }};">{{ o }}</span></span><span style="color: var(--text-muted);">H <span style="color: {{ cc }};">{{ h }}</span></span><span style="color: var(--text-muted);">L <span style="color: {{ cc }};">{{ l }}</span></span><span style="color: var(--text-muted);">C <span style="color: {{ cc }};">{{ c }}</span></span><span style="color: {{ cc }};">{{ chg }}</span><span style="color: var(--text-muted);">Vol <span style="color: var(--ink);">{{ vol }}</span></span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0 12px; font-family: var(--font-mono); font-size: 11px;"><sc-for list="{{ legend }}" as="g" hint-placeholder-count="2"><span style="color: {{ g.col }};">{{ g.label }} {{ g.v }}</span></sc-for><sc-if value="{{ hasHint }}"><span style="color: var(--blue-700); font-weight: 700;">{{ hint }}</span></sc-if></div>
+      </div>
 
-  <sc-if value="{{ macdOn }}"><div data-screen-label="MACD pane" style="display: grid; grid-template-columns: minmax(0, 1fr) 58px; height: 130px; flex-shrink: 0; border-top: 1px solid var(--ink); position: relative;">
-    <div style="position: relative; min-width: 0;">
-      <svg viewBox="0 0 1000 120" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;" aria-label="MACD">
-        <line x1="0" x2="1000" y1="60" y2="60" stroke="var(--neutral-300)" stroke-width="1" vector-effect="non-scaling-stroke"></line>
-        <sc-for list="{{ macdBars }}" as="b" hint-placeholder-count="40"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.col }}"></rect></sc-for>
-        <path d="{{ macdLine }}" fill="none" stroke="var(--blue-700)" stroke-width="1.2" vector-effect="non-scaling-stroke"></path>
-        <path d="{{ sigLine }}" fill="none" stroke="var(--red-700)" stroke-width="1.2" vector-effect="non-scaling-stroke"></path>
-      </svg>
-      <div style="position: absolute; left: 8px; top: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">{{ macdText }}</div>
-      <sc-if value="{{ showHover }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hoverLeft }}; width: 1px; background: var(--neutral-500); pointer-events: none;"></div></sc-if>
-    </div>
-    <div style="position: relative; border-left: 1px solid var(--neutral-300); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><span style="position: absolute; left: 6px; top: 6px;">{{ macdMax }}</span><span style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%);">0</span><span style="position: absolute; left: 6px; bottom: 6px;">{{ macdMin }}</span></div>
-  </div></sc-if>
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 58px; flex: 1; min-height: {{ minPlot }}; position: relative;">
+        <div style="position: relative; min-width: 0; cursor: crosshair;" onMouseMove="{{ onMove }}" onMouseLeave="{{ onLeave }}" onClick="{{ onPlotClick }}">
+          <svg viewBox="0 0 1000 400" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;" aria-label="Price chart">
+            <sc-for list="{{ grid }}" as="g" hint-placeholder-count="5"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" stroke-width="1" vector-effect="non-scaling-stroke"></line></sc-for>
+            <sc-for list="{{ vols }}" as="v" hint-placeholder-count="40"><rect x="{{ v.x }}" y="{{ v.y }}" width="{{ v.w }}" height="{{ v.h }}" fill="{{ v.col }}" opacity="0.45"></rect></sc-for>
+            <sc-for list="{{ candles }}" as="k" hint-placeholder-count="40"><line x1="{{ k.cx }}" x2="{{ k.cx }}" y1="{{ k.hy }}" y2="{{ k.ly }}" stroke="{{ k.col }}" stroke-width="1" vector-effect="non-scaling-stroke"></line><rect x="{{ k.x }}" y="{{ k.y }}" width="{{ k.w }}" height="{{ k.h }}" fill="{{ k.col }}"></rect></sc-for>
+            <path d="{{ linePath }}" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"></path>
+            <sc-for list="{{ overlays }}" as="p" hint-placeholder-count="2"><path d="{{ p.d }}" fill="none" stroke="{{ p.col }}" stroke-width="1.2" vector-effect="non-scaling-stroke"></path></sc-for>
+            <line x1="0" x2="1000" y1="{{ lastY }}" y2="{{ lastY }}" stroke="{{ lastCol }}" stroke-width="1" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"></line>
+            <sc-for list="{{ dRects }}" as="r" hint-placeholder-count="1"><rect x="{{ r.x }}" y="{{ r.y }}" width="{{ r.w }}" height="{{ r.h }}" fill="{{ r.fill }}" stroke="{{ r.col }}" stroke-width="1" vector-effect="non-scaling-stroke"></rect></sc-for>
+            <sc-for list="{{ dLines }}" as="s" hint-placeholder-count="2"><line x1="{{ s.x1 }}" x2="{{ s.x2 }}" y1="{{ s.y1 }}" y2="{{ s.y2 }}" stroke="{{ s.col }}" stroke-width="{{ s.w }}" stroke-dasharray="{{ s.dash }}" opacity="{{ s.op }}" vector-effect="non-scaling-stroke"></line></sc-for>
+          </svg>
+          <sc-for list="{{ dLabels }}" as="l" hint-placeholder-count="1"><span style="position: absolute; left: {{ l.left }}; top: {{ l.top }}; transform: translate(4px, -100%); font-family: var(--font-mono); font-size: 10px; line-height: 14px; padding: 0 3px; background: var(--paper); color: {{ l.col }}; pointer-events: none; white-space: nowrap;">{{ l.text }}</span></sc-for>
+          <sc-if value="{{ showHover }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hoverLeft }}; width: 1px; background: var(--neutral-500); pointer-events: none;"></div></sc-if>
+          <sc-if value="{{ showWm }}"><div style="position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); font-family: var(--font-sans-b); font-size: {{ wmFs }}; letter-spacing: 0.08em; color: var(--neutral-200); opacity: 0.55; pointer-events: none; white-space: nowrap;" aria-hidden="true">UFTCL</div></sc-if>
+        </div>
+        <div style="position: relative; border-left: 1px solid var(--neutral-300); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">
+          <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="5"><span style="position: absolute; left: 6px; top: {{ t.top }}; transform: translateY(-50%);">{{ t.label }}</span></sc-for>
+          <sc-for list="{{ dTags }}" as="t" hint-placeholder-count="1"><span style="position: absolute; left: 0; right: 0; top: {{ t.top }}; transform: translateY(-50%); background: var(--blue-700); color: var(--paper); padding: 1px 6px; font-weight: 700;">{{ t.label }}</span></sc-for>
+          <span style="position: absolute; left: 0; right: 0; top: {{ lastTop }}; transform: translateY(-50%); background: {{ lastCol }}; color: #fff; padding: 1px 6px; font-weight: 700;">{{ lastLabel }}</span>
+        </div>
+      </div>
 
-  <sc-if value="{{ rsiOn }}"><div data-screen-label="RSI pane" style="display: grid; grid-template-columns: minmax(0, 1fr) 58px; height: 110px; flex-shrink: 0; border-top: 1px solid var(--ink); position: relative;">
-    <div style="position: relative; min-width: 0;">
-      <svg viewBox="0 0 1000 120" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;" aria-label="RSI">
-        <rect x="0" y="{{ rsiTop }}" width="1000" height="{{ rsiBand }}" fill="var(--neutral-100)"></rect>
-        <line x1="0" x2="1000" y1="{{ rsiTop }}" y2="{{ rsiTop }}" stroke="var(--neutral-400)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>
-        <line x1="0" x2="1000" y1="{{ rsiBot }}" y2="{{ rsiBot }}" stroke="var(--neutral-400)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>
-        <path d="{{ rsiLine }}" fill="none" stroke="var(--blue-700)" stroke-width="1.3" vector-effect="non-scaling-stroke"></path>
-      </svg>
-      <div style="position: absolute; left: 8px; top: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">{{ rsiText }}</div>
-      <sc-if value="{{ showHover }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hoverLeft }}; width: 1px; background: var(--neutral-500); pointer-events: none;"></div></sc-if>
-    </div>
-    <div style="position: relative; border-left: 1px solid var(--neutral-300); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><span style="position: absolute; left: 6px; top: {{ rsiTopPct }}; transform: translateY(-50%);">70</span><span style="position: absolute; left: 6px; top: {{ rsiBotPct }}; transform: translateY(-50%);">30</span></div>
-  </div></sc-if>
+      <sc-if value="{{ rsiOn }}"><div data-screen-label="RSI pane" style="display: grid; grid-template-columns: minmax(0, 1fr) 58px; height: 110px; flex-shrink: 0; border-top: 1px solid var(--neutral-400); position: relative;">
+        <div style="position: relative; min-width: 0;">
+          <svg viewBox="0 0 1000 120" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;" aria-label="RSI">
+            <rect x="0" y="{{ rsiTop }}" width="1000" height="{{ rsiBand }}" fill="var(--neutral-100)"></rect>
+            <line x1="0" x2="1000" y1="{{ rsiTop }}" y2="{{ rsiTop }}" stroke="var(--neutral-400)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>
+            <line x1="0" x2="1000" y1="{{ rsiBot }}" y2="{{ rsiBot }}" stroke="var(--neutral-400)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>
+            <path d="{{ rsiLine }}" fill="none" stroke="var(--blue-700)" stroke-width="1.3" vector-effect="non-scaling-stroke"></path>
+          </svg>
+          <div style="position: absolute; left: 8px; top: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">{{ rsiText }}</div>
+          <sc-if value="{{ showHover }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hoverLeft }}; width: 1px; background: var(--neutral-500); pointer-events: none;"></div></sc-if>
+        </div>
+        <div style="position: relative; border-left: 1px solid var(--neutral-300); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><span style="position: absolute; left: 6px; top: {{ rsiTopPct }}; transform: translateY(-50%);">70</span><span style="position: absolute; left: 6px; top: {{ rsiBotPct }}; transform: translateY(-50%);">30</span></div>
+      </div></sc-if>
 
-  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 58px; height: 24px; flex-shrink: 0; border-top: 1px solid var(--neutral-300);">
-    <div style="position: relative; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ xticks }}" as="x" hint-placeholder-count="6"><span style="position: absolute; top: 5px; left: {{ x.left }}; transform: translateX(-50%); white-space: nowrap;">{{ x.label }}</span></sc-for></div>
-    <span style="border-left: 1px solid var(--neutral-300);"></span>
+      <sc-if value="{{ macdOn }}"><div data-screen-label="MACD pane" style="display: grid; grid-template-columns: minmax(0, 1fr) 58px; height: 130px; flex-shrink: 0; border-top: 1px solid var(--neutral-400); position: relative;">
+        <div style="position: relative; min-width: 0;">
+          <svg viewBox="0 0 1000 120" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;" aria-label="MACD">
+            <line x1="0" x2="1000" y1="60" y2="60" stroke="var(--neutral-300)" stroke-width="1" vector-effect="non-scaling-stroke"></line>
+            <sc-for list="{{ macdBars }}" as="b" hint-placeholder-count="40"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.col }}"></rect></sc-for>
+            <path d="{{ macdLine }}" fill="none" stroke="var(--blue-700)" stroke-width="1.2" vector-effect="non-scaling-stroke"></path>
+            <path d="{{ sigLine }}" fill="none" stroke="var(--red-700)" stroke-width="1.2" vector-effect="non-scaling-stroke"></path>
+          </svg>
+          <div style="position: absolute; left: 8px; top: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">{{ macdText }}</div>
+          <sc-if value="{{ showHover }}"><div style="position: absolute; top: 0; bottom: 0; left: {{ hoverLeft }}; width: 1px; background: var(--neutral-500); pointer-events: none;"></div></sc-if>
+        </div>
+        <div style="position: relative; border-left: 1px solid var(--neutral-300); font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><span style="position: absolute; left: 6px; top: 6px;">{{ macdMax }}</span><span style="position: absolute; left: 6px; top: 50%; transform: translateY(-50%);">0</span><span style="position: absolute; left: 6px; bottom: 6px;">{{ macdMin }}</span></div>
+      </div></sc-if>
+
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 58px; height: 24px; flex-shrink: 0; border-top: 1px solid var(--neutral-300);">
+        <div style="position: relative; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ xticks }}" as="x" hint-placeholder-count="6"><span style="position: absolute; top: 5px; left: {{ x.left }}; transform: translateX(-50%); white-space: nowrap;">{{ x.label }}</span></sc-for></div>
+        <span style="border-left: 1px solid var(--neutral-300);"></span>
+      </div>
+    </div>
   </div>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:620},&quot;code&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;DSEX&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;tf&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;D&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mode&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;compact&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;type&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;candle&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;range&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;1Y&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;overlays&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;panes&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;sync&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;0&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;urlsym&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;0&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;height&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;100%&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:620},&quot;code&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;DSEX&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;tf&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;D&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mode&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;compact&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;type&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;candle&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;range&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;1Y&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;overlays&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;panes&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;sync&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;0&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;urlsym&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;0&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;dates&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;0&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;draw&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;0&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;savekey&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;main&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;height&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;100%&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, code: null, tf: null, type: null, range: null, ov: null, pn: null, menu: null, hover: -1, full: false };
+  state = { ready: !!window.UFT, code: null, tf: null, type: null, range: null, ov: null, pn: null, menu: null, hover: -1, full: false,
+    from: null, to: null, grid: true, wm: true, log: false, theme: 'light',
+    tool: 'cross', pending: null, cur: null, meas: null, dmap: {}, undo: [], redo: [], hideD: false, lockD: false, saved: false };
+
+  readStore(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+  writeStore(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  skey() { return 'uftcl.chart.' + (this.props.savekey || 'main'); }
 
   componentDidMount() {
     this.pid = 'p' + Math.random().toString(36).slice(2);
     if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50);
-    this.onSym = e => { const d = e.detail || {}; if (this.props.sync === '1' && d.src !== this.pid && d.code) this.setState({ code: d.code, hover: -1 }); };
-    this.onKey = e => { if (e.key === 'Escape') this.setState(s => (s.full || s.menu ? { full: false, menu: null } : null)); };
+    this.onSym = e => { const d = e.detail || {}; if (this.props.sync === '1' && d.src !== this.pid && d.code) this.setState({ code: d.code, hover: -1, pending: null, meas: null }); };
+    this.onKey = e => { if (e.key === 'Escape') this.setState(s => (s.full || s.menu || s.pending || s.meas ? { full: false, menu: null, pending: null, meas: null } : null)); };
     window.addEventListener('uft-chart-symbol', this.onSym); window.addEventListener('keydown', this.onKey);
+    if (this.props.draw === '1') {
+      const sv = this.readStore(this.skey());
+      if (sv && typeof sv === 'object') {
+        const P = {}; ['type', 'range', 'theme', 'tf'].forEach(k => { if (typeof sv[k] === 'string') P[k] = sv[k]; }); ['grid', 'wm', 'log'].forEach(k => { if (typeof sv[k] === 'boolean') P[k] = sv[k]; });
+        if (Array.isArray(sv.ov)) P.ov = sv.ov; if (Array.isArray(sv.pn)) P.pn = sv.pn; if (sv.dmap && typeof sv.dmap === 'object') P.dmap = sv.dmap;
+        if (typeof sv.code === 'string' && this.props.urlsym !== '1') P.code = sv.code;
+        this.setState(P);
+      }
+    }
   }
   componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-chart-symbol', this.onSym); window.removeEventListener('keydown', this.onKey); }
 
@@ -125,32 +171,48 @@ class Component extends DCLogic {
     return (this._s[key] = { bars, ma20: sma(cl, 20), ema50: ema(cl, 50), sma100: sma(cl, 100), sma200: sma(cl, 200), macd, sig, hist, rsi: U.rsiSeries(cl, 14) });
   }
 
-  changeSymbol(code) { this.setState({ code, hover: -1 }); window.dispatchEvent(new CustomEvent('uft-chart-symbol', { detail: { code, src: this.pid } })); }
+  changeSymbol(code) { this.setState({ code, hover: -1, pending: null, meas: null }); window.dispatchEvent(new CustomEvent('uft-chart-symbol', { detail: { code, src: this.pid } })); }
+  commit(key, list) { this.setState(s => ({ dmap: { ...s.dmap, [key]: list }, undo: [...s.undo, { key, list: s.dmap[key] || [] }].slice(-50), redo: [], saved: false })); }
+  doUndo() { this.setState(s => { const u = s.undo[s.undo.length - 1]; if (!u) return null; return { undo: s.undo.slice(0, -1), redo: [...s.redo, { key: u.key, list: s.dmap[u.key] || [] }], dmap: { ...s.dmap, [u.key]: u.list }, saved: false }; }); }
+  doRedo() { this.setState(s => { const u = s.redo[s.redo.length - 1]; if (!u) return null; return { redo: s.redo.slice(0, -1), undo: [...s.undo, { key: u.key, list: s.dmap[u.key] || [] }], dmap: { ...s.dmap, [u.key]: u.list }, saved: false }; }); }
 
   renderVals() {
     const U = window.UFT; if (!U || !U.chartBars) return {};
     const st = this.state, P = this.props || {};
-    const isFull = P.mode === 'full';
+    const isFull = P.mode === 'full', canDraw = P.draw === '1';
     let initCode = P.code || 'DSEX';
     if (P.urlsym === '1') { const q = (U.param('symbol', '') || '').toUpperCase(); if (U.bySym[q] || U.indices[q]) initCode = q; }
     const code = st.code || initCode; const tf = st.tf || P.tf || 'D'; const type = st.type || P.type || 'candle'; const range = st.range || P.range || '1Y';
     const ovKeys = st.ov || (P.overlays || '').split(',').filter(Boolean); const pnKeys = st.pn || (P.panes || '').split(',').filter(Boolean);
     const D = this.series(code, tf); const nAll = D.bars.length;
+    const isoD = ts => { const d = new Date(ts); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 
+    const useDates = isFull && P.dates === '1' && tf !== '1m';
     const RANGES = { '3M': 63, '6M': 126, '1Y': 252, '2Y': 504 };
-    let cnt;
-    if (tf === '1m') cnt = nAll; else if (isFull) cnt = Math.max(24, Math.round(RANGES[range] / (tf === 'D' ? 1 : tf === 'W' ? 5 : 21))); else cnt = { D: 120, W: 100, M: 60 }[tf];
-    cnt = Math.min(cnt, nAll); const o0 = nAll - cnt; const bars = D.bars.slice(o0);
+    let cnt, o0 = 0, o1 = nAll; const out = {};
+    if (useDates) {
+      const lastTs = D.bars[nAll - 1].ts; const toIso = st.to || isoD(lastTs); const fromIso = st.from || isoD(lastTs - 365 * 864e5);
+      const fts = new Date(fromIso + 'T00:00:00').getTime(), tts = new Date(toIso + 'T00:00:00').getTime() + 864e5 - 1;
+      let a = D.bars.findIndex(b => b.ts >= fts); if (a < 0) a = Math.max(0, nAll - 24);
+      let e = 0; for (let i = nAll - 1; i >= 0; i--) { if (D.bars[i].ts <= tts) { e = i + 1; break; } }
+      if (e - a < 20) { e = Math.min(nAll, Math.max(e, a + 20)); a = Math.max(0, e - 20); }
+      o0 = a; o1 = e; cnt = o1 - o0; out.from = fromIso; out.to = toIso; out.dMin = isoD(D.bars[0].ts); out.dMax = isoD(lastTs);
+    } else {
+      if (tf === '1m') cnt = nAll; else if (isFull) cnt = Math.max(24, Math.round(RANGES[range] / (tf === 'D' ? 1 : tf === 'W' ? 5 : 21))); else cnt = { D: 120, W: 100, M: 60 }[tf];
+      cnt = Math.min(cnt, nAll); o0 = nAll - cnt; o1 = nAll;
+    }
+    const bars = D.bars.slice(o0, o1);
     const W = 1000, bw = W / cnt, X = i => (i + 0.5) * bw;
     const volOn = !isFull || pnKeys.includes('volume'); const macdOn = isFull && pnKeys.includes('macd'); const rsiOn = isFull && pnKeys.includes('rsi');
 
     const OV = [['ema50', 'EMA(50)', 'var(--red-700)'], ['ma20', 'MA(20)', 'var(--green-700)'], ['sma100', 'SMA(100)', 'var(--blue-700)'], ['sma200', 'SMA(200)', 'var(--neutral-700)']];
     const ovOn = OV.filter(([k]) => ovKeys.includes(k));
-    let mx = Math.max(...bars.map(b => b.h)), mn = Math.min(...bars.map(b => b.l));
-    ovOn.forEach(([k]) => D[k].slice(o0).forEach(v => { if (v != null) { mx = Math.max(mx, v); mn = Math.min(mn, v); } }));
-    const padv = (mx - mn) * 0.06 || 1; mx += padv; mn -= padv;
-    const top = 8, bot = volOn ? 296 : 392; const Y = v => top + (mx - v) / (mx - mn) * (bot - top);
-    const span = mx - mn; const dec = span < 4 ? 2 : span < 60 ? 1 : 0; const f = v => U.fmt(v, dec);
+    let mxP = Math.max(...bars.map(b => b.h)), mnP = Math.min(...bars.map(b => b.l));
+    ovOn.forEach(([k]) => D[k].slice(o0, o1).forEach(v => { if (v != null) { mxP = Math.max(mxP, v); mnP = Math.min(mnP, v); } }));
+    const T = st.log ? Math.log : (x => x), Ti = st.log ? Math.exp : (x => x);
+    let mx = T(mxP), mn = T(mnP); const padv = (mx - mn) * 0.06 || 1; mx += padv; mn -= padv;
+    const top = 8, bot = volOn ? 296 : 392; const Y = v => top + (mx - T(v)) / (mx - mn) * (bot - top); const priceAt = yv => Ti(mx - (yv - top) / (bot - top) * (mx - mn));
+    const span = mx - mn; const spanP = Ti(mx) - Ti(mn); const dec = spanP < 4 ? 2 : spanP < 60 ? 1 : 0; const f = v => U.fmt(v, dec);
     const UPc = 'var(--green-700)', DNc = 'var(--red-700)';
 
     const candles = type === 'candle' ? bars.map((b, i) => { const col = b.c >= b.o ? UPc : DNc; const yo = Y(b.o), yc = Y(b.c); return { cx: X(i).toFixed(2), hy: Y(b.h).toFixed(2), ly: Y(b.l).toFixed(2), x: (X(i) - bw * 0.31).toFixed(2), w: (bw * 0.62).toFixed(2), y: Math.min(yo, yc).toFixed(2), h: Math.max(1, Math.abs(yo - yc)).toFixed(2), col }; }) : [];
@@ -158,49 +220,106 @@ class Component extends DCLogic {
     const vmax = Math.max(...bars.map(b => b.v)) || 1;
     const vols = volOn ? bars.map((b, i) => { const hh = b.v / vmax * 64; return { x: (X(i) - bw * 0.31).toFixed(2), w: (bw * 0.62).toFixed(2), y: (400 - hh).toFixed(2), h: hh.toFixed(2), col: b.c >= b.o ? UPc : DNc }; }) : [];
     const path = arr => { let d = '', on = false; arr.forEach((v, i) => { if (v == null) { on = false; return; } d += (on ? 'L' : 'M') + X(i).toFixed(2) + ' ' + Y(v).toFixed(2); on = true; }); return d; };
-    const overlays = ovOn.map(([k, label, col]) => ({ d: path(D[k].slice(o0)), col }));
+    const overlays = ovOn.map(([k, label, col]) => ({ d: path(D[k].slice(o0, o1)), col }));
 
     const hv = st.hover >= 0 && st.hover < cnt ? st.hover : cnt - 1; const hb = bars[hv];
     const prevC = hv > 0 ? bars[hv - 1].c : (o0 > 0 ? D.bars[o0 - 1].c : hb.o);
     const chgV = hb.c - prevC, chgP = prevC ? chgV / prevC * 100 : 0; const cc = U.tone(chgV);
     const last = bars[cnt - 1]; const lastPrev = cnt > 1 ? bars[cnt - 2].c : last.o; const lastCol = last.c >= lastPrev ? UPc : DNc;
 
-    const grid = [0.1, 0.3, 0.5, 0.7, 0.9].map(q => ({ y: Y(mn + span * q).toFixed(1) }));
-    const ticks = [0.1, 0.3, 0.5, 0.7, 0.9].map(q => { const v = mn + span * (1 - q); return { top: (Y(v) / 4).toFixed(1) + '%', label: f(v) }; });
+    const qs = [0.1, 0.3, 0.5, 0.7, 0.9];
+    const grid = st.grid ? qs.map(q => ({ y: Y(Ti(mn + span * q)).toFixed(1) })) : [];
+    const ticks = qs.map(q => { const v = Ti(mn + span * (1 - q)); return { top: (Y(v) / 4).toFixed(1) + '%', label: f(v) }; });
     const xticks = [0, 1, 2, 3, 4, 5].map(k => { const i = Math.min(cnt - 1, Math.round((k + 0.5) * cnt / 6)); return { left: (X(i) / 10).toFixed(1) + '%', label: bars[i].t }; });
-
     const ovLegend = ovOn.map(([k, label, col]) => { const v = D[k][o0 + hv]; return { label, col, v: v == null ? '' : f(v) }; });
     const isIx = !!U.indices[code]; const NAMES = { DSEX: 'Dhaka Stock Exchange Broad Index', DSES: 'DSE Shariah Index', DS30: 'DSE 30 Index' };
     const full = st.full; const TFL = { '1m': '1m', D: '1D', W: '1W', M: '1M' }[tf];
-    const out = {
-      pos: full ? 'fixed' : 'relative', inset: full ? '0' : 'auto', z: full ? 80 : 'auto', rootH: full ? '100vh' : (P.height || '100%'),
-      isFull, code, tf, symMin: isFull ? '150px' : '90px', symbolOptions: [...Object.keys(U.indices), ...U.symbols].map(c => ({ code: c })),
-      onSymbol: e => this.changeSymbol(e.target.value), onTf: e => this.setState({ tf: e.target.value, hover: -1 }),
+
+    // ---- drawings
+    const dkey = code + '|' + tf; const drawList = canDraw && !st.hideD ? (st.dmap[dkey] || []) : [];
+    const dLines = [], dRects = [], dLabels = [], dTags = [];
+    const BLUE = 'var(--blue-700)'; const LV = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+    const px = pt => ({ x: X(pt.i - o0), y: Y(pt.p) });
+    const addShape = (d, preview) => {
+      const op = preview ? 0.6 : 1, dash = preview ? '4 3' : 'none';
+      if (d.t === 'h') { const y = Y(d.p); dLines.push({ x1: 0, x2: 1000, y1: y.toFixed(1), y2: y.toFixed(1), col: BLUE, w: 1.3, dash, op }); dTags.push({ top: (y / 4).toFixed(1) + '%', label: f(d.p) }); return; }
+      const A = px(d.a), B = px(d.b);
+      if (d.t === 'trend') dLines.push({ x1: A.x.toFixed(1), x2: B.x.toFixed(1), y1: A.y.toFixed(1), y2: B.y.toFixed(1), col: BLUE, w: 1.6, dash, op });
+      if (d.t === 'rect') dRects.push({ x: Math.min(A.x, B.x).toFixed(1), y: Math.min(A.y, B.y).toFixed(1), w: Math.abs(A.x - B.x).toFixed(1), h: Math.abs(A.y - B.y).toFixed(1), col: BLUE, fill: 'color-mix(in srgb, var(--blue-700) 14%, transparent)' });
+      if (d.t === 'fib') { const xl = Math.min(A.x, B.x);
+        LV.forEach(l => { const pr = d.b.p + (d.a.p - d.b.p) * l; const y = Y(pr); dLines.push({ x1: xl.toFixed(1), x2: 1000, y1: y.toFixed(1), y2: y.toFixed(1), col: BLUE, w: 1, dash: l === 0 || l === 1 ? 'none' : '3 3', op: preview ? 0.5 : 0.85 }); dLabels.push({ left: (xl / 10).toFixed(2) + '%', top: (y / 4).toFixed(2) + '%', text: `${l} (${f(pr)})`, col: BLUE }); }); }
+      if (d.t === 'meas') { dLines.push({ x1: A.x.toFixed(1), x2: B.x.toFixed(1), y1: A.y.toFixed(1), y2: B.y.toFixed(1), col: 'var(--orange-t1)', w: 1.5, dash: '5 3', op: 1 });
+        const dp = d.b.p - d.a.p, pc = d.a.p ? dp / d.a.p * 100 : 0; dLabels.push({ left: ((A.x + B.x) / 20).toFixed(2) + '%', top: (Math.min(A.y, B.y) / 4).toFixed(2) + '%', text: `${U.sign(dp, dec)} (${U.sign(pc)}%) · ${Math.abs(d.b.i - d.a.i)} bars`, col: 'var(--orange-t1)' }); }
+    };
+    drawList.forEach(d => addShape(d, false));
+    if (canDraw && !st.hideD) {
+      if (st.meas) addShape({ t: 'meas', a: st.meas.a, b: st.meas.b }, false);
+      const tmap = { trend: 'trend', fib: 'fib', rect: 'rect', measure: 'meas' };
+      if (st.pending && st.cur && tmap[st.tool]) addShape({ t: tmap[st.tool], a: st.pending, b: st.cur }, true);
+    }
+
+    Object.assign(out, {
+      pos: full ? 'fixed' : 'relative', inset: full ? '0' : 'auto', z: full ? 80 : 'auto', rootH: full ? '100vh' : (P.height || '100%'), themeCls: st.theme === 'dark' ? 'cp-dark' : '',
+      isFull, canDraw, showRange: isFull && !useDates, showDates: useDates, code, tf, symMin: isFull ? '150px' : '90px', symbolOptions: [...Object.keys(U.indices), ...U.symbols].map(c => ({ code: c })),
+      onSymbol: e => this.changeSymbol(e.target.value), onTf: e => this.setState({ tf: e.target.value, hover: -1, pending: null, meas: null }),
       tfOpts: [['1m', '1m'], ['D', 'D'], ['W', 'W'], ['M', 'M']].map(([value, label]) => ({ value, label })),
+      onFrom: e => { if (e.target.value) this.setState({ from: e.target.value, hover: -1 }); }, onTo: e => { if (e.target.value) this.setState({ to: e.target.value, hover: -1 }); },
       rangeTabs: ['3M', '6M', '1Y', '2Y'].map(r => ({ label: r, bg: r === range ? 'var(--ink)' : 'var(--paper)', fg: r === range ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ range: r }) })),
       typeTabs: [['candle', 'Candle'], ['line', 'Line']].map(([k, label]) => ({ label, bg: type === k ? 'var(--ink)' : 'var(--paper)', fg: type === k ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ type: k }) })),
-      menuOv: st.menu === 'ov', menuPn: st.menu === 'pn', onOvMenu: () => this.setState(s => ({ menu: s.menu === 'ov' ? null : 'ov' })), onPnMenu: () => this.setState(s => ({ menu: s.menu === 'pn' ? null : 'pn' })), closeMenu: () => this.setState({ menu: null }),
-      ovOpts: OV.map(([k, label, col]) => { const on = ovKeys.includes(k); return { label, col, mark: on ? '✓' : '', bg: on ? 'var(--ink)' : 'var(--paper)', onToggle: () => this.setState({ ov: on ? ovKeys.filter(x => x !== k) : [...ovKeys, k] }) }; }),
-      pnOpts: [['volume', 'Volume'], ['macd', 'MACD (12,26,9)'], ['rsi', 'RSI (14)']].map(([k, label]) => { const on = pnKeys.includes(k); return { label, mark: on ? '✓' : '', bg: on ? 'var(--ink)' : 'var(--paper)', onToggle: () => this.setState({ pn: on ? pnKeys.filter(x => x !== k) : [...pnKeys, k] }) }; }),
+      menuOv: st.menu === 'ov', menuPn: st.menu === 'pn', menuSet: st.menu === 'set',
+      onOvMenu: () => this.setState(s => ({ menu: s.menu === 'ov' ? null : 'ov' })), onPnMenu: () => this.setState(s => ({ menu: s.menu === 'pn' ? null : 'pn' })), onSetMenu: () => this.setState(s => ({ menu: s.menu === 'set' ? null : 'set' })), closeMenu: () => this.setState({ menu: null }),
+      ovOpts: OV.map(([k, label, col]) => { const on = ovKeys.includes(k); return { label, col, mark: on ? '✓' : '', bg: on ? 'var(--ink)' : 'var(--paper)', onToggle: () => this.setState({ ov: on ? ovKeys.filter(x => x !== k) : [...ovKeys, k], saved: false }) }; }),
+      pnOpts: [['volume', 'Volume'], ['macd', 'MACD (12,26,9)'], ['rsi', 'RSI (14)']].map(([k, label]) => { const on = pnKeys.includes(k); return { label, mark: on ? '✓' : '', bg: on ? 'var(--ink)' : 'var(--paper)', onToggle: () => this.setState({ pn: on ? pnKeys.filter(x => x !== k) : [...pnKeys, k], saved: false }) }; }),
+      setOpts: [['grid', 'Grid lines'], ['wm', 'Watermark'], ['log', 'Logarithmic scale']].map(([k, label]) => { const on = !!st[k]; return { label, mark: on ? '✓' : '', bg: on ? 'var(--ink)' : 'var(--paper)', onToggle: () => this.setState({ [k]: !on, saved: false }) }; }),
       onFull: () => this.setState(s => ({ full: !s.full })), fullLabel: full ? 'Exit full screen' : 'Full screen',
       fullIcon: full ? 'M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4' : 'M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4',
-      title: (isIx ? NAMES[code] : U.company(code)) + ' · ' + TFL, titleFs: isFull ? '15px' : '13px', dateLabel: hb.t, wmFs: isFull ? '72px' : '34px', minPlot: isFull ? '300px' : '170px',
+      title: (isIx ? NAMES[code] : U.company(code)) + ' · ' + TFL, titleFs: isFull ? '15px' : '13px', dateLabel: hb.t, wmFs: isFull ? '72px' : '34px', showWm: st.wm, minPlot: isFull ? '300px' : '170px',
       o: f(hb.o), h: f(hb.h), l: f(hb.l), c: f(hb.c), chg: `${U.sign(chgV, dec)} (${U.sign(chgP)}%)`, cc, vol: U.fmtInt(hb.v), legend: ovLegend,
       grid, vols, candles, linePath, overlays, ticks, xticks, lastY: Y(last.c).toFixed(2), lastTop: (Y(last.c) / 4).toFixed(1) + '%', lastLabel: f(last.c), lastCol,
-      onMove: e => { const r = e.currentTarget.getBoundingClientRect(); const i = Math.max(0, Math.min(cnt - 1, Math.floor((e.clientX - r.left) / r.width * cnt))); if (i !== st.hover) this.setState({ hover: i }); },
+      dLines, dRects, dLabels, dTags,
+      onMove: e => { const r = e.currentTarget.getBoundingClientRect(); const i = Math.max(0, Math.min(cnt - 1, Math.floor((e.clientX - r.left) / r.width * cnt)));
+        if (canDraw && st.pending) this.setState({ hover: i, cur: { i: o0 + i, p: priceAt((e.clientY - r.top) / r.height * 400) } }); else if (i !== st.hover) this.setState({ hover: i }); },
       onLeave: () => this.setState({ hover: -1 }), showHover: st.hover >= 0 && st.hover < cnt, hoverLeft: (X(hv) / 10).toFixed(2) + '%',
       macdOn, rsiOn,
-    };
+    });
+
+    // ---- drawing tools rail, undo/redo, theme, save
+    if (canDraw) {
+      const TOOLS = [['cross', 'Crosshair', 'M8 1.500v13M1.500 8h13'], ['trend', 'Trend line', 'M2.500 13.500l11-11M2.500 13.500h.01M13.500 2.500h.01'], ['hline', 'Horizontal line', 'M1.500 8h13M3.500 6v4'], ['fib', 'Fib retracement', 'M2 3h12M2 6.300h12M2 9.700h12M2 13h12'], ['rect', 'Rectangle', 'M3 3.500h10v9H3z'], ['measure', 'Measure', 'M2 11L11 2l3 3-9 9z M5 8l1.500 1.500M7.500 5.500L9 7']];
+      out.tools = TOOLS.map(([k, title, d]) => { const on = st.tool === k; return { title, d, on: on ? 'true' : 'false', bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'transparent', onClick: () => this.setState({ tool: k, pending: null, meas: null }) }; });
+      const T2 = [
+        ['hide', st.hideD ? 'Show drawings' : 'Hide drawings', 'M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5zM8 10a2 2 0 100-4 2 2 0 000 4z', st.hideD, () => this.setState(s => ({ hideD: !s.hideD }))],
+        ['lock', st.lockD ? 'Unlock drawings' : 'Lock drawings', 'M4 7V5a4 4 0 018 0v2M3 7h10v7H3z', st.lockD, () => this.setState(s => ({ lockD: !s.lockD, pending: null }))],
+        ['trash', 'Remove all drawings', 'M3 4h10M6 4V2h4v2M4 4l1 10h6l1-10', false, () => { if (!st.lockD && (st.dmap[dkey] || []).length) this.commit(dkey, []); this.setState({ pending: null, meas: null }); }],
+      ];
+      out.tools2 = T2.map(([k, title, d, on, fn]) => ({ title, d, on: on ? 'true' : 'false', bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'transparent', onClick: fn }));
+      out.onUndo = () => this.doUndo(); out.onRedo = () => this.doRedo(); out.noUndo = st.undo.length === 0; out.noRedo = st.redo.length === 0;
+      out.onTheme = () => this.setState(s => ({ theme: s.theme === 'dark' ? 'light' : 'dark', saved: false })); out.themeLabel = st.theme === 'dark' ? 'Dark' : 'Light';
+      out.saveLabel = st.saved ? 'Saved' : 'Save';
+      out.onSave = () => { const ok = this.writeStore(this.skey(), { code, tf, type, range, ov: ovKeys, pn: pnKeys, theme: st.theme, grid: st.grid, wm: st.wm, log: st.log, dmap: st.dmap }); this.setState({ saved: ok }); };
+      const HINT = { trend: 'Click two points to draw a trend line', fib: 'Click two points to draw Fib levels', rect: 'Click two corners to draw a rectangle', measure: 'Click two points to measure', hline: 'Click to place a horizontal line' };
+      out.hint = st.lockD ? 'Drawings are locked' : st.pending ? 'Click the second point (Esc to cancel)' : (HINT[st.tool] || ''); out.hasHint = !!out.hint;
+      out.onPlotClick = e => {
+        if (st.lockD || st.tool === 'cross') return;
+        const r = e.currentTarget.getBoundingClientRect(); const idx = Math.max(0, Math.min(cnt - 1, Math.floor((e.clientX - r.left) / r.width * cnt)));
+        const pt = { i: o0 + idx, p: priceAt((e.clientY - r.top) / r.height * 400) };
+        const list = st.dmap[dkey] || [];
+        if (st.tool === 'hline') { this.commit(dkey, [...list, { t: 'h', p: pt.p }]); return; }
+        if (!st.pending) { this.setState({ pending: pt, cur: pt, meas: null }); return; }
+        if (st.tool === 'measure') { this.setState({ meas: { a: st.pending, b: pt }, pending: null }); return; }
+        this.commit(dkey, [...list, { t: st.tool, a: st.pending, b: pt }]); this.setState({ pending: null });
+      };
+    } else { out.onPlotClick = () => {}; out.hasHint = false; out.hint = ''; }
 
     if (macdOn) {
-      const m = D.macd.slice(o0), sg = D.sig.slice(o0), hs = D.hist.slice(o0); const ext = Math.max(...m.map(Math.abs), ...sg.map(Math.abs), ...hs.map(Math.abs)) || 1;
+      const m = D.macd.slice(o0, o1), sg = D.sig.slice(o0, o1), hs = D.hist.slice(o0, o1); const ext = Math.max(...m.map(Math.abs), ...sg.map(Math.abs), ...hs.map(Math.abs)) || 1;
       const Y2 = v => 60 - v / ext * 52; const line = a => a.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(2) + ' ' + Y2(v).toFixed(2)).join('');
       out.macdBars = hs.map((v, i) => ({ x: (X(i) - bw * 0.3).toFixed(2), w: (bw * 0.6).toFixed(2), y: Math.min(Y2(v), 60).toFixed(2), h: Math.max(0.5, Math.abs(Y2(v) - 60)).toFixed(2), col: v >= 0 ? UPc : DNc }));
       out.macdLine = line(m); out.sigLine = line(sg); out.macdMax = U.fmt(ext, ext < 10 ? 2 : 0); out.macdMin = U.fmt(-ext, ext < 10 ? 2 : 0);
       out.macdText = `MACD(12,26,9)  DIFF: ${U.fmt(m[hv], 2)}  DEA: ${U.fmt(sg[hv], 2)}  MACD: ${U.fmt(hs[hv], 2)}`;
     }
     if (rsiOn) {
-      const rs = D.rsi.slice(o0); const Y3 = v => 4 + (100 - v) / 100 * 112;
+      const rs = D.rsi.slice(o0, o1); const Y3 = v => 4 + (100 - v) / 100 * 112;
       out.rsiLine = rs.map((v, i) => v == null ? '' : ((rs[i - 1] == null ? 'M' : 'L') + X(i).toFixed(2) + ' ' + Y3(v).toFixed(2))).join('');
       out.rsiTop = Y3(70).toFixed(1); out.rsiBot = Y3(30).toFixed(1); out.rsiBand = (Y3(30) - Y3(70)).toFixed(1); out.rsiTopPct = (Y3(70) / 1.2).toFixed(1) + '%'; out.rsiBotPct = (Y3(30) / 1.2).toFixed(1) + '%';
       out.rsiText = `RSI(14)  ${rs[hv] == null ? '-' : U.fmt(rs[hv], 2)}`;

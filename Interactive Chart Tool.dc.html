@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Interactive Chart — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.ic-wrap { display: grid; height: 820px; border: 0; min-width: 0; }
+.ic-rail { border: 1px solid var(--ink); border-left: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; background: var(--paper); }
+.ic-railbtn { width: 34px; height: 34px; box-sizing: border-box; border: 1px solid transparent; background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.ic-railbtn:hover { background: var(--neutral-100); }
+.ic-panel { border: 1px solid var(--ink); border-left: 0; display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--paper); }
+.ic-row { display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 64px; align-items: center; height: 32px; border-bottom: 1px solid var(--neutral-200); font-size: 13px; cursor: pointer; }
+.ic-row:hover { background: var(--neutral-50); }
+@media (max-width: 900px) { .ic-wrap { height: auto; grid-template-columns: 1fr !important; } .ic-chart { height: 700px; } .ic-rail { flex-direction: row; border-left: 1px solid var(--ink); border-top: 0; } .ic-panel { height: 420px; border-left: 1px solid var(--ink); border-top: 0; } }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+
+  <div class="ic-wrap" data-screen-label="Interactive chart" style="grid-template-columns: {{ cols }};">
+    <div class="ic-chart" style="min-width: 0; min-height: 0; display: grid;"><dc-import name="ChartPane" mode="full" draw="1" code="DSEX" tf="D" range="1Y" overlays="" panes="volume,rsi,macd" urlsym="1" sync="1" savekey="interactive" height="100%" hint-size="100%,820px"></dc-import></div>
+
+    <sc-if value="{{ panelOpen }}"><aside class="ic-panel" data-screen-label="{{ panelTitle }}">
+      <div style="display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 12px; border-bottom: 1px solid var(--ink);"><b style="font-size: 14px;">{{ panelTitle }}</b><button onClick="{{ closePanel }}" aria-label="Close panel" style="width: 28px; height: 28px; border: 0; background: transparent; color: var(--ink); cursor: pointer; font-size: 18px; line-height: 1;">×</button></div>
+
+      <sc-if value="{{ isWatch }}"><div style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+        <div style="display: flex; gap: 6px; padding: 8px; border-bottom: 1px solid var(--neutral-300);">
+          <select onChange="{{ onList }}" value="{{ list }}" aria-label="Watchlist" style="font: inherit; font-size: 13px; font-weight: 700; flex: 1; min-width: 0; height: 32px; padding: 0 6px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;"><sc-for list="{{ listOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
+        </div>
+        <div style="padding: 8px; border-bottom: 1px solid var(--neutral-300);"><input type="search" placeholder="Search symbol" value="{{ q }}" onChange="{{ onQ }}" aria-label="Search symbol" style="font: inherit; font-size: 13px; width: 100%; box-sizing: border-box; height: 32px; padding: 0 10px; border: 1px solid var(--neutral-400); background: var(--paper); color: var(--ink);"></div>
+        <div style="display: grid; grid-template-columns: 30px minmax(0, 1fr) 64px 64px; align-items: center; height: 28px; background: var(--neutral-100); border-bottom: 1px solid var(--neutral-300); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);"><span></span><span>Symbol</span><span style="text-align: right;">Last</span><span style="text-align: right; padding-right: 8px;">Chg%</span></div>
+        <div style="flex: 1; overflow-y: auto; min-height: 0;"><sc-for list="{{ rows }}" as="r" hint-placeholder-count="12"><div class="ic-row" onClick="{{ r.onPick }}" style="background: {{ r.bg }};"><button onClick="{{ r.onFav }}" aria-label="{{ r.favLabel }}" style="font: inherit; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 32px; color: {{ r.favCol }};"><svg width="13" height="13" viewBox="0 0 16 16" fill="{{ r.favFill }}" stroke="currentColor" stroke-width="1.3"><path d="M8 13.500S2 9.800 2 6a3 3 0 015.200-2L8 4.800 8.800 4A3 3 0 0114 6c0 3.800-6 7.500-6 7.500z"></path></svg></button><span style="font-weight: {{ r.fw }};">{{ r.code }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ r.last }}</span><span style="text-align: right; padding-right: 8px; font-family: var(--font-mono); color: {{ r.tone }};">{{ r.pct }}</span></div></sc-for>
+          <sc-if value="{{ noRows }}"><div style="padding: 20px 12px; font-size: 13px; color: var(--text-muted); text-align: center;">{{ emptyText }}</div></sc-if></div>
+      </div></sc-if>
+
+      <sc-if value="{{ isInfo }}"><div style="flex: 1; overflow-y: auto; min-height: 0;">
+        <div style="padding: 14px 12px; border-bottom: 1px solid var(--neutral-300); display: flex; flex-direction: column; gap: 4px;"><b style="font-size: 15px;">{{ infoName }}</b><span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">{{ infoCode }}</span><div style="display: flex; align-items: baseline; gap: 10px; font-family: var(--font-mono); margin-top: 4px;"><b style="font-size: 22px;">{{ infoLtp }}</b><span style="color: {{ infoTone }};">{{ infoChg }}</span></div></div>
+        <sc-for list="{{ infoRows }}" as="i" hint-placeholder-count="10"><div style="display: flex; justify-content: space-between; gap: 12px; padding: 9px 12px; border-bottom: 1px solid var(--neutral-200); font-size: 13px;"><span style="color: var(--text-muted);">{{ i.label }}</span><span style="font-family: var(--font-mono); font-weight: 700; text-align: right;">{{ i.value }}</span></div></sc-for>
+        <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"><a href="{{ pageHref }}" style="height: 36px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;" style-hover="background: var(--ink); color: var(--paper);">{{ pageLabel }}</a><a href="{{ stockChartHref }}" style="height: 36px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;" style-hover="background: var(--ink); color: var(--paper);">Open stock chart</a></div>
+      </div></sc-if>
+    </aside></sc-if>
+
+    <div class="ic-rail" data-screen-label="Side rail">
+      <sc-for list="{{ rail }}" as="b" hint-placeholder-count="2"><button class="ic-railbtn" onClick="{{ b.onClick }}" title="{{ b.title }}" aria-label="{{ b.title }}" aria-pressed="{{ b.on }}" style="background: {{ b.bg }}; color: {{ b.fg }}; border-color: {{ b.bd }};"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="{{ b.d }}"></path></svg></button></sc-for>
+    </div>
+  </div>
+
+  <dc-import name="SymbolIndex" page="Interactive Chart Tool" hint-size="100%,120px"></dc-import>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, code: null, panel: null, list: 'all', q: '', favs: ['GP', 'BATBC'] };
+  readStore(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+  writeStore(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+  componentDidMount() {
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50);
+    const f = this.readStore('uftcl.chart.favs'); if (Array.isArray(f)) this.setState({ favs: f });
+    this.onSym = e => { const d = e.detail || {}; if (d.code) this.setState({ code: d.code }); };
+    window.addEventListener('uft-chart-symbol', this.onSym);
+  }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('uft-chart-symbol', this.onSym); }
+  pick(code) { this.setState({ code }); window.dispatchEvent(new CustomEvent('uft-chart-symbol', { detail: { code, src: 'page' } })); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt, fmtInt, sign, tone } = U;
+    const q0 = (U.param('symbol', '') || '').toUpperCase(); const init = U.bySym[q0] || U.indices[q0] ? q0 : 'DSEX';
+    const code = st.code || init; const S = U.bySym[code], IX = U.indices[code];
+    const ix = Object.keys(U.indices).map(c => ({ code: c, last: U.indices[c].value, pct: U.indices[c].pct, d: 2 }));
+    const stocks = U.stocks.slice().sort((a, b) => a.code.localeCompare(b.code)).map(s => ({ code: s.code, last: s.ltp, pct: s.changePct, d: 1, s }));
+    const LISTS = { all: ['All symbols', () => [...ix, ...stocks]], fav: ['Favourites', () => [...ix, ...stocks].filter(r => st.favs.includes(r.code))], gain: ['Top gainers', () => stocks.slice().sort((a, b) => b.pct - a.pct).slice(0, 15)], lose: ['Top losers', () => stocks.slice().sort((a, b) => a.pct - b.pct).slice(0, 15)], idx: ['Indices', () => ix] };
+    const qq = st.q.trim().toUpperCase();
+    const rows = LISTS[st.list][1]().filter(r => !qq || r.code.includes(qq)).map(r => { const on = st.favs.includes(r.code);
+      return { code: r.code, last: fmt(r.last, r.d), pct: sign(r.pct) + '%', tone: tone(r.pct), bg: r.code === code ? 'var(--neutral-100)' : 'var(--paper)', fw: r.code === code ? 700 : 400,
+        favLabel: (on ? 'Remove ' : 'Add ') + r.code + (on ? ' from' : ' to') + ' favourites', favCol: on ? 'var(--red-700)' : 'var(--neutral-500)', favFill: on ? 'currentColor' : 'none',
+        onPick: () => this.pick(r.code), onFav: e => { e.stopPropagation(); const favs = on ? st.favs.filter(c => c !== r.code) : [...st.favs, r.code]; this.writeStore('uftcl.chart.favs', favs); this.setState({ favs }); } }; });
+    const NAMES = { DSEX: 'Dhaka Stock Exchange Broad Index', DSES: 'DSE Shariah Index', DS30: 'DSE 30 Index' };
+    const infoRows = S ? [['Sector', S.sector], ['Category', S.cat], ['Open', fmt(S.open, 1)], ['High', fmt(S.high, 1)], ['Low', fmt(S.low, 1)], ['Prev. close', fmt(S.ycp, 1)], ['Volume', fmtInt(S.volume)], ['Value (mn)', fmt(S.value, 2)], ['Audited PE', S.pe > 0 ? fmt(S.pe, 2) : '-'], ['EPS', fmt(S.eps, 2)], ['NAV', fmt(S.nav, 2)], ['52-week range', `${fmt(S.w52l, 1)} – ${fmt(S.w52h, 1)}`]]
+      : [['Open', fmt(IX.open, 2)], ['High', fmt(IX.high, 2)], ['Low', fmt(IX.low, 2)], ['Prev. close', fmt(IX.prev, 2)], ['52-week range', `${fmt(IX.w52l, 2)} – ${fmt(IX.w52h, 2)}`], ['6-month return', sign(IX.ret6m) + '%'], ['1-year return', sign(IX.ret1y) + '%']];
+    const open = st.panel; const toggle = k => () => this.setState(s => ({ panel: s.panel === k ? null : k }));
+    const RAIL = [['watch', 'Watchlist', 'M2 3.500h12M2 8h12M2 12.500h8'], ['info', 'Instrument details', 'M8 14A6 6 0 108 2a6 6 0 000 12zM8 7.500V11M8 5.200h.01']];
+    return {
+      cols: open ? 'minmax(0, 1fr) 300px 44px' : 'minmax(0, 1fr) 44px', panelOpen: !!open, isWatch: open === 'watch', isInfo: open === 'info', panelTitle: open === 'watch' ? 'Watchlist' : 'Instrument details', closePanel: () => this.setState({ panel: null }),
+      rail: RAIL.map(([k, title, d]) => ({ title, d, on: open === k ? 'true' : 'false', bg: open === k ? 'var(--ink)' : 'var(--paper)', fg: open === k ? 'var(--paper)' : 'var(--ink)', bd: open === k ? 'var(--ink)' : 'transparent', onClick: toggle(k) })),
+      list: st.list, listOpts: Object.keys(LISTS).map(k => ({ value: k, label: LISTS[k][0] })), onList: e => this.setState({ list: e.target.value }), q: st.q, onQ: e => this.setState({ q: e.target.value }),
+      rows, noRows: rows.length === 0, emptyText: st.list === 'fav' && !qq ? 'No favourites yet. Tap the heart next to a symbol.' : 'No symbols match.',
+      infoName: S ? U.company(code) : NAMES[code], infoCode: code, infoLtp: fmt(S ? S.ltp : IX.value, S ? 1 : 2), infoChg: `${sign(S ? S.change : IX.change)} (${sign(S ? S.changePct : IX.pct)}%)`, infoTone: tone(S ? S.change : IX.change),
+      infoRows: infoRows.map(([label, value]) => ({ label, value })), pageHref: S ? U.href('Stock Chart', { symbol: code }) : U.href('Market Watch', { symbol: code }), pageLabel: S ? 'Open instrument page' : 'Open market watch', stockChartHref: U.href('Stock Chart Tool', { symbol: code }),
+    };
+  }
+}
+</script>
+</body>
+</html>
