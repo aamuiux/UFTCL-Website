@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Trend — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.tl-ctl { font: inherit; font-size: 13px; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.tl-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tl-btn:hover { background: var(--ink); color: var(--paper); }
+
+
+
+
+.tr-slot { font: inherit; font-size: 13px; height: 32px; width: 100%; box-sizing: border-box; padding: 0 8px; border: 1px solid var(--neutral-400); background: var(--paper); color: var(--ink); min-width: 0; }
+.tr-slot:focus { border-color: var(--ink); }
+.tr-cell { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; font-size: 13px; }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="tools" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Trend</h1>
+  <div style="color: var(--text-muted);">See whether price sits above or below an indicator across nine time frames, from one minute to one month.</div>
+</section>
+
+<div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; height: 36px; padding: 0 16px; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+
+<section style="border: 1px solid var(--ink); overflow-x: auto;"><div style="min-width: 1120px;">
+  <div style="display: grid; grid-template-columns: {{ gridCols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); align-items: stretch;">
+    <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+      <sc-if value="{{ isInd }}"><label style="display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">Instrument<select class="tr-slot" value="{{ symbol }}" onChange="{{ onSymbol }}"><sc-for list="{{ symOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o }}">{{ o }}</option></sc-for></select></label></sc-if>
+      <sc-if value="{{ isStock }}"><label style="display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">Indicator<select class="tr-slot" value="{{ topInd }}" onChange="{{ onTopInd }}"><sc-for list="{{ indOpts }}" as="o" hint-placeholder-count="10"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">Value<input class="tr-slot" value="{{ topP }}" onChange="{{ onTopP }}" placeholder="{{ topPh }}"></label></sc-if>
+    </div>
+    <sc-for list="{{ heads }}" as="h" hint-placeholder-count="10"><div style="display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; padding: 8px 0; border-left: 1px solid var(--neutral-300);">{{ h }}</div></sc-for>
+  </div>
+  <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: {{ gridCols }}; border-top: 1px solid var(--neutral-200); background: {{ r.bg }}; align-items: center;">
+    <div style="padding: 6px 12px; display: grid; grid-template-columns: {{ r.lc }}; gap: 8px; align-items: center;">
+      <select class="tr-slot" aria-label="{{ r.label }}" value="{{ r.sel }}" onChange="{{ r.onSel }}"><option value="">{{ r.empty }}</option><sc-for list="{{ r.opts }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+      <sc-if value="{{ r.hasP }}"><input class="tr-slot" aria-label="Indicator value" value="{{ r.p }}" onChange="{{ r.onP }}" placeholder="{{ r.ph }}" disabled="{{ r.pOff }}"></sc-if>
+    </div>
+    <sc-for list="{{ r.cells }}" as="c"><div class="tr-cell" style="border-left: 1px solid var(--neutral-200);" title="{{ c.title }}"><span aria-label="{{ c.title }}" style="color: {{ c.fg }}; font-size: 15px;">{{ c.mark }}</span></div></sc-for>
+    <div class="tr-cell" style="border-left: 1px solid var(--neutral-300); font-family: var(--font-mono);" title="{{ r.sum.title }}"><span aria-label="{{ r.sum.title }}" style="color: {{ r.sum.fg }}; font-size: 15px;">{{ r.sum.mark }}</span>{{ r.sum.pct }}</div>
+  </div></sc-for>
+  <div style="display: grid; grid-template-columns: {{ gridCols }}; border-top: 1px solid var(--ink); background: var(--neutral-100); align-items: center;">
+    <div style="padding: 12px; font-weight: 700; text-align: center;">Column summary</div>
+    <sc-for list="{{ colSum }}" as="c"><div class="tr-cell" style="border-left: 1px solid var(--neutral-300); font-family: var(--font-mono);" title="{{ c.title }}"><span aria-label="{{ c.title }}" style="color: {{ c.fg }}; font-size: 15px;">{{ c.mark }}</span>{{ c.pct }}</div></sc-for>
+    <div></div>
+  </div>
+</div></section>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;">
+  <div style="display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px; color: var(--text-muted);"><span><b style="color: var(--green-700);">▲</b> price above the indicator (bullish)</span><span><b style="color: var(--red-700);">▼</b> price below the indicator (bearish)</span><span>[ % ] share of cells that agree with the majority</span></div>
+  <div style="display: flex; align-items: center; gap: 12px;"><span role="status" style="font-size: 13px; color: var(--text-muted);">{{ note }}</span><button class="tl-btn" onClick="{{ onSave }}">Save my settings</button></div>
+</div>
+<div style="font-size: 12px; color: var(--text-muted);">Day, week and month columns use daily, weekly and monthly bars. Intraday columns (1M to 4H) are simulated from the latest price in this preview.</div>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, tab: null, symbol: 'DSEX', topInd: 'MA', topP: '20', note: '',
+    irows: [{ ind: 'MA', p: '50' }, { ind: 'MA', p: '100' }, { ind: 'MA', p: '200' }, { ind: 'EMA', p: '15' }, { ind: '', p: '' }], srows: ['DSEX', 'ABBANK', 'ARAMITCEM', 'RAKCERAMIC', ''] };
+  TF = ['1M', '5M', '15M', '30M', '1H', '4H', 'D', 'W', 'MN'];
+  IND = { MA: { l: 'MA (Moving average)', p: '20' }, EMA: { l: 'EMA (Exponential MA)', p: '20' }, RSI: { l: 'RSI', p: '14' }, MACD: { l: 'MACD', p: '12,26,9' }, STO: { l: 'Stochastic', p: '14' }, CCI: { l: 'CCI', p: '20' }, MFI: { l: 'MFI', p: '14' }, WILLR: { l: 'Williams %R', p: '14' }, ROC: { l: 'ROC', p: '12' }, MOM: { l: 'Momentum', p: '10' }, BBPB: { l: 'Bollinger %B', p: '20,2' } };
+  componentDidMount() { try { const s = JSON.parse(localStorage.getItem('uftcl.trend') || 'null'); if (s && s.irows && s.srows) this.setState({ irows: s.irows, srows: s.srows, symbol: s.symbol || 'DSEX', topInd: s.topInd || 'MA', topP: s.topP || '20' }); } catch (e) { /* ignore */ }
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  series(U, code, tf) {
+    this._c = this._c || {}; const key = code + '|' + tf; if (this._c[key]) return this._c[key];
+    let out;
+    if (tf === 'D' || tf === 'W' || tf === 'MN') out = U.chartBars(code, tf === 'MN' ? 'M' : tf).slice(-400);
+    else { const S = U.bySym[code], IX = U.indices[code]; const last = S ? S.ltp : IX.value; const vol = [0.0006, 0.0012, 0.002, 0.003, 0.0045, 0.008][this.TF.indexOf(tf)]; const r = U.rng(U.hash(code + tf)); const n = 300; const c = new Array(n); c[n - 1] = last;
+      for (let i = n - 1; i > 0; i--) c[i - 1] = c[i] / (1 + (r() - 0.5) * 2 * vol); out = c.map((x, i) => ({ c: x, h: x * (1 + vol * 0.4), l: x * (1 - vol * 0.4), v: 1000 + r() * 4000 })); }
+    return (this._c[key] = out);
+  }
+  sma(a, n) { const o = []; let s = 0; a.forEach((v, i) => { s += v; if (i >= n) s -= a[i - n]; o.push(i >= n - 1 ? s / n : NaN); }); return o; }
+  ema(a, n) { const k = 2 / (n + 1); const o = []; let e = a[0]; a.forEach((v, i) => { e = i ? v * k + e * (1 - k) : v; o.push(e); }); return o; }
+  // +1 bullish, -1 bearish, 0 not enough data
+  signal(bars, ind, ps) {
+    const c = bars.map(b => b.c), h = bars.map(b => b.h), l = bars.map(b => b.l), v = bars.map(b => b.v), n = c.length - 1; const p = ps.length ? ps : [parseFloat(this.IND[ind].p)];
+    const k = p[0] || 14; if (n < Math.max(k, 26) + 2 && !['MA', 'EMA'].includes(ind)) return 0; if (n < k) return 0;
+    const sg = x => (isNaN(x) ? 0 : x > 0 ? 1 : x < 0 ? -1 : 0); const tp = bars.map(b => (b.h + b.l + b.c) / 3);
+    switch (ind) {
+      case 'MA': return sg(c[n] - this.sma(c, k)[n]);
+      case 'EMA': return sg(c[n] - this.ema(c, k)[n]);
+      case 'RSI': { let g = 0, d = 0; for (let i = 1; i <= k; i++) { const x = c[i] - c[i - 1]; if (x > 0) g += x; else d -= x; } g /= k; d /= k; for (let i = k + 1; i <= n; i++) { const x = c[i] - c[i - 1]; g = (g * (k - 1) + Math.max(x, 0)) / k; d = (d * (k - 1) + Math.max(-x, 0)) / k; } return sg((d === 0 ? 100 : 100 - 100 / (1 + g / d)) - 50); }
+      case 'MACD': { const m = this.ema(c, p[0] || 12).map((x, i) => x - this.ema(c, p[1] || 26)[i]); const s = this.ema(m, p[2] || 9); return sg(m[n] - s[n]); }
+      case 'STO': { const H = Math.max(...h.slice(n - k + 1)), L = Math.min(...l.slice(n - k + 1)); return sg(H === L ? 0 : (c[n] - L) / (H - L) * 100 - 50); }
+      case 'CCI': { const m = this.sma(tp, k)[n]; return sg(tp[n] - m); }
+      case 'MFI': { let pos = 0, neg = 0; for (let i = n - k + 1; i <= n; i++) { const f = tp[i] * v[i]; if (tp[i] > tp[i - 1]) pos += f; else if (tp[i] < tp[i - 1]) neg += f; } return sg((neg === 0 ? 100 : 100 - 100 / (1 + pos / neg)) - 50); }
+      case 'WILLR': { const H = Math.max(...h.slice(n - k + 1)), L = Math.min(...l.slice(n - k + 1)); return sg(H === L ? 0 : -(H - c[n]) / (H - L) * 100 + 50); }
+      case 'ROC': return sg(c[n] - c[n - k]);
+      case 'MOM': return sg(c[n] - c[n - k]);
+      case 'BBPB': { const mean = this.sma(c, k)[n]; return sg(c[n] - mean); }
+    } return 0;
+  }
+  summarize(vals) { const up = vals.filter(x => x > 0).length, dn = vals.filter(x => x < 0).length, tot = up + dn; if (!tot) return { dir: 0, pct: '' }; const dir = up >= dn ? 1 : -1; return { dir, pct: '[' + Math.round(Math.max(up, dn) / tot * 100) + '%]' }; }
+  mark(d) { return d > 0 ? { mark: '▲', fg: 'var(--green-700)', title: 'Bullish' } : d < 0 ? { mark: '▼', fg: 'var(--red-700)', title: 'Bearish' } : { mark: '-', fg: 'var(--neutral-400)', title: 'No signal' }; }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const tab = st.tab || (U.param('tab', '') === 'stock' ? 'stock' : 'ind'); const isInd = tab === 'ind';
+    const parse = s => (s || '').split(',').map(x => parseFloat(x)).filter(x => !isNaN(x));
+    const sym = [...Object.keys(U.indices), ...U.symbols]; const indOpts = Object.keys(this.IND).map(k => ({ v: k, l: this.IND[k].l }));
+    const grid = []; // matrix of signals
+    let rows;
+    if (isInd) {
+      rows = st.irows.map((r, i) => { const sigs = this.TF.map(tf => r.ind ? this.signal(this.series(U, st.symbol, tf), r.ind, parse(r.p)) : null); grid.push(sigs);
+        const set = patch => this.setState(s => ({ irows: s.irows.map((x, k) => k === i ? { ...x, ...patch } : x) }));
+        return { sel: r.ind, label: 'Indicator ' + (i + 1), empty: 'Select indicator', opts: indOpts, onSel: e => set({ ind: e.target.value, p: e.target.value ? this.IND[e.target.value].p : '' }), hasP: true, p: r.p, ph: r.ind ? this.IND[r.ind].p : 'Value', pOff: !r.ind, onP: e => set({ p: e.target.value }), lc: 'minmax(0, 1fr) 84px', sigs }; });
+    } else {
+      const ps = parse(st.topP);
+      rows = st.srows.map((code, i) => { const sigs = this.TF.map(tf => code ? this.signal(this.series(U, code, tf), st.topInd, ps) : null); grid.push(sigs);
+        return { sel: code, label: 'Instrument ' + (i + 1), empty: 'Select symbol', opts: sym.map(s => ({ v: s, l: s })), onSel: e => this.setState(s => ({ srows: s.srows.map((x, k) => k === i ? e.target.value : x) })), hasP: false, lc: 'minmax(0, 1fr)', sigs }; });
+    }
+    const out = rows.map((r, i) => { const vals = r.sigs; const filled = vals[0] !== null; const s = filled ? this.summarize(vals) : { dir: 0, pct: '' }; const m = this.mark(s.dir);
+      return { ...r, bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)', cells: vals.map(v => v === null ? { mark: '-', fg: 'var(--neutral-400)', title: 'Empty' } : this.mark(v)), sum: { ...m, pct: filled ? s.pct : '' } }; });
+    const colSum = this.TF.map((_, c) => { const s = this.summarize(grid.map(g => g[c]).filter(x => x !== null)); return { ...this.mark(s.dir), pct: s.pct }; });
+    const save = () => { try { localStorage.setItem('uftcl.trend', JSON.stringify({ irows: st.irows, srows: st.srows, symbol: st.symbol, topInd: st.topInd, topP: st.topP })); this.setState({ note: 'Settings saved in this browser.' }); } catch (e) { this.setState({ note: 'Could not save in this browser.' }); } };
+    const go = k => { this.setState({ tab: k, note: '' }); try { history.replaceState(null, '', k === 'stock' ? 'Trend.dc.html?tab=stock' : 'Trend.dc.html'); } catch (e) { /* no history */ } };
+    return { tabs: [['ind', 'Trend of indicator'], ['stock', 'Trend analysis of stock']].map(([k, l]) => ({ label: l, sel: tab === k ? 'true' : 'false', bg: tab === k ? 'var(--ink)' : 'var(--paper)', fg: tab === k ? 'var(--paper)' : 'var(--ink)', bd: tab === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => go(k) })),
+      isInd, isStock: !isInd, symbol: st.symbol, symOpts: sym, onSymbol: e => this.setState({ symbol: e.target.value }), topInd: st.topInd, indOpts, onTopInd: e => this.setState({ topInd: e.target.value, topP: this.IND[e.target.value].p }), topP: st.topP, topPh: this.IND[st.topInd].p, onTopP: e => this.setState({ topP: e.target.value }),
+      gridCols: 'minmax(320px, 2.6fr) repeat(9, minmax(64px, 1fr)) minmax(100px, 1fr)', heads: [...this.TF, 'Row summary'], rows: out, colSum, note: st.note, onSave: save };
+  }
+}
+</script>
+</body>
+</html>
