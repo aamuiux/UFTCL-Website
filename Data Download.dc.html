@@ -26,8 +26,13 @@ a:hover { color: var(--blue-700); }
 
 
 
-.dd-th { font: inherit; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 0; background: transparent; color: var(--ink); cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px; width: 100%; }
-.dd-row { display: grid; align-items: center; gap: 0 12px; padding: 0 12px; min-height: 38px; font-size: 14px; }
+.dd-th { font: inherit; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 0; background: transparent; color: var(--ink); cursor: pointer; padding: 0; display: flex; align-items: center; gap: 4px; width: 100%; }
+.dd-row { display: grid; align-items: center; gap: 0 12px; padding: 0 12px; }
+.dd-chip { font: inherit; font-size: 14px; height: 36px; padding: 0 14px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.dd-chip:hover:not(:disabled) { border-color: var(--ink); }
+.dd-chip:disabled { cursor: default; }
+.dd-icon { width: 36px; padding: 0; justify-content: center; }
+.dd-link { font: inherit; font-size: 12px; border: 0; background: none; padding: 0; text-decoration: underline; cursor: pointer; color: var(--ink); }
 </style>
 </helmet>
 <div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
@@ -46,23 +51,55 @@ a:hover { color: var(--blue-700); }
     <select class="tl-ctl" aria-label="Category" value="{{ cat }}" onChange="{{ onCat }}"><sc-for list="{{ catOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
     <span style="font-size: 13px; color: var(--text-muted);">{{ countLabel }}</span>
     <span style="flex: 1;"></span>
-    <button class="tl-btn" onClick="{{ onCols }}" aria-haspopup="true" aria-expanded="{{ colsStr }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 8h12M2 13h12"></path></svg>Select columns</button>
+    <button class="tl-btn" onClick="{{ onOpenModal }}" aria-haspopup="dialog"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 8h12M2 13h12"></path></svg>Select columns</button>
+    <button class="tl-btn" onClick="{{ onGear }}" aria-label="Table settings" aria-haspopup="true" aria-expanded="{{ gearStr }}" title="Table settings" style="width: 36px; padding: 0; justify-content: center;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.2"></circle><path d="M8 1.500v2M8 12.500v2M1.500 8h2M12.500 8h2M3.400 3.400l1.400 1.400M11.200 11.200l1.400 1.400M12.600 3.400l-1.400 1.400M4.800 11.200l-1.400 1.400"></path></svg></button>
     <button class="tl-btn" onClick="{{ onDownload }}" style="background: var(--ink); color: var(--paper);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M4.500 7L8 10.500 11.500 7M2 13.500h12"></path></svg>Download CSV</button>
-    <sc-if value="{{ colsOpen }}"><div>
-      <div onClick="{{ onCols }}" style="position: fixed; inset: 0; z-index: 40;"></div>
-      <div role="dialog" aria-label="Select columns" style="position: absolute; right: 0; top: 44px; z-index: 41; width: 260px; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset);">
-        <div style="display: flex; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--ink); font-size: 13px; font-weight: 700;"><span>Columns</span><span style="display: flex; gap: 12px; font-weight: 400;"><button onClick="{{ onAll }}" style="font: inherit; border: 0; background: none; text-decoration: underline; cursor: pointer; padding: 0;">All</button><button onClick="{{ onDefault }}" style="font: inherit; border: 0; background: none; text-decoration: underline; cursor: pointer; padding: 0;">Reset</button></span></div>
-        <div style="max-height: 320px; overflow: auto; padding: 4px 0;"><sc-for list="{{ colOpts }}" as="c" hint-placeholder-count="14"><label style="display: flex; align-items: center; gap: 10px; padding: 6px 12px; cursor: pointer; font-size: 13px;"><input type="checkbox" checked="{{ c.on }}" onChange="{{ c.toggle }}" style="margin: 0;">{{ c.label }}</label></sc-for></div>
+    <sc-if value="{{ gearOpen }}"><div>
+      <div onClick="{{ onGear }}" style="position: fixed; inset: 0; z-index: 40;"></div>
+      <div role="dialog" aria-label="Table settings" style="position: absolute; right: 0; top: 44px; z-index: 41; width: 300px; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset);">
+        <div style="padding: 10px 12px; border-bottom: 1px solid var(--neutral-300); display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;">Density</span>
+          <button onClick="{{ onCompact }}" aria-pressed="{{ compactStr }}" style="font: inherit; font-size: 13px; display: flex; align-items: center; gap: 10px; border: 0; background: none; padding: 0; cursor: pointer; text-align: left;"><span style="width: 18px; height: 18px; box-sizing: border-box; border: 1px solid var(--ink); background: {{ compactBg }}; color: var(--paper); display: inline-flex; align-items: center; justify-content: center; font-size: 12px;">{{ compactMark }}</span>Compact rows (less padding, shorter rows)</button>
+        </div>
+        <div style="padding: 10px 12px; border-bottom: 1px solid var(--neutral-300); display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;">Font size</span>
+          <div role="group" aria-label="Font size" style="display: flex;"><sc-for list="{{ sizes }}" as="z"><button onClick="{{ z.onClick }}" aria-pressed="{{ z.on }}" style="font: inherit; font-size: 13px; flex: 1; height: 32px; border: 1px solid var(--ink); border-left: {{ z.bl }}; background: {{ z.bg }}; color: {{ z.fg }}; cursor: pointer;">{{ z.label }}</button></sc-for></div>
+        </div>
+        <div style="padding: 10px 12px 4px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;">Columns</span><button class="dd-link" onClick="{{ onOpenModal }}">Open column manager</button></div>
+        <div style="max-height: 220px; overflow: auto; padding: 4px 0 6px;"><sc-for list="{{ quickCols }}" as="c" hint-placeholder-count="12"><label style="display: flex; align-items: center; gap: 10px; padding: 5px 12px; cursor: pointer; font-size: 13px;"><input type="checkbox" checked="{{ c.on }}" disabled="{{ c.locked }}" onChange="{{ c.toggle }}" style="margin: 0;">{{ c.label }}</label></sc-for></div>
+        <div style="padding: 8px 12px; border-top: 1px solid var(--neutral-300); text-align: right;"><button class="dd-link" onClick="{{ onResetAll }}">Reset table settings</button></div>
       </div>
     </div></sc-if>
   </div>
-  <div style="border: 1px solid var(--ink); overflow-x: auto;"><div style="min-width: {{ minW }};">
-    <div class="dd-row" style="grid-template-columns: {{ gridCols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); min-height: 44px;"><sc-for list="{{ heads }}" as="h" hint-placeholder-count="14"><button class="dd-th" onClick="{{ h.sort }}" style="justify-content: {{ h.just }};" aria-label="Sort by {{ h.label }}">{{ h.label }}<span style="font-size: 10px; opacity: {{ h.op }};">{{ h.arrow }}</span></button></sc-for></div>
-    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="14"><div class="dd-row" style="grid-template-columns: {{ gridCols }}; background: {{ r.bg }}; color: {{ r.fg }};"><sc-for list="{{ r.cells }}" as="c"><span style="text-align: {{ c.al }}; font-family: {{ c.ff }}; font-weight: {{ c.fw }};">{{ c.v }}</span></sc-for></div></sc-for>
+
+  <div style="border: 1px solid var(--ink); overflow-x: auto;"><div style="min-width: {{ minW }}; font-size: {{ fs }}px;">
+    <div class="dd-row" style="grid-template-columns: {{ gridCols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); min-height: {{ headH }}px; font-size: {{ fsHead }}px;"><sc-for list="{{ heads }}" as="h" hint-placeholder-count="14"><div draggable="{{ h.drag }}" onDragStart="{{ h.onDragStart }}" onDragOver="{{ h.onDragOver }}" onDrop="{{ h.onDrop }}" title="{{ h.tip }}" style="min-width: 0; cursor: {{ h.cursor }};"><button class="dd-th" onClick="{{ h.sort }}" style="justify-content: {{ h.just }}; font-size: inherit;" aria-label="Sort by {{ h.label }}">{{ h.label }}<span style="font-size: 10px; opacity: {{ h.op }};">{{ h.arrow }}</span></button></div></sc-for></div>
+    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="14"><div class="dd-row" style="grid-template-columns: {{ gridCols }}; background: {{ r.bg }}; color: {{ r.fg }}; min-height: {{ rowH }}px;"><sc-for list="{{ r.cells }}" as="c"><span style="text-align: {{ c.al }}; font-family: {{ c.ff }}; font-weight: {{ c.fw }}; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ c.v }}</span></sc-for></div></sc-for>
     <sc-if value="{{ none }}"><div style="padding: 32px 16px; text-align: center; color: var(--text-muted);">No instrument matches your filters.</div></sc-if>
   </div></div>
-</section></sc-if>
+</section>
 
+<sc-if value="{{ modalOpen }}"><div>
+  <div onClick="{{ onCancel }}" style="position: fixed; inset: 0; z-index: 90; background: oklch(0% 0 0 / 0.5);"></div>
+  <div role="dialog" aria-modal="true" aria-labelledby="dd-modal-title" style="position: fixed; z-index: 91; left: 50%; top: 40px; transform: translateX(-50%); width: 1000px; max-width: calc(100vw - 24px); max-height: calc(100vh - 80px); display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset);">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--neutral-300);"><b id="dd-modal-title" style="font-size: 20px;">Select columns</b><button onClick="{{ onCancel }}" aria-label="Close" style="font: inherit; width: 36px; height: 36px; border: 1px solid var(--neutral-300); background: var(--paper); font-size: 20px; line-height: 1; cursor: pointer;">×</button></div>
+    <div style="overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;"><b style="font-size: 16px;">Columns</b><span style="color: var(--neutral-700); line-height: 22px; max-width: 760px;">Start from a preset, then fine-tune. Trading code is always included. The CSV contains exactly these columns, in the order the table shows them — drag a column header to change the order.</span></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;"><sc-for list="{{ presets }}" as="p"><button class="dd-chip" onClick="{{ p.onClick }}" aria-pressed="{{ p.on }}" style="background: {{ p.bg }}; color: {{ p.fg }}; border-color: {{ p.bd }}; font-weight: {{ p.fw }};">{{ p.label }}</button></sc-for></div>
+      <input class="tl-ctl" type="search" placeholder="Filter columns" aria-label="Filter columns" value="{{ filter }}" onInput="{{ onFilter }}" style="width: 260px; max-width: 100%; height: 40px; font-size: 14px;">
+      <div style="display: flex; justify-content: space-between; gap: 16px; align-items: baseline; background: var(--neutral-50); border: 1px solid var(--neutral-200); padding: 10px 12px; font-size: 12px;"><span style="min-width: 0; line-height: 18px;"><span style="color: var(--text-muted); letter-spacing: 0.06em; margin-right: 8px;">SHOWING</span>{{ showing }}</span><span style="font-family: var(--font-mono); color: var(--text-muted); white-space: nowrap;">{{ countOf }}</span></div>
+      <sc-for list="{{ groups }}" as="g"><div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 12px;"><span style="font-size: 12px; letter-spacing: 0.08em; color: var(--text-muted); text-transform: uppercase;">{{ g.name }}</span><span style="flex: 1; height: 1px; background: var(--neutral-200);"></span><button class="dd-link" onClick="{{ g.onAll }}">{{ g.allLabel }}</button></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;"><sc-for list="{{ g.cols }}" as="c"><button class="dd-chip" onClick="{{ c.toggle }}" disabled="{{ c.locked }}" aria-pressed="{{ c.on }}" style="background: {{ c.bg }}; color: {{ c.fg }}; border-color: {{ c.bd }}; font-weight: {{ c.fw }};"><span aria-hidden="true" style="font-size: 12px;">{{ c.mark }}</span>{{ c.label }}</button></sc-for></div>
+      </div></sc-for>
+      <sc-if value="{{ noGroups }}"><div style="color: var(--text-muted);">No column matches "{{ filter }}".</div></sc-if>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; padding: 14px 24px; border-top: 1px solid var(--neutral-300);">
+      <button class="dd-chip" onClick="{{ onResetCols }}">Reset to defaults</button>
+      <span style="display: flex; align-items: center; gap: 12px;"><span role="status" style="font-size: 13px; color: var(--text-muted);">{{ draftNote }}</span><button class="dd-chip" onClick="{{ onCancel }}">Cancel</button><button class="dd-chip" onClick="{{ onSave }}" style="background: var(--ink); color: var(--paper); border-color: var(--ink); font-weight: 700;">Save</button></span>
+    </div>
+  </div>
+</div></sc-if>
 <sc-if value="{{ isEod }}"><section style="border: 1px solid var(--ink); display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px 48px; padding: 32px 24px; align-items: center;">
   <div style="display: flex; justify-content: center;"><svg viewBox="0 0 360 240" width="100%" style="max-width: 360px;" role="img" aria-label="CSV download illustration">
     <rect x="70" y="30" width="120" height="150" fill="var(--neutral-100)" stroke="var(--ink)" stroke-width="1.5"></rect>
@@ -82,39 +119,84 @@ a:hover { color: var(--blue-700); }
     <label style="display: grid; grid-template-columns: 150px 1fr; gap: 8px 16px; align-items: center;"><span style="font-weight: 700;">Select date</span><input class="tl-ctl" type="date" value="{{ eodDate }}" min="{{ eodMin }}" max="{{ eodMax }}" onChange="{{ onEodDate }}" style="width: 200px;"></label>
     <div style="display: grid; grid-template-columns: 150px 1fr; gap: 8px 16px; align-items: center;"><span></span><span style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;"><button type="submit" class="tl-btn" style="background: var(--ink); color: var(--paper);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M4.500 7L8 10.500 11.500 7M2 13.500h12"></path></svg>Download CSV</button><span style="font-size: 12px; color: var(--text-muted); line-height: 18px;">{{ typeHelp }}</span></span></div>
   </form>
-  <div style="grid-column: 1 / -1; font-size: 12px; line-height: 18px; color: var(--neutral-700); display: flex; flex-direction: column; gap: 10px;">
+  <div style="grid-column: 1 / -1; font-size: 14px; line-height: 22px; color: var(--neutral-700); display: flex; flex-direction: column; gap: 10px;">
     <span>The sole purpose of this site is to provide the user with historical financial information related to stock market investing. All of the table data listed displays stock metrics derived from Dhaka Stock Exchange. Please take a moment to download and review the data posted in order to facilitate your stock portfolio analytics.</span>
     <b>Web site stock quote disclaimer</b>
     <span>The stock price provided on our website is for informational purposes only and should not be relied upon for trading. Historical and current stock price performance is not necessarily indicative of future performance. You should not rely on the stock price quotes or market data provided on our website for trading and investment purposes. UFTCL does not guarantee the accuracy or completeness of any stock information, nor shall we be liable to any person for delays, inaccuracies, omissions, or errors in such data, or for any actions taken in reliance of such data, or for any damages resulting therefrom.</span>
   </div>
 </section></sc-if>
-<div role="status" style="font-size: 13px; color: var(--text-muted); min-height: 18px;">{{ note }}</div>
+<div role="status" style="font-size: 14px; color: var(--text-muted); min-height: 18px;">{{ note }}</div>
 </main>
 <dc-import name="Footer" hint-size="100%,320px"></dc-import>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, eodType: 'adjusted', eodDate: '', tab: null, q: '', cat: 'all', sortK: 'code', sortDir: 1, cols: null, colsOpen: false, note: '' };
-  COLS = [
-    { k: 'code', l: 'Trading code', al: 'left', w: 'minmax(130px, 1.3fr)' }, { k: 'ltp', l: 'LTP', f: s => s.ltp, d: 1 }, { k: 'pct', l: '%', f: s => s.changePct, d: 2 }, { k: 'open', l: 'Open', f: s => s.open, d: 1 },
-    { k: 'high', l: 'High', f: s => s.high, d: 1 }, { k: 'low', l: 'Low', f: s => s.low, d: 1 }, { k: 'close', l: 'Close', f: s => s.close, d: 1 }, { k: 'ycp', l: 'YCP', f: s => s.ycp, d: 1 },
-    { k: 'chg', l: 'Change', f: s => s.change, d: 1 }, { k: 'trade', l: 'Trade', f: s => s.trades, d: 0 }, { k: 'value', l: 'Value (mn)', f: s => s.value, d: 2 }, { k: 'volume', l: 'Volume', f: s => s.volume, d: 0 },
-    { k: 'cat', l: 'Cat', f: s => s.cat, txt: true, al: 'center' }, { k: 'pe', l: 'Audited PE', f: s => s.pe, d: 2 }, { k: 'sector', l: 'Sector', f: s => s.sector, txt: true, al: 'left', w: 'minmax(160px, 1.4fr)' }];
-  DEF = ['code', 'ltp', 'pct', 'open', 'high', 'low', 'close', 'ycp', 'chg', 'trade', 'value', 'volume', 'cat', 'pe'];
-  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
-  componentWillUnmount() { clearInterval(this.p); }
+  state = { ready: !!window.UFT, eodType: 'adjusted', eodDate: '', tab: null, q: '', cat: 'all', sortK: 'code', sortDir: 1, vis: null, tbl: { compact: false, fs: 'sm' }, gear: false, modal: false, draft: null, filter: '', note: '' };
+  // [key, label, group, kind, decimals]
+  DEFS = [['no', '#', 'Identity', 'idx'], ['code', 'Trading code', 'Identity', 'code'], ['type', 'Instrument type', 'Identity', 'text'], ['segment', 'Business segment', 'Identity', 'text'], ['name', 'Full name', 'Identity', 'text'],
+    ['ltp', 'LTP', 'Price', 'num', 1], ['pct', '%', 'Price', 'num', 2], ['open', 'Open', 'Price', 'num', 1], ['high', 'High', 'Price', 'num', 1], ['low', 'Low', 'Price', 'num', 1], ['close', 'Closep', 'Price', 'num', 1], ['ycp', 'YCP', 'Price', 'num', 1], ['chg', 'Change', 'Price', 'num', 1], ['floor', 'Floor price', 'Price', 'num', 1], ['openpct', 'Open %', 'Price', 'num', 2],
+    ['trade', 'Trade', 'Trade activity', 'num', 0], ['value', 'Value (mn)', 'Trade activity', 'num', 2], ['volume', 'Volume', 'Trade activity', 'num', 0], ['vchg', 'V.Change', 'Trade activity', 'num', 0], ['vchgpct', 'V.Change %', 'Trade activity', 'num', 2], ['yvol', 'Y.Volume', 'Trade activity', 'num', 0],
+    ['cat', 'Cat', 'Valuation', 'cat'], ['pe', 'Audited PE', 'Valuation', 'num', 2], ['upe', 'Un audited PE', 'Valuation', 'num', 2], ['mcap', 'Market cap', 'Valuation', 'num', 1], ['nav', 'NAV (book value)', 'Valuation', 'num', 2], ['navp', 'NAV/Price', 'Valuation', 'num', 2], ['auth', 'Authorized cap', 'Valuation', 'num', 1], ['paid', 'Paid up cap', 'Valuation', 'num', 1], ['tot', 'Total securities', 'Valuation', 'num', 1], ['reserve', 'Reserve surplus', 'Valuation', 'num', 1], ['free', 'Free float', 'Valuation', 'num', 1],
+    ['ye1', 'Year End PE 1', 'Earnings', 'num', 2], ['ye2', 'Year End PE 2', 'Earnings', 'num', 2], ['ye3', 'Year End PE 3', 'Earnings', 'num', 2], ['ye4', 'Year End PE 4', 'Earnings', 'num', 2], ['ye5', 'Year End PE 5', 'Earnings', 'num', 2], ['ye6', 'Year End PE 6', 'Earnings', 'num', 2], ['ye7', 'Year End PE 7', 'Earnings', 'num', 2], ['ye8', 'Year End PE 8', 'Earnings', 'num', 2],
+    ['eps', 'EPS', 'Earnings', 'num', 2], ['q1', 'Q1 EPS', 'Earnings', 'num', 2], ['q2', 'Q2 EPS', 'Earnings', 'num', 2], ['half', 'Half yearly EPS', 'Earnings', 'num', 2], ['q3', 'Q3 EPS', 'Earnings', 'num', 2], ['oci', 'OCI', 'Earnings', 'num', 2],
+    ['dir', 'Director %', 'Ownership', 'num', 2], ['govt', 'Govt %', 'Ownership', 'num', 2], ['inst', 'Institute %', 'Ownership', 'num', 2], ['fore', 'Foreign %', 'Ownership', 'num', 2], ['pub', 'Public %', 'Ownership', 'num', 2]];
+  LOCKED = ['no', 'code'];
+  DEF = ['no', 'code', 'ltp', 'pct', 'open', 'high', 'low', 'close', 'ycp', 'chg', 'trade', 'value', 'volume', 'cat', 'pe'];
+  PRESETS = [['Essential', ['no', 'code', 'ltp', 'pct', 'chg', 'volume', 'value']], ['Trading', null], ['Fundamentals', ['no', 'code', 'ltp', 'cat', 'pe', 'upe', 'mcap', 'nav', 'navp', 'eps', 'q1', 'q2', 'q3', 'dir', 'inst', 'fore', 'pub']], ['Everything', 'all']];
+  SIZES = [['lg', 'lg', 15], ['sm', 'sm', 13], ['xs', 'xs', 12], ['xxs', 'xxs', 11]];
+  componentDidMount() { try { const s = JSON.parse(localStorage.getItem('uftcl.dd') || 'null'); if (s && Array.isArray(s.vis) && s.vis.every(k => this.DEFS.some(d => d[0] === k))) this.setState({ vis: s.vis, tbl: s.tbl || this.state.tbl }); } catch (e) { /* ignore */ }
+    this.onKey = e => { if (e.key === 'Escape') this.setState(s => (s.modal ? { modal: false, draft: null } : s.gear ? { gear: false } : null)); }; window.addEventListener('keydown', this.onKey);
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('keydown', this.onKey); }
+  persist(vis, tbl) { try { localStorage.setItem('uftcl.dd', JSON.stringify({ vis, tbl })); } catch (e) { /* storage unavailable */ } }
   csv(rows, head) { return [head, ...rows].map(r => r.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(',')).join('\r\n'); }
   save(name, text) { try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); } catch (e) { /* download blocked */ } }
+  ex(U, s) { this._ex = this._ex || {}; if (this._ex[s.code]) return this._ex[s.code]; const r = U.rng(U.hash(s.code) + 7); const rd = v => Math.round(v * 100) / 100; const prevV = U.daily(s.code, 2)[0].v; const tot = s.mcap / s.ltp; const paid = tot * 10;
+    const govt = r() < 0.2 ? rd(r() * 9) : 0, inst = rd(10 + r() * 20), fore = r() < 0.5 ? rd(r() * 12) : 0; const pub = rd(Math.max(0, 100 - s.director - govt - inst - fore));
+    return (this._ex[s.code] = { prevV, tot, paid, auth: paid * 2, reserve: s.nav * tot - paid, free: tot * (100 - s.director) / 100, upe: rd(s.pe * (0.9 + r() * 0.2)), ye: Array.from({ length: 8 }, () => rd(s.pe * (0.75 + r() * 0.6))),
+      q1: rd(s.eps / 4 * (0.8 + r() * 0.4)), q2: rd(s.eps / 4 * (0.8 + r() * 0.4)), half: rd(s.eps / 2 * (0.9 + r() * 0.2)), q3: rd(s.eps / 4 * (0.8 + r() * 0.4)), oci: rd((r() - 0.5) * Math.abs(s.eps) * 0.2), govt, inst, fore, pub }); }
+  val(U, k, s, i) { const x = this.ex(U, s);
+    switch (k) { case 'no': return i + 1; case 'code': return s.code; case 'type': return s.sector === 'Mutual Funds' ? 'Mutual fund' : 'Equity'; case 'segment': return s.sector; case 'name': return U.company(s.code);
+      case 'ltp': return s.ltp; case 'pct': return s.changePct; case 'open': return s.open; case 'high': return s.high; case 'low': return s.low; case 'close': return s.close; case 'ycp': return s.ycp; case 'chg': return s.change; case 'floor': return s.lower; case 'openpct': return s.ycp ? (s.open - s.ycp) / s.ycp * 100 : 0;
+      case 'trade': return s.trades; case 'value': return s.value; case 'volume': return s.volume; case 'vchg': return s.volume - x.prevV; case 'vchgpct': return x.prevV ? (s.volume - x.prevV) / x.prevV * 100 : 0; case 'yvol': return x.prevV;
+      case 'cat': return s.cat; case 'pe': return s.pe; case 'upe': return x.upe; case 'mcap': return s.mcap; case 'nav': return s.nav; case 'navp': return s.navPrice; case 'auth': return x.auth; case 'paid': return x.paid; case 'tot': return x.tot; case 'reserve': return x.reserve; case 'free': return x.free;
+      case 'eps': return s.eps; case 'q1': return x.q1; case 'q2': return x.q2; case 'half': return x.half; case 'q3': return x.q3; case 'oci': return x.oci;
+      case 'dir': return s.director; case 'govt': return x.govt; case 'inst': return x.inst; case 'fore': return x.fore; case 'pub': return x.pub; }
+    if (/^ye\d$/.test(k)) return x.ye[+k[2] - 1]; return ''; }
   renderVals() {
     const U = window.UFT; if (!U) return {};
-    const st = this.state; const tab = st.tab || (U.param('tab', '') === 'eod' ? 'eod' : 'live'); const vis = st.cols || this.DEF; const cols = this.COLS.filter(c => vis.includes(c.k));
-    const q = st.q.trim().toUpperCase();
-    const val = (c, s) => c.k === 'code' ? s.code : c.f(s);
-    const list = U.stocks.filter(s => (!q || s.code.includes(q)) && (st.cat === 'all' || s.cat === st.cat)).sort((a, b) => { const c = this.COLS.find(x => x.k === st.sortK) || this.COLS[0]; const x = val(c, a), y = val(c, b); return (typeof x === 'string' ? x.localeCompare(y) : x - y) * st.sortDir; });
-    const rows = list.map((s, i) => ({ bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)', fg: s.change > 0 ? 'var(--green-700)' : s.change < 0 ? 'var(--red-700)' : 'var(--ink)',
-      cells: cols.map(c => c.k === 'code' ? { v: s.code, al: 'left', ff: 'var(--font-sans)', fw: 700 } : c.txt ? { v: c.f(s), al: c.al, ff: 'var(--font-sans)', fw: 400 } : { v: U.fmt(c.f(s), c.d), al: 'right', ff: 'var(--font-mono)', fw: 400 }) }));
-    const heads = cols.map(c => ({ label: c.l, just: c.al === 'left' ? 'flex-start' : c.al === 'center' ? 'center' : 'flex-end', arrow: st.sortDir > 0 ? '▲' : '▼', op: st.sortK === c.k ? 1 : 0, sort: () => this.setState(s => ({ sortK: c.k, sortDir: s.sortK === c.k ? -s.sortDir : 1 })) }));
+    const st = this.state; const tab = st.tab || (U.param('tab', '') === 'eod' ? 'eod' : 'live'); const vis = st.vis || this.DEF; const def = k => this.DEFS.find(d => d[0] === k);
+    const cols = vis.map(def).filter(Boolean); const q = st.q.trim().toUpperCase();
+    const base = U.stocks.slice().sort((a, b) => a.code.localeCompare(b.code));
+    let list = base.filter(s => (!q || s.code.includes(q)) && (st.cat === 'all' || s.cat === st.cat));
+    const sd = def(st.sortK) || def('code'); const idxOf = new Map(base.map((s, i) => [s.code, i]));
+    list = list.slice().sort((a, b) => { if (sd[0] === 'no') return (idxOf.get(a.code) - idxOf.get(b.code)) * st.sortDir; const x = this.val(U, sd[0], a, 0), y = this.val(U, sd[0], b, 0); return (typeof x === 'string' ? x.localeCompare(y) : x - y) * st.sortDir; });
+    const fs = (this.SIZES.find(z => z[0] === st.tbl.fs) || this.SIZES[1])[2]; const compact = st.tbl.compact;
+    const cell = (c, s, i) => { const v = this.val(U, c[0], s, i); if (c[3] === 'idx') return { v, al: 'left', ff: 'var(--font-mono)', fw: 400 }; if (c[3] === 'code') return { v, al: 'left', ff: 'var(--font-sans)', fw: 700 }; if (c[3] === 'text') return { v, al: 'left', ff: 'var(--font-sans)', fw: 400 }; if (c[3] === 'cat') return { v, al: 'center', ff: 'var(--font-sans)', fw: 400 };
+      return { v: U.fmt(v, c[4]), al: 'right', ff: 'var(--font-mono)', fw: 400 }; };
+    const rows = list.map((s, i) => ({ bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)', fg: s.change > 0 ? 'var(--green-700)' : s.change < 0 ? 'var(--red-700)' : 'var(--ink)', cells: cols.map(c => cell(c, s, idxOf.get(s.code))) }));
+    const move = (from, to) => this.setState(s => { const v = (s.vis || this.DEF).slice(); const a = v.indexOf(from), b = v.indexOf(to); if (a < 0 || b < 0 || a === b) return null; v.splice(a, 1); v.splice(b, 0, from); this.persist(v, s.tbl); return { vis: v }; });
+    const heads = cols.map(c => { const lock = c[0] === 'no'; return { label: c[1], just: c[3] === 'num' ? 'flex-end' : c[3] === 'cat' ? 'center' : 'flex-start', arrow: st.sortDir > 0 ? '▲' : '▼', op: st.sortK === c[0] ? 1 : 0, tip: 'Click to sort · drag to reorder', drag: lock ? 'false' : 'true', cursor: lock ? 'default' : 'grab',
+      onDragStart: e => { this.dragK = c[0]; try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', c[0]); } catch (x) { /* ignore */ } }, onDragOver: e => e.preventDefault(), onDrop: e => { e.preventDefault(); if (this.dragK && !lock) move(this.dragK, c[0]); this.dragK = null; },
+      sort: () => this.setState(s => ({ sortK: c[0], sortDir: s.sortK === c[0] ? -s.sortDir : 1 })) }; });
+    const widthOf = c => c[0] === 'no' ? '56px' : c[0] === 'code' ? 'minmax(120px, 1fr)' : c[0] === 'name' ? 'minmax(230px, 2fr)' : c[0] === 'segment' ? 'minmax(190px, 1.4fr)' : c[0] === 'type' ? 'minmax(120px, 1fr)' : 'minmax(104px, 1fr)';
+    // ---- column editing helpers
+    const setVis = (v, keep) => { const set = new Set([...v, ...this.LOCKED]); const ordered = [...(st.vis || this.DEF).filter(k => set.has(k)), ...this.DEFS.map(d => d[0]).filter(k => set.has(k) && !(st.vis || this.DEF).includes(k))]; this.persist(ordered, st.tbl); this.setState({ vis: ordered }); };
+    const quickToggle = k => { const on = vis.includes(k); setVis(on ? vis.filter(x => x !== k) : [...vis, k]); };
+    const quickCols = this.DEFS.map(d => ({ label: d[1], on: vis.includes(d[0]), locked: this.LOCKED.includes(d[0]), toggle: () => quickToggle(d[0]) }));
+    const draft = st.draft || vis; const fq = st.filter.trim().toLowerCase();
+    const orderFrom = keys => { const set = new Set([...keys, ...this.LOCKED]); return [...vis.filter(k => set.has(k)), ...this.DEFS.map(d => d[0]).filter(k => set.has(k) && !vis.includes(k))]; };
+    const setDraft = keys => this.setState({ draft: orderFrom(keys) });
+    const groupNames = [...new Set(this.DEFS.map(d => d[2]))];
+    const groups = groupNames.map(g => { const all = this.DEFS.filter(d => d[2] === g); const shown = all.filter(d => !fq || d[1].toLowerCase().includes(fq) || g.toLowerCase().includes(fq)); const free = all.filter(d => !this.LOCKED.includes(d[0])); const allOn = free.every(d => draft.includes(d[0]));
+      return { name: g, shown: shown.length, allLabel: allOn ? 'clear all' : 'select all', onAll: () => setDraft(allOn ? draft.filter(k => !free.some(d => d[0] === k)) : [...new Set([...draft, ...free.map(d => d[0])])]),
+        cols: shown.map(d => { const on = draft.includes(d[0]); const lock = this.LOCKED.includes(d[0]); return { label: d[1], on: on ? 'true' : 'false', locked: lock, mark: lock ? '🔒' : on ? '✓' : '+', bg: lock ? 'var(--neutral-100)' : on ? 'var(--ink)' : 'var(--paper)', fg: lock ? 'var(--neutral-600)' : on ? 'var(--paper)' : 'var(--ink)', bd: on || lock ? (lock ? 'var(--neutral-300)' : 'var(--ink)') : 'var(--neutral-300)', fw: on && !lock ? 700 : 400, toggle: () => setDraft(on ? draft.filter(k => k !== d[0]) : [...draft, d[0]]) }; }) }; }).filter(g => g.shown > 0);
+    const sameSet = (a, b) => a.length === b.length && a.every(k => b.includes(k));
+    const presets = this.PRESETS.map(([label, keys]) => { const target = keys === 'all' ? this.DEFS.map(d => d[0]) : keys || this.DEF; const on = sameSet(draft, target);
+      return { label, on: on ? 'true' : 'false', bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'var(--neutral-300)', fw: on ? 700 : 400, onClick: () => setDraft(target) }; });
+    const dirty = st.draft && !(st.draft.length === vis.length && st.draft.every(k => vis.includes(k)));
+    const sizes = this.SIZES.map(([k, l], i) => ({ label: l, on: st.tbl.fs === k ? 'true' : 'false', bg: st.tbl.fs === k ? 'var(--ink)' : 'var(--paper)', fg: st.tbl.fs === k ? 'var(--paper)' : 'var(--ink)', bl: i ? '0' : '1px solid var(--ink)', onClick: () => { const t = { ...st.tbl, fs: k }; this.persist(st.vis || this.DEF, t); this.setState({ tbl: t }); } }));
     // EOD file: one row per instrument for the chosen session
     const ref = U.daily('GP', 30); const iso = d => d.toISOString().slice(0, 10); const dates = ref.map(b => iso(b.date)); const eodDate = st.eodDate || dates[dates.length - 1];
     const doEod = () => { const k = dates.indexOf(eodDate); if (k < 0) { this.setState({ note: 'No trading session on ' + eodDate + '. The market is closed on Friday, Saturday and holidays. Try ' + dates[dates.length - 1] + '.' }); return; }
@@ -122,16 +204,22 @@ class Component extends DCLogic {
       const body = U.stocks.map(s => { const d = U.daily(s.code, 30); const x = d[d.length - 1 - off]; const f = adj && U.hash(s.code) % 5 === 0 && eodDate < '2026-11-03' ? 1 / 1.1 : 1; const px = v => U.round(v * f, 2);
         return [s.code, eodDate, px(x.o), px(x.h), px(x.l), px(x.c), Math.round(x.v / f), x.value, x.trades]; });
       const name = 'eod-' + st.eodType + '-' + eodDate + '.csv'; this.save(name, this.csv(body, ['code', 'date', 'open', 'high', 'low', 'close', 'volume', 'value_mn', 'trades'])); this.setState({ note: 'Downloaded ' + name + ' (' + body.length + ' rows).' }); };
-    const toggle = k => this.setState(s => { const cur = s.cols || this.DEF; return { cols: cur.includes(k) ? cur.filter(x => x !== k) : this.COLS.map(c => c.k).filter(x => cur.includes(x) || x === k) }; });
-    return { tabs: [['live', 'Data download'], ['eod', 'EOD CSV download']].map(([k, l]) => ({ label: l, sel: tab === k ? 'true' : 'false', bg: tab === k ? 'var(--ink)' : 'var(--paper)', fg: tab === k ? 'var(--paper)' : 'var(--ink)', bd: tab === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => { this.setState({ tab: k, note: '' }); try { history.replaceState(null, '', k === 'eod' ? 'Data%20Download.dc.html?tab=eod' : 'Data%20Download.dc.html'); } catch (e) { /* no history */ } } })),
+
+    return { tabs: [['live', 'Data download'], ['eod', 'EOD CSV download']].map(([k, l]) => ({ label: l, sel: tab === k ? 'true' : 'false', bg: tab === k ? 'var(--ink)' : 'var(--paper)', fg: tab === k ? 'var(--paper)' : 'var(--ink)', bd: tab === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => { this.setState({ tab: k, note: '', gear: false }); try { history.replaceState(null, '', k === 'eod' ? 'Data%20Download.dc.html?tab=eod' : 'Data%20Download.dc.html'); } catch (e) { /* no history */ } } })),
       isLive: tab === 'live', isEod: tab === 'eod', note: st.note, eodDate, eodMin: dates[0], eodMax: dates[dates.length - 1], onEodDate: e => this.setState({ eodDate: e.target.value, note: '' }), onEodSubmit: e => { e.preventDefault(); doEod(); },
       types: [['adjusted', 'Adjusted'], ['unadjusted', 'Unadjusted']].map(([k, l]) => ({ label: l, on: st.eodType === k, onChange: () => this.setState({ eodType: k, note: '' }) })),
       typeHelp: st.eodType === 'adjusted' ? 'Adjusted files restate earlier prices and volumes for bonus shares and splits.' : 'Unadjusted files show prices as they traded on that day.',
       q: st.q, onQ: e => this.setState({ q: e.target.value }), cat: st.cat, onCat: e => this.setState({ cat: e.target.value }), catOpts: [{ v: 'all', l: 'All categories' }, ...['A', 'B', 'N', 'Z'].map(c => ({ v: c, l: 'Category ' + c }))],
-      countLabel: `${rows.length} of ${U.stocks.length} instruments`, rows, heads, none: rows.length === 0, gridCols: cols.map(c => c.w || 'minmax(78px, 1fr)').join(' '), minW: Math.max(640, cols.length * 96 + 80) + 'px',
-      colsOpen: st.colsOpen, colsStr: st.colsOpen ? 'true' : 'false', onCols: () => this.setState(s => ({ colsOpen: !s.colsOpen })), onAll: () => this.setState({ cols: this.COLS.map(c => c.k) }), onDefault: () => this.setState({ cols: null }),
-      colOpts: this.COLS.map(c => ({ label: c.l, on: vis.includes(c.k), toggle: () => toggle(c.k) })),
-      onDownload: () => { const body = list.map(s => cols.map(c => c.k === 'code' ? s.code : c.txt ? c.f(s) : c.f(s))); this.save('data-download.csv', this.csv(body, cols.map(c => c.l))); this.setState({ note: 'Downloaded data-download.csv with ' + body.length + ' rows and ' + cols.length + ' columns.' }); } };
+      countLabel: `${rows.length} of ${U.stocks.length} instruments · ${cols.length} of ${this.DEFS.length} columns`, rows, heads, none: rows.length === 0, gridCols: cols.map(widthOf).join(' '), minW: Math.max(640, cols.length * 112 + 80) + 'px',
+      fs, fsHead: Math.max(11, fs - 1), rowH: compact ? 28 : 40, headH: compact ? 34 : 46,
+      gearOpen: st.gear, gearStr: st.gear ? 'true' : 'false', onGear: () => this.setState(s => ({ gear: !s.gear })), sizes, quickCols,
+      compactStr: compact ? 'true' : 'false', compactBg: compact ? 'var(--ink)' : 'var(--paper)', compactMark: compact ? '✓' : '', onCompact: () => { const t = { ...st.tbl, compact: !compact }; this.persist(st.vis || this.DEF, t); this.setState({ tbl: t }); },
+      onResetAll: () => { this.persist(this.DEF, { compact: false, fs: 'sm' }); this.setState({ vis: null, tbl: { compact: false, fs: 'sm' } }); },
+      modalOpen: st.modal, onOpenModal: () => this.setState({ modal: true, gear: false, draft: vis.slice(), filter: '' }), onCancel: () => this.setState({ modal: false, draft: null, filter: '' }),
+      onSave: () => { const d = st.draft || vis; this.persist(d, st.tbl); this.setState({ vis: d, modal: false, draft: null, filter: '' }); },
+      onResetCols: () => this.setState({ draft: orderFrom(this.DEF) }), presets, groups, noGroups: groups.length === 0, filter: st.filter, onFilter: e => this.setState({ filter: e.target.value }),
+      showing: draft.map(k => def(k)[1].toUpperCase()).join(' · '), countOf: `${draft.length}/${this.DEFS.length}`, draftNote: dirty ? 'Unsaved changes' : 'All changes saved',
+      onDownload: () => { const body = list.map(s => cols.map(c => this.val(U, c[0], s, idxOf.get(s.code)))); this.save('data-download.csv', this.csv(body, cols.map(c => c[1]))); this.setState({ note: 'Downloaded data-download.csv with ' + body.length + ' rows and ' + cols.length + ' columns.' }); } };
   }
 }
 </script>
