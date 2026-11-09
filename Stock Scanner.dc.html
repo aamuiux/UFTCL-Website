@@ -25,7 +25,11 @@ a:hover { color: var(--blue-700); }
 .scn-row { height: 40px; font: inherit; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 0 14px; border: 0; border-bottom: 1px solid var(--neutral-200); background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; font-size: 13px; }
 .scn-row:hover { background: var(--surface-hover, var(--neutral-50)); }
 .scn-table { overflow-x: auto; border: 1px solid var(--ink); }
-.scn-table-inner { width: max-content; min-width: 100%; }
+.scn-table-inner { width: 100%; }
+.scn-set-row { font: inherit; font-size: 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; box-sizing: border-box; height: 36px; padding: 0 12px; border: 0; border-bottom: 1px solid var(--neutral-200); background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; }
+.scn-set-row:hover { background: var(--neutral-50); }
+.scn-set-box { width: 16px; height: 16px; box-sizing: border-box; border: 1px solid var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; line-height: 1; flex-shrink: 0; }
+.scn-set-title { padding: 10px 12px 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
 .scn-btn { font: inherit; font-weight: 700; height: 40px; padding: 0 16px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 .scn-btn:hover { background: var(--ink); color: var(--paper); }
 .scn-btn-primary { background: var(--green-700); border-color: var(--green-700); color: var(--paper); }
@@ -147,33 +151,38 @@ a:hover { color: var(--blue-700); }
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
       <b style="font-size: 15px;">{{ resultTitle }}</b>
       <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-        <input type="search" placeholder="Search instrument" value="{{ q }}" onChange="{{ onQ }}" aria-label="Search instrument" style="font: inherit; font-size: 13px; height: 36px; width: 220px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink);">
+        <input type="search" placeholder="Search instrument" value="{{ q }}" onChange="{{ onQ }}" aria-label="Search instrument" style="font: inherit; font-size: 13px; height: 40px; box-sizing: border-box; width: 220px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink);">
         <button class="scn-btn" onClick="{{ onExport }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M4.5 6.5L8 10l3.5-3.5M3 13h10"></path></svg>Export CSV</button>
+        <div style="position: relative;">
+          <button class="scn-btn" onClick="{{ onSettings }}" aria-label="Table settings" title="Table settings" style="width: 40px; padding: 0; justify-content: center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+          <sc-if value="{{ setOpen }}"><div>
+            <div onClick="{{ onCloseSettings }}" style="position: fixed; inset: 0; z-index: 20;"></div>
+            <div role="dialog" aria-label="Table settings" style="position: absolute; right: 0; top: 46px; z-index: 21; width: 300px; max-width: calc(100vw - 32px); max-height: 70vh; overflow-y: auto; background: var(--paper); border: 1px solid var(--ink);">
+              <div class="scn-set-title">Density</div>
+              <button class="scn-set-row" onClick="{{ onCompact }}"><span>Compact rows</span><span class="scn-set-box" style="background: {{ cmpBg }}; color: var(--paper);">{{ cmpMark }}</span></button>
+              <div class="scn-set-title">Font size</div>
+              <div style="display: flex; padding: 0 12px 10px; gap: 0;">
+                <sc-for list="{{ fsOpts }}" as="f" hint-placeholder-count="4"><button onClick="{{ f.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; flex: 1; height: 32px; border: 1px solid var(--ink); margin-left: -1px; background: {{ f.bg }}; color: {{ f.fg }}; cursor: pointer;">{{ f.label }}</button></sc-for>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--neutral-200);"><span class="scn-set-title" style="padding-bottom: 6px;">Columns</span><button onClick="{{ onShowAll }}" style="font: inherit; font-size: 12px; font-weight: 700; margin-right: 12px; border: 0; background: transparent; color: var(--blue-700); cursor: pointer;">Show all</button></div>
+              <sc-for list="{{ colOpts }}" as="c" hint-placeholder-count="15"><button class="scn-set-row" onClick="{{ c.onToggle }}" style="opacity: {{ c.op }};"><span>{{ c.label }}</span><span class="scn-set-box" style="background: {{ c.bg }}; color: var(--paper);">{{ c.mark }}</span></button></sc-for>
+              <div style="padding: 10px 12px;"><button class="scn-btn" onClick="{{ onResetTbl }}" style="width: 100%; justify-content: center; height: 34px;">Reset table settings</button></div>
+            </div>
+          </div></sc-if>
+        </div>
       </div>
     </div>
 
-    <div class="scn-table" data-screen-label="Scanner results table"><div class="scn-table-inner">
-      <div style="display: grid; grid-template-columns: {{ cols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-muted);">
-        <sc-for list="{{ heads }}" as="h" hint-placeholder-count="15"><button onClick="{{ h.onClick }}" style="font: inherit; font-size: 11px; font-weight: 700; height: 40px; padding: 0 10px; border: 0; background: transparent; color: {{ h.fg }}; cursor: {{ h.cursor }}; display: flex; align-items: center; gap: 4px; justify-content: {{ h.justify }}; text-transform: uppercase; white-space: nowrap;">{{ h.t }}<span style="font-size: 9px;">{{ h.arrow }}</span></button></sc-for>
-        <sc-if value="{{ showX }}"><div style="display: flex; align-items: center; justify-content: flex-end; padding: 0 10px; text-transform: uppercase; white-space: nowrap;">{{ xLabel }}</div></sc-if>
+    <div class="scn-table" data-screen-label="Scanner results table"><div class="scn-table-inner" style="min-width: {{ minW }}px;">
+      <div style="display: grid; grid-template-columns: {{ cols }}; background: var(--neutral-100); border-bottom: 1px solid var(--ink); color: var(--text-muted);">
+        <sc-for list="{{ heads }}" as="h" hint-placeholder-count="15"><button onClick="{{ h.onClick }}" style="font: inherit; font-size: {{ fsHead }}; font-weight: 700; letter-spacing: 0.04em; height: {{ headH }}; padding: {{ pad }}; border: 0; background: transparent; color: {{ h.fg }}; cursor: {{ h.cursor }}; display: flex; align-items: center; gap: 4px; justify-content: {{ h.justify }}; text-transform: uppercase; white-space: nowrap;">{{ h.t }}<span style="font-size: 9px;">{{ h.arrow }}</span></button></sc-for>
       </div>
-      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8"><div data-screen-label="Scanner row" style="display: grid; grid-template-columns: {{ cols }}; align-items: center; min-height: 40px; border-bottom: 1px solid var(--neutral-200); font-size: 13px; font-family: var(--font-mono);">
-        <a href="{{ r.href }}" style="font-family: var(--font-sans); font-weight: 700; padding: 0 10px;" style-hover="color: var(--blue-700);">{{ r.code }}</a>
-        <div style="display: flex; gap: 10px; padding: 0 10px; font-family: var(--font-sans); font-size: 11px; font-weight: 700;"><a href="{{ r.href }}" style-hover="color: var(--blue-700);">Chart</a><a href="{{ r.vpa }}" style-hover="color: var(--blue-700);">VPA</a><a href="{{ r.depth }}" style-hover="color: var(--blue-700);">Depth</a><a href="{{ r.effect }}" style-hover="color: var(--blue-700);">News</a></div>
-        <span style="text-align: right; padding: 0 10px;">{{ r.ltp }}</span>
-        <span style="text-align: right; padding: 0 10px; color: {{ r.tone }};">{{ r.pct }}%</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.open }}</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.high }}</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.low }}</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.close }}</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.ycp }}</span>
-        <span style="text-align: right; padding: 0 10px; color: {{ r.chgTone }};">{{ r.chg }}</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.trade }}</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.value }}</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.volume }}</span>
-        <span style="text-align: center; padding: 0 10px;">{{ r.cat }}</span>
-        <span style="text-align: right; padding: 0 10px;">{{ r.pe }}</span>
-        <sc-if value="{{ showX }}"><span style="text-align: right; padding: 0 10px;">{{ r.x }}</span></sc-if>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8"><div data-screen-label="Scanner row" style="display: grid; grid-template-columns: {{ cols }}; align-items: center; min-height: {{ rowH }}; border-bottom: 1px solid var(--neutral-200); font-size: {{ fsBody }}; font-family: var(--font-mono);">
+        <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="15">
+          <sc-if value="{{ x.isCode }}"><a href="{{ x.href }}" style="font-family: var(--font-sans); font-weight: 700; padding: {{ x.pad }};" style-hover="color: var(--blue-700);">{{ x.v }}</a></sc-if>
+          <sc-if value="{{ x.isLinks }}"><div style="display: flex; gap: 10px; padding: {{ x.pad }}; font-family: var(--font-sans); font-size: {{ x.lfs }}; font-weight: 700;"><a href="{{ x.href }}" style-hover="color: var(--blue-700);">Chart</a><a href="{{ x.vpa }}" style-hover="color: var(--blue-700);">VPA</a><a href="{{ x.depth }}" style-hover="color: var(--blue-700);">Depth</a><a href="{{ x.effect }}" style-hover="color: var(--blue-700);">News</a></div></sc-if>
+          <sc-if value="{{ x.isText }}"><span style="text-align: {{ x.align }}; padding: {{ x.pad }}; color: {{ x.color }};">{{ x.v }}</span></sc-if>
+        </sc-for>
       </div></sc-for>
       <sc-if value="{{ empty }}"><div style="padding: 28px 16px; text-align: center; color: var(--text-muted); font-size: 13px;">{{ emptyText }}</div></sc-if>
     </div></div>
@@ -205,14 +214,21 @@ class Component extends DCLogic {
   state = {
     ready: !!window.UFT, sub: 'technical', msg: '', q: '', sort: { k: 'pct', d: -1 },
     picks: { SMA20: 'SMA20:below' },
-    preGroup: 'Oscillators', preInd: 'RSI (14)', preF: -1, cSel: -1, tf: 'D',
+    preGroup: 'Oscillators', preInd: 'RSI (14)', preF: -1, cSel: -1, tf: 'D', setOpen: false, tbl: { compact: false, fs: 'sm', hidden: {} },
     cGroup: 'Oscillators', cInd: 'RSI', cPeriod: 14,
     cp: [{ n: 40, x: 3 }, { n: 60, x: 3 }, { n: 70, x: 3 }, { n: 30, x: 3 }, { n: 3, x: 3 }, { n: 40, x: 3 }, { n: 3, x: 3 }, { n: 60, x: 3 }],
     chips: [], lastRun: null,
   };
 
-  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
-  componentWillUnmount() { clearInterval(this.p); }
+  componentDidMount() {
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50);
+    const t = this.readStore('uftcl.scanner.table');
+    if (t && typeof t === 'object') this.setState({ tbl: { compact: !!t.compact, fs: ['lg', 'sm', 'xs', 'xxs'].includes(t.fs) ? t.fs : 'sm', hidden: t.hidden && typeof t.hidden === 'object' ? t.hidden : {} } });
+    this.onKey = e => { if (e.key === 'Escape') this.setState({ setOpen: false }); };
+    window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { clearInterval(this.p); window.removeEventListener('keydown', this.onKey); }
+  setTbl(patch) { const tbl = { ...this.state.tbl, ...patch }; this.writeStore('uftcl.scanner.table', tbl); this.setState({ tbl }); }
 
   readStore(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
   writeStore(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
@@ -587,17 +603,18 @@ class Component extends DCLogic {
 
   makeRows(list, xOf, xFmt) {
     const U = window.UFT; const { k, d } = this.state.sort; const q = this.state.q.trim().toUpperCase();
-    const raw = list.map(s => ({ code: s.code, ltp: s.ltp, pct: s.changePct, open: s.open, high: s.high, low: s.low, close: s.ltp, ycp: s.ycp, chg: s.change, trade: s.trades, value: s.value, volume: s.volume, cat: s.cat, pe: s.pe, x: xOf ? xOf(s) : 0 }));
+    const raw = list.map(s2 => ({ code: s2.code, ltp: s2.ltp, pct: s2.changePct, open: s2.open, high: s2.high, low: s2.low, close: s2.ltp, ycp: s2.ycp, chg: s2.change, trade: s2.trades, value: s2.value, volume: s2.volume, cat: s2.cat, pe: s2.pe, x: xOf ? xOf(s2) : 0 }));
     const f = q ? raw.filter(r => r.code.includes(q)) : raw;
     f.sort((a, b) => ((a[k] > b[k]) ? 1 : (a[k] < b[k]) ? -1 : 0) * d);
-    return f.map(r => { const A = U.actions(r.code); return { code: r.code, href: A.stock, vpa: A.vpa, depth: A.depth, effect: A.effect,
-      ltp: U.fmt(r.ltp, 1), pct: U.sign(r.pct), tone: U.tone(r.pct), open: U.fmt(r.open, 1), high: U.fmt(r.high, 1), low: U.fmt(r.low, 1), close: U.fmt(r.close, 1), ycp: U.fmt(r.ycp, 1),
-      chg: U.sign(r.chg), chgTone: U.tone(r.chg), trade: U.fmtInt(r.trade), value: U.fmt(r.value, 2), volume: U.fmtInt(r.volume), cat: r.cat, pe: r.pe > 0 ? U.fmt(r.pe, 2) : '-', x: xFmt ? xFmt(r.x) : '' }; });
+    return f.map(r => { const A = U.actions(r.code); return { href: A.stock, vpa: A.vpa, depth: A.depth, effect: A.effect, tone: U.tone(r.pct), chgTone: U.tone(r.chg),
+      v: { code: r.code, ltp: U.fmt(r.ltp, 1), pct: U.sign(r.pct) + '%', open: U.fmt(r.open, 1), high: U.fmt(r.high, 1), low: U.fmt(r.low, 1), close: U.fmt(r.close, 1), ycp: U.fmt(r.ycp, 1),
+        chg: U.sign(r.chg), trade: U.fmtInt(r.trade), value: U.fmt(r.value, 2), volume: U.fmtInt(r.volume), cat: r.cat, pe: r.pe > 0 ? U.fmt(r.pe, 2) : '-', x: xFmt ? xFmt(r.x) : '' } }; });
   }
 
   exportCsv(rows, name) {
-    const head = ['Code', 'LTP', 'Change %', 'Open', 'High', 'Low', 'Close', 'YCP', 'Change', 'Trade', 'Value (mn)', 'Volume', 'Cat', 'Audited PE', 'Indicator'];
-    const body = rows.map(r => [r.code, r.ltp, r.pct, r.open, r.high, r.low, r.close, r.ycp, r.chg, r.trade, r.value, r.volume, r.cat, r.pe, r.x].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+    const cols = (this._visCols || []).filter(c => c.k !== 'links');
+    const head = cols.map(c => c.t);
+    const body = rows.map(r => cols.map(c => `"${String(r.v[c.k]).replace(/"/g, '""')}"`).join(','));
     try {
       const blob = new Blob([[head.join(','), ...body].join('\n')], { type: 'text/csv' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
@@ -610,7 +627,6 @@ class Component extends DCLogic {
     const st = this.state; const C = this.ctxMap(); const lastOf = a => a[a.length - 1];
     const t0 = U.param('tab', 'technical'); const tab = t0 === 'pre' || t0 === 'custom' ? t0 : 'technical';
     const sub = st.sub;
-    const COLS = '110px 180px 72px 72px 72px 72px 72px 72px 72px 72px 68px 84px 96px 48px 80px';
 
     const TABS = [['technical', 'Scanner', null], ['pre', 'Pre scanner', { tab: 'pre' }], ['custom', 'Custom scanner', { tab: 'custom' }]];
     const out = {
@@ -692,23 +708,47 @@ class Component extends DCLogic {
       out.onExport = () => this.exportCsv(out.rows || [], 'scanner-custom.csv');
     }
 
-    out.rows = this.makeRows(list, xOf, xFmt);
-    out.empty = out.rows.length === 0;
+    const base = this.makeRows(list, xOf, xFmt);
+    const tb = st.tbl; const compact = tb.compact;
+    const FS = { lg: [15, 12, 13], sm: [13, 11, 11], xs: [12, 10, 10], xxs: [11, 9, 9] }[tb.fs] || [13, 11, 11];
+    const pad = compact ? '0 8px' : '0 10px';
+    const ALL = [
+      { k: 'code', t: 'Trading code', fr: 1.2, min: 110, al: 'flex-start', lock: true }, { k: 'links', t: 'Quick links', fr: 1.6, min: 170, al: 'flex-start' },
+      { k: 'ltp', t: 'LTP', min: 72 }, { k: 'pct', t: '%', min: 72 }, { k: 'open', t: 'Open', min: 72 }, { k: 'high', t: 'High', min: 72 }, { k: 'low', t: 'Low', min: 72 }, { k: 'close', t: 'Close', min: 72 },
+      { k: 'ycp', t: 'YCP', min: 72 }, { k: 'chg', t: 'Change', min: 72 }, { k: 'trade', t: 'Trade', min: 68 }, { k: 'value', t: 'Value (mn)', min: 90 }, { k: 'volume', t: 'Volume', min: 96 },
+      { k: 'cat', t: 'Cat', fr: 0.6, min: 48, al: 'center' }, { k: 'pe', t: 'Audited PE', min: 80 },
+    ];
+    if (showX) ALL.push({ k: 'x', t: xLabel, min: 110 });
+    const vis = ALL.filter(c => c.lock || !tb.hidden[c.k]); this._visCols = vis;
+    const TA = { 'flex-start': 'left', center: 'center', 'flex-end': 'right' };
+    out.cols = vis.map(c => `minmax(${c.min}px, ${c.fr || 1}fr)`).join(' ');
+    out.minW = vis.reduce((a, c) => a + c.min, 0);
+    out.pad = pad; out.fsBody = FS[0] + 'px'; out.fsHead = FS[1] + 'px'; out.rowH = (compact ? 28 : 40) + 'px'; out.headH = (compact ? 32 : 40) + 'px';
+    out.rows = base.map(r => ({ ...r, cells: vis.map(c => c.k === 'code' ? { isCode: true, v: r.v.code, href: r.href, pad }
+      : c.k === 'links' ? { isLinks: true, href: r.href, vpa: r.vpa, depth: r.depth, effect: r.effect, pad, lfs: FS[2] + 'px' }
+      : { isText: true, v: r.v[c.k], align: TA[c.al || 'flex-end'], pad, color: c.k === 'pct' ? r.tone : c.k === 'chg' ? r.chgTone : 'inherit' }) }));
+    out.empty = base.length === 0;
     out.emptyText = emptyText;
     out.showResults = tab !== 'pre' || st.preF >= 0;
-    out.showX = showX; out.xLabel = xLabel; out.cols = showX ? COLS + ' 100px' : COLS;
-    if (tab === 'technical') { out.total = out.rows.length; out.resultTitle = `Total ${out.rows.length} using Day period`; }
+    out.showX = showX; out.xLabel = xLabel;
+    if (tab === 'technical') { out.total = base.length; out.resultTitle = `Total ${base.length} using Day period`; }
     if (!out.onExport) out.onExport = () => this.exportCsv(out.rows, 'scanner-technical.csv');
-    out.onExport = out.onExport.bind ? out.onExport : out.onExport;
-    this.lastRows = out.rows;
     out.resultTitle = out.resultTitle || 'Results';
 
-    const H = [['code', 'Trading code', 'flex-start'], [null, '', 'flex-start'], ['ltp', 'LTP'], ['pct', '%'], ['open', 'Open'], ['high', 'High'], ['low', 'Low'], ['close', 'Close'], ['ycp', 'YCP'], ['chg', 'Change'], ['trade', 'Trade'], ['value', 'Value (mn)'], ['volume', 'Volume'], ['cat', 'Cat'], ['pe', 'Audited PE']];
-    out.heads = H.map(([k, t, al]) => { const on = k && st.sort.k === k; return {
-      t, arrow: on ? (st.sort.d > 0 ? '▲' : '▼') : '', fg: on ? 'var(--ink)' : 'var(--text-muted)', cursor: k ? 'pointer' : 'default',
-      justify: al || 'flex-end',
-      onClick: () => { if (!k) return; this.setState(s => ({ sort: { k, d: s.sort.k === k ? -s.sort.d : (k === 'code' ? 1 : -1) } })); } }; });
-    out.onExport = out.onExport;
+    out.heads = vis.map(c => { const k = c.k; const sortable = k !== 'links'; const on = sortable && st.sort.k === k; return {
+      t: k === 'links' ? '' : c.t, arrow: on ? (st.sort.d > 0 ? '▲' : '▼') : '', fg: on ? 'var(--ink)' : 'var(--text-muted)', cursor: sortable ? 'pointer' : 'default', justify: c.al || 'flex-end',
+      onClick: () => { if (!sortable) return; this.setState(s => ({ sort: { k, d: s.sort.k === k ? -s.sort.d : (k === 'code' ? 1 : -1) } })); } }; });
+
+    out.setOpen = st.setOpen;
+    out.onSettings = () => this.setState(s => ({ setOpen: !s.setOpen }));
+    out.onCloseSettings = () => this.setState({ setOpen: false });
+    out.cmpMark = compact ? '✓' : ''; out.cmpBg = compact ? 'var(--ink)' : 'var(--paper)';
+    out.onCompact = () => this.setTbl({ compact: !compact });
+    out.fsOpts = ['lg', 'sm', 'xs', 'xxs'].map(k => ({ label: k, bg: tb.fs === k ? 'var(--ink)' : 'var(--paper)', fg: tb.fs === k ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setTbl({ fs: k }) }));
+    out.colOpts = ALL.map(c => { const on = !!c.lock || !tb.hidden[c.k]; return { label: c.t, mark: on ? '✓' : '', bg: on ? 'var(--ink)' : 'var(--paper)', op: c.lock ? 0.5 : 1,
+      onToggle: () => { if (c.lock) return; const h = { ...tb.hidden }; if (on) h[c.k] = true; else delete h[c.k]; this.setTbl({ hidden: h }); } }; });
+    out.onShowAll = () => this.setTbl({ hidden: {} });
+    out.onResetTbl = () => this.setTbl({ compact: false, fs: 'sm', hidden: {} });
     return out;
   }
 }
