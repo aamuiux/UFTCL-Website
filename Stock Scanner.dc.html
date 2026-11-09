@@ -75,7 +75,7 @@ a:hover { color: var(--blue-700); }
   <section data-screen-label="Pre scanner" style="display: flex; flex-direction: column; gap: 12px;">
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
       <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">Time frame<span style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font-weight: 700;">D · Day</span></div>
-      <span style="font-size: 12px; color: var(--text-muted);">Pick an indicator, then a condition. The table shows the indicator value for every security.</span>
+      <span style="font-size: 12px; color: var(--text-muted);">Pick an indicator, then a formula. The matching securities are listed below.</span>
     </div>
     <div class="scn-panels" data-screen-label="Pre scanner builder">
       <div>
@@ -93,7 +93,7 @@ a:hover { color: var(--blue-700); }
       </div>
       <div>
         <div class="scn-panel-head">How it works</div>
-        <div style="padding: 14px; font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;"><span>Counts update from the day's data.</span><span>Select a formula to filter the table. Select it again to clear.</span><span>Export the filtered list as CSV.</span></div>
+        <div style="padding: 14px; font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;"><span>Counts update from the day's data.</span><span>Select a formula to list the matching securities below. Select it again to hide the list.</span><span>Export the filtered list as CSV.</span></div>
       </div>
     </div>
   </section>
@@ -142,6 +142,7 @@ a:hover { color: var(--blue-700); }
 
   <sc-if value="{{ hasMsg }}"><div role="status" style="font-size: 12px; color: var(--text-muted);">{{ msg }}</div></sc-if>
 
+  <sc-if value="{{ showResults }}">
   <section data-screen-label="Scanner results" style="display: flex; flex-direction: column; gap: 12px;">
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
       <b style="font-size: 15px;">{{ resultTitle }}</b>
@@ -178,6 +179,7 @@ a:hover { color: var(--blue-700); }
     </div></div>
     <p style="margin: 0; font-size: 12px; color: var(--text-muted);">{{ footnote }}</p>
   </section>
+  </sc-if>
 
   <dc-import name="SymbolIndex" page="Stock Chart" hint-size="100%,120px"></dc-import>
 </main>
@@ -472,6 +474,7 @@ class Component extends DCLogic {
     out.rows = this.makeRows(list, xOf, xFmt);
     out.empty = out.rows.length === 0;
     out.emptyText = emptyText;
+    out.showResults = tab !== 'pre' || st.preF >= 0;
     out.showX = showX; out.xLabel = xLabel; out.cols = showX ? COLS + ' 100px' : COLS;
     if (tab === 'technical') { out.total = out.rows.length; out.resultTitle = `Total ${out.rows.length} using Day period`; }
     if (!out.onExport) out.onExport = () => this.exportCsv(out.rows, 'scanner-technical.csv');
