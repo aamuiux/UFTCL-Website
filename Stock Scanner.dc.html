@@ -113,13 +113,13 @@ a:hover { color: var(--blue-700); }
       </div>
       <div>
         <div class="scn-panel-head">Formulas</div>
-        <sc-for list="{{ cForms }}" as="f" hint-placeholder-count="8"><div style="display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 14px; border-bottom: 1px solid var(--neutral-200);">
-          <span style="flex: 1; min-width: 0; font-size: 13px; font-weight: 700;">{{ f.name }}</span>
-          <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 8px; flex-shrink: 0; font-size: 12px; color: var(--text-muted);">
-            <label style="display: flex; align-items: center; gap: 4px;">N <input class="scn-input" style="width: 52px;" type="number" min="1" max="50" value="{{ f.n }}" aria-label="{{ f.name }} N" onChange="{{ f.onN }}"></label>
+        <sc-for list="{{ cForms }}" as="f" hint-placeholder-count="8"><div onClick="{{ f.onSelect }}" style="display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 14px; border-bottom: 1px solid var(--neutral-200); cursor: pointer; background: {{ f.bg }}; color: {{ f.fg }};">
+          <span style="flex: 1; min-width: 0; font-size: 13px; font-weight: {{ f.fw }};">{{ f.name }}</span>
+          <sc-if value="{{ f.sel }}"><div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 8px; flex-shrink: 0; font-size: 12px; color: var(--text-muted);">
+            <label style="display: flex; align-items: center; gap: 4px; color: var(--ink);">N <input class="scn-input" style="width: 52px;" type="number" min="1" max="50" value="{{ f.n }}" aria-label="{{ f.name }} N" onChange="{{ f.onN }}"></label>
             <sc-if value="{{ f.hx }}"><label style="display: flex; align-items: center; gap: 4px;">X <input class="scn-input" style="width: 52px;" type="number" min="1" max="50" value="{{ f.x }}" aria-label="{{ f.name }} X" onChange="{{ f.onX }}"></label></sc-if>
             <button class="scn-btn" style="height: 32px; padding: 0 14px;" onClick="{{ f.onAdd }}">Add</button>
-          </div>
+          </div></sc-if>
         </div></sc-for>
       </div>
       <div>
@@ -203,7 +203,7 @@ class Component extends DCLogic {
   state = {
     ready: !!window.UFT, sub: 'technical', msg: '', q: '', sort: { k: 'pct', d: -1 },
     slots: { technical: ['SMA20-below', ...Array(14).fill('')], fundamental: Array(15).fill(''), all: Array(15).fill('') },
-    preGroup: 'Oscillators', preInd: 'RSI (14)', preF: -1,
+    preGroup: 'Oscillators', preInd: 'RSI (14)', preF: -1, cSel: -1,
     cGroup: 'Oscillators', cInd: 'RSI', cPeriod: 14,
     cp: [{ n: 40, x: 3 }, { n: 60, x: 3 }, { n: 70, x: 3 }, { n: 30, x: 3 }, { n: 3, x: 3 }, { n: 40, x: 3 }, { n: 3, x: 3 }, { n: 60, x: 3 }],
     chips: [], lastRun: null,
@@ -458,7 +458,7 @@ class Component extends DCLogic {
       out.onPeriod = e => { const v = Math.max(2, Math.min(100, Math.round(+e.target.value) || 14)); this.setState({ cPeriod: v }); };
       out.stopClick = e => e.stopPropagation();
       const isRsi = st.cInd === 'RSI';
-      out.cForms = isRsi ? this.cf.map((f, idx) => ({ name: f.name, hx: f.hx, n: st.cp[idx].n, x: st.cp[idx].x, onN: e => this.setCp(idx, 'n', e.target.value), onX: e => this.setCp(idx, 'x', e.target.value), onAdd: () => this.addChip(idx) })) : [];
+      out.cForms = isRsi ? this.cf.map((f, idx) => ({ sel: st.cSel === idx, bg: st.cSel === idx ? 'var(--neutral-100)' : 'var(--paper)', fg: 'var(--ink)', fw: st.cSel === idx ? 700 : 400, onSelect: () => this.setState({ cSel: idx }), name: f.name, hx: f.hx, n: st.cp[idx].n, x: st.cp[idx].x, onN: e => this.setCp(idx, 'n', e.target.value), onX: e => this.setCp(idx, 'x', e.target.value), onAdd: () => this.addChip(idx) })) : [];
       out.chips = st.chips.map(c => ({ label: c.label, onRemove: () => this.setState(s => ({ chips: s.chips.filter(x => x.key !== c.key) })) }));
       out.onRun = () => this.setState(s => ({ lastRun: s.chips.slice(), msg: `Scanner ran with ${s.chips.length} formula(s).` }));
       out.onClear = () => this.setState({ chips: [], lastRun: null, msg: '' });
