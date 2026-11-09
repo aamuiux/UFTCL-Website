@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>IPO — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--blue-700); }
+.ipo-ctl { font: inherit; font-size: 13px; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.ipo-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; }
+.ipo-btn:hover { background: var(--ink); color: var(--paper); }
+.ipo-pg { font: inherit; font-size: 13px; min-width: 32px; height: 32px; box-sizing: border-box; padding: 0 8px; border: 1px solid var(--neutral-400); background: var(--paper); color: var(--ink); cursor: pointer; }
+.ipo-pg:hover:not(:disabled) { border-color: var(--ink); }
+.ipo-pg:disabled { color: var(--neutral-400); cursor: default; }
+.ipo-row { display: grid; grid-template-columns: minmax(230px, 2.4fr) 64px 104px 104px 96px 112px 90px 100px; align-items: center; gap: 0 12px; padding: 0 12px; min-height: 44px; font-size: 14px; }
+.ipo-letter { font: inherit; font-size: 13px; width: 32px; height: 32px; box-sizing: border-box; border: 1px solid var(--neutral-400); background: var(--paper); color: var(--ink); cursor: pointer; padding: 0; }
+.ipo-letter:hover { border-color: var(--ink); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="ipo" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <section style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px;">
+    <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+      <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">{{ title }}</h1>
+      <div style="color: var(--text-muted);">{{ subtitle }}</div>
+    </div>
+    <div role="tablist" style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink);">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" style="font: inherit; height: 32px; padding: 0 14px; border: 0; border-left: {{ t.bl }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; display: flex; align-items: center; gap: 8px;">{{ t.label }}<span style="font-family: var(--font-mono); font-size: 11px; opacity: 0.75;">{{ t.n }}</span></button></sc-for>
+    </div>
+  </section>
+
+  <sc-if value="{{ isOverview }}"><section data-screen-label="About IPOs" style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+    <b style="font-size: 16px;">What is an IPO?</b>
+    <p style="margin: 0; max-width: 980px; line-height: 22px; color: var(--neutral-700);">An initial public offering (IPO) is when a company offers its equity shares to the general public in the open market for the first time. Public subscription is the way a company raises funds from investors. Shares set aside in the offer are reserved for different investor groups, including individual investors, eligible institutions and non-resident Bangladeshis. An IPO is issued either at a fixed price or through book building.</p>
+  </section></sc-if>
+
+  <sc-if value="{{ showUp }}"><section data-screen-label="Upcoming IPOs" style="display: flex; flex-direction: column; gap: 12px;">
+    <sc-if value="{{ isOverview }}"><div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px;"><div style="display: flex; flex-direction: column;"><h2 style="margin: 0; font-family: var(--font-sans-b); font-size: 24px; line-height: 32px;">Upcoming IPOs</h2><span style="color: var(--text-muted);">Stay informed about companies preparing to list and the investment opportunities ahead.</span></div><button class="ipo-btn" onClick="{{ goUp }}">View all upcoming</button></div></sc-if>
+
+    <sc-if value="{{ upFilters }}"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; border: 1px solid var(--ink); padding: 8px 12px;">
+      <input class="ipo-ctl" type="search" placeholder="Search company" aria-label="Search company" value="{{ q }}" onInput="{{ onQ }}" style="width: 240px; max-width: 100%;">
+      <select class="ipo-ctl" aria-label="Board" value="{{ board }}" onChange="{{ onBoard }}"><sc-for list="{{ boardOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+      <select class="ipo-ctl" aria-label="Status" value="{{ status }}" onChange="{{ onStatus }}"><sc-for list="{{ statusOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+      <span style="margin-left: auto; font-size: 13px; color: var(--text-muted);">Showing <b style="color: var(--ink);">{{ upCount }}</b> of <b style="color: var(--ink);">{{ upTotal }}</b></span>
+    </div></sc-if>
+
+    <sc-if value="{{ upHas }}"><div style="border: 1px solid var(--ink);">
+      <sc-for list="{{ upRows }}" as="u" hint-placeholder-count="4"><article style="padding: 16px; border-top: {{ u.bt }}; background: {{ u.bg }}; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0;"><b style="font-size: 17px;">{{ u.name }}</b><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; padding: 2px 8px; border: 1px solid {{ u.sc }}; color: {{ u.sc }};">{{ u.status }}</span></div>
+          <div style="display: flex; gap: 16px; font-size: 13px;"><sc-for list="{{ u.links }}" as="l" hint-placeholder-count="3"><a href="{{ l.href }}" aria-disabled="{{ l.dis }}" style="color: {{ l.c }}; pointer-events: {{ l.pe }}; font-weight: 700; text-decoration: {{ l.td }};">{{ l.label }}</a></sc-for></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(max(170px, calc(25% - 20px)), 1fr)); gap: 8px 20px;">
+          <sc-for list="{{ u.fields }}" as="f" hint-placeholder-count="8"><div style="display: flex; flex-direction: column;"><span style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">{{ f.k }}</span><span style="font-family: var(--font-mono); font-size: 14px; color: {{ f.c }};">{{ f.v }}</span></div></sc-for>
+        </div>
+      </article></sc-for>
+    </div></sc-if>
+
+    <sc-if value="{{ upEmpty }}"><div data-screen-label="Empty state" style="border: 1px solid var(--ink); padding: 40px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="var(--neutral-500)" stroke-width="1.6" aria-hidden="true"><rect x="6" y="5" width="28" height="30"></rect><path d="M12 14h16M12 20h16M12 26h9"></path></svg>
+      <b style="font-size: 18px;">{{ upEmptyTitle }}</b>
+      <span style="color: var(--text-muted); max-width: 460px;">{{ upEmptyText }}</span>
+      <sc-if value="{{ upFiltered }}"><button class="ipo-btn" onClick="{{ clearUp }}">Clear filters</button></sc-if>
+      <sc-if value="{{ upNotFiltered }}"><button class="ipo-btn" onClick="{{ goPast }}">Browse past IPOs</button></sc-if>
+    </div></sc-if>
+  </section></sc-if>
+
+  <sc-if value="{{ showOpen }}"><section data-screen-label="Open IPOs" style="display: flex; flex-direction: column; gap: 12px;">
+    <sc-if value="{{ isOverview }}"><div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px;"><div style="display: flex; flex-direction: column;"><h2 style="margin: 0; font-family: var(--font-sans-b); font-size: 24px; line-height: 32px;">Open IPOs</h2><span style="color: var(--text-muted);">Offers currently open for subscription, with offer price, open and close dates, size and the full list.</span></div><button class="ipo-btn" onClick="{{ goOpen }}">View open IPOs</button></div></sc-if>
+    <div data-screen-label="Empty state" style="border: 1px solid var(--ink); padding: 40px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="var(--neutral-500)" stroke-width="1.6" aria-hidden="true"><circle cx="20" cy="20" r="14"></circle><path d="M20 12v9l6 3"></path></svg>
+      <b style="font-size: 18px;">No IPO is open for subscription</b>
+      <span style="color: var(--text-muted); max-width: 460px;">There is no offer open right now. Check the upcoming list to prepare for the next one.</span>
+      <button class="ipo-btn" onClick="{{ goUp }}">See upcoming IPOs</button>
+    </div>
+    <sc-if value="{{ isOpenTab }}"><div data-screen-label="How to apply" style="border: 1px solid var(--ink);">
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700;">How to apply through UFTCL</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3"><div style="padding: 16px; border-left: {{ s.bl }}; display: flex; flex-direction: column; gap: 6px;"><span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">STEP {{ s.n }}</span><b>{{ s.t }}</b><span style="color: var(--neutral-700); line-height: 20px;">{{ s.d }}</span></div></sc-for>
+      </div>
+    </div></sc-if>
+  </section></sc-if>
+
+  <sc-if value="{{ showPast }}"><section data-screen-label="Past IPOs" style="display: flex; flex-direction: column; gap: 12px;">
+    <sc-if value="{{ isOverview }}"><div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px;"><div style="display: flex; flex-direction: column;"><h2 style="margin: 0; font-family: var(--font-sans-b); font-size: 24px; line-height: 32px;">Past IPOs</h2><span style="color: var(--text-muted);">Browse earlier public offers with their dates, offer price and issue size.</span></div><button class="ipo-btn" onClick="{{ goPast }}">View all past IPOs</button></div></sc-if>
+
+    <sc-if value="{{ pastFilters }}"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; border: 1px solid var(--ink); padding: 8px 12px;">
+      <input class="ipo-ctl" type="search" placeholder="Search company" aria-label="Search company" value="{{ pq }}" onInput="{{ onPq }}" style="width: 240px; max-width: 100%;">
+      <select class="ipo-ctl" aria-label="Year" value="{{ year }}" onChange="{{ onYear }}"><sc-for list="{{ yearOpts }}" as="o" hint-placeholder-count="8"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+      <button class="ipo-btn" onClick="{{ clearPast }}" style="display: {{ clearShow }};">Clear filters</button>
+      <span style="margin-left: auto; font-size: 13px; color: var(--text-muted);">Showing <b style="color: var(--ink);">{{ pastCount }}</b> of <b style="color: var(--ink);">{{ pastTotal }}</b></span>
+    </div></sc-if>
+
+    <div style="border: 1px solid var(--ink); overflow-x: auto;">
+      <div style="min-width: 940px;">
+        <div class="ipo-row" style="min-height: 44px; background: var(--neutral-100); border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;"><span>Scrip</span><span style="text-align: right;">Year</span><span style="text-align: right;">Open date</span><span style="text-align: right;">Close date</span><span style="text-align: right;">Price</span><span style="text-align: right;">Size (mn.)</span><span style="text-align: right;">Summary</span><span style="text-align: right;">Prospectus</span></div>
+        <sc-for list="{{ pastRows }}" as="p" hint-placeholder-count="10"><div class="ipo-row" style="background: {{ p.bg }};"><span style="font-weight: 500; padding: 8px 0;">{{ p.name }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ p.year }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ p.open }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ p.close }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ p.price }}</span><span style="text-align: right; font-family: var(--font-mono);">{{ p.size }}</span><span style="text-align: right;"><a href="{{ p.sumHref }}" style="color: var(--blue-700); display: {{ p.sumShow }};">summary</a></span><span style="text-align: right;"><a href="{{ p.proHref }}" style="color: var(--blue-700); display: {{ p.proShow }};">prospectus</a></span></div></sc-for>
+        <sc-if value="{{ pastEmpty }}"><div data-screen-label="Empty state" style="padding: 40px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;"><b style="font-size: 18px;">No IPOs match your filters</b><span style="color: var(--text-muted);">Try another name, year or letter.</span><button class="ipo-btn" onClick="{{ clearPast }}">Clear filters</button></div></sc-if>
+      </div>
+      <sc-if value="{{ pager }}"><div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 8px 12px; border-top: 1px solid var(--ink); background: var(--neutral-50);">
+        <nav aria-label="Pagination" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ pages }}" as="g" hint-placeholder-count="10"><button class="ipo-pg" onClick="{{ g.onClick }}" disabled="{{ g.dis }}" aria-label="{{ g.aria }}" aria-current="{{ g.cur }}" style="background: {{ g.bg }}; color: {{ g.fg }}; font-weight: {{ g.fw }}; border-color: {{ g.bd }};">{{ g.label }}</button></sc-for></nav>
+        <span style="font-size: 13px; color: var(--text-muted);">{{ range }}</span>
+      </div></sc-if>
+    </div>
+
+    <sc-if value="{{ pastFilters }}"><div role="group" aria-label="Filter by first letter" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 4px 0;">
+      <sc-for list="{{ letters }}" as="l" hint-placeholder-count="27"><button class="ipo-letter" onClick="{{ l.onClick }}" aria-pressed="{{ l.on }}" style="background: {{ l.bg }}; color: {{ l.fg }}; border-color: {{ l.bd }}; width: {{ l.w }};">{{ l.label }}</button></sc-for>
+    </div></sc-if>
+  </section></sc-if>
+
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, tab: null, q: '', board: 'all', status: 'all', pq: '', year: 'all', letter: '', page: 1 };
+  PAGE = 12;
+  componentDidMount() {
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50);
+  }
+  componentWillUnmount() { clearInterval(this.p); }
+
+  // ---- mock data (deterministic) ----
+  upcomingData() {
+    const raw = [
+      ['Subra Systems Limited', 'SME', 'Fixed Price', 'Applied'], ['Index Accessories Ltd.', 'SME', 'Fixed Price', 'Applied'],
+      ['Islam Oxygen Limited', 'Main', 'Book Building', 'Applied'], ['B.Brothers Garments Co. Limited', 'Main', 'Fixed Price', 'Applied'],
+      ['Three Angle Marine Limited', 'Main', 'Fixed Price', 'Applied'], ['Omera Petroleum Limited', 'Main', 'Book Building', 'Applied'],
+      ['Alliance Finance PLC', 'Main', 'Fixed Price', 'Applied'], ['Rhymer Chemical Industries Limited', 'Main', 'Fixed Price', 'Applied'],
+      ['Bangla Trac Rental Services PLC', 'SME', 'Fixed Price', 'Applied'], ['Scandex (BD) Limited', 'SME', 'Fixed Price', 'Applied'],
+      ['Abound Steel Industries Ltd.', 'Main', 'Fixed Price', 'Applied'], ['Protective Islami Life Insurance Limited', 'Main', 'Fixed Price', 'Applied'],
+      ['Brain Station 23 PLC.', 'SME', 'Fixed Price', 'Approved'], ['Doer Services PLC.', 'SME', 'Fixed Price', 'Postponed'],
+    ];
+    const size = [300, 450, 1200, 600, 520, 2400, 800, 350, 180, 150, 700, 900, 250, 200];
+    return raw.map((r, i) => ({ id: i, name: r[0], board: r[1], method: r[2], status: r[3], price: r[2] === 'Fixed Price' ? '10.00' : '', size: r[3] === 'Applied' && i % 3 ? '' : String(size[i]),
+      open: r[3] === 'Approved' ? '24.11.2026' : '', close: r[3] === 'Approved' ? '30.11.2026' : '', times: '' }));
+  }
+  pastData() {
+    const fixed = [
+      ['Navana Pharmaceuticals Ltd', '12.09.2022', '18.09.2022', 24, 75, 0, 0], ['Meghna Insurance Company Limited', '10.05.2022', '17.05.2022', 10, 1600, 1, 1],
+      ['JMI Hospital Requisite Manufacturing Limited', '26.02.2022', '02.03.2022', 20, 500, 1, 1], ['JMI Hospital Requisite Manufacturing Limited (BB)', '08.01.2022', '11.01.2022', 10, 750, 1, 0],
+      ['Union Bank Limited', '25.12.2021', '29.12.2021', 10, 4280, 1, 0], ['BD Thai Food & Beverage Ltd', '22.12.2021', '28.12.2021', 10, 150, 1, 0],
+      ['Union Insurance Company Limited', '14.12.2021', '21.12.2021', 10, 193.60904, 1, 0], ['Acme Pesticides Limited', '11.10.2021', '17.10.2021', 10, 300, 1, 1],
+      ['Krishibid Feed Limited', '09.10.2021', '13.10.2021', 10, 220, 1, 0], ['Sena Kalyan Insurance Company Limited', '02.10.2021', '06.10.2021', 10, 160, 1, 1],
+      ['Mostofa Metal Industries Ltd.', '25.09.2021', '29.09.2021', 10, 110, 1, 0], ['Beximco Green Sukuk', '15.08.2021', '29.09.2021', 100, 7500, 1, 1],
+    ];
+    const rows = fixed.map(f => ({ name: f[0], open: f[1], close: f[2], price: f[3], size: f[4], sum: !!f[5], pro: !!f[6] }));
+    const A = ['Alpha', 'Bengal', 'Padma', 'Meghna', 'Jamuna', 'Sonali', 'Dhaka', 'Karnaphuli', 'Shyamoli', 'Rupali', 'Eastern', 'Central', 'Prime', 'Delta', 'Orion', 'Surma', 'Teesta', 'Unity', 'Pioneer', 'Harbor'];
+    const B = ['Textile', 'Pharma', 'Steel', 'Cement', 'Insurance', 'Bank', 'Food', 'Power', 'Ceramics', 'Paper', 'Jute', 'Leasing', 'Fisheries', 'Chemical', 'Housing'];
+    const PRICES = [10, 10, 10, 10, 20, 100, 25, 50, 10, 10]; const pad = n => String(n).padStart(2, '0');
+    let t = Date.UTC(2021, 6, 28); let seed = 7; const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+    for (let i = 0; i < 108; i++) {
+      let name = `${A[i % 20]} ${B[(i * 7 + 3) % 15]} ${i < 60 ? 'Limited' : 'PLC'}`;
+      if (i === 17) name = '1st Padma Mutual Fund'; if (i === 61) name = '5th Sena Mutual Fund';
+      const days = 5 + Math.floor(rnd() * 4); const c = new Date(t); const o = new Date(t - days * 86400000);
+      const f = d => `${pad(d.getUTCDate())}.${pad(d.getUTCMonth() + 1)}.${d.getUTCFullYear()}`;
+      rows.push({ name, open: f(o), close: f(c), price: PRICES[Math.floor(rnd() * PRICES.length)], size: Math.round((100 + rnd() * 3900) / 10) * 10, sum: rnd() > 0.12, pro: rnd() > 0.55 });
+      t = o.getTime() - (20 + Math.floor(rnd() * 30)) * 86400000;
+    }
+    return rows.map(r => ({ ...r, year: r.open.slice(6) }));
+  }
+  cache() { if (!this._c) this._c = { up: this.upcomingData(), past: this.pastData() }; return this._c; }
+  go(tab) { this.setState({ tab, page: 1 }); try { history.replaceState(null, '', tab === 'overview' ? 'IPO.dc.html' : `IPO.dc.html?tab=${tab}`); } catch (e) { /* no history */ } window.scrollTo(0, 0); }
+
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const D = this.cache();
+    const tabP = U.param('tab', 'overview'); const tab = st.tab || (['upcoming', 'open', 'past'].includes(tabP) ? tabP : 'overview');
+    const empty = U.param('state', '') === 'empty';
+    const isOv = tab === 'overview';
+    const f2 = v => v === '' ? '—' : Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+
+    // upcoming
+    const upAll = empty ? [] : D.up; const q = st.q.trim().toLowerCase();
+    const upFilt = upAll.filter(u => (st.board === 'all' || u.board === st.board) && (st.status === 'all' || u.status === st.status) && (!q || u.name.toLowerCase().includes(q)));
+    const upShownList = isOv ? upFilt.slice(0, 3) : upFilt;
+    const SC = { Applied: 'var(--neutral-700)', Approved: 'var(--green-700)', Postponed: 'var(--red-700)' };
+    const upRows = upShownList.map((u, i) => {
+      const mk = (label, on) => ({ label, href: '#', dis: on ? 'false' : 'true', c: on ? 'var(--blue-700)' : 'var(--neutral-400)', pe: on ? 'auto' : 'none', td: on ? 'none' : 'none' });
+      const dash = v => v || '—';
+      return { name: u.name, status: u.status, sc: SC[u.status], bt: i ? '1px solid var(--neutral-300)' : '0', bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)',
+        links: [mk('summary', u.status !== 'Applied'), mk('prospectus', u.status === 'Approved'), mk('result', false)],
+        fields: [{ k: 'Board', v: u.board }, { k: 'Asset class', v: 'Equity' }, { k: 'Listing method', v: u.method }, { k: 'Offer price (BDT)', v: dash(u.price) }, { k: 'IPO size (BDT mn)', v: dash(u.size) }, { k: 'Subscription open', v: dash(u.open) }, { k: 'Subscription close', v: dash(u.close) }, { k: 'Subscription (times)', v: '—' }].map(x => ({ ...x, c: x.v === '—' ? 'var(--neutral-500)' : 'var(--ink)' })) };
+    });
+    const upFiltered = upAll.length > 0 && upFilt.length === 0;
+    const clearUp = () => this.setState({ q: '', board: 'all', status: 'all' });
+
+    // past
+    const pq = st.pq.trim().toLowerCase(); const L = st.letter;
+    const pastFilt = D.past.filter(p => (st.year === 'all' || p.year === st.year) && (!pq || p.name.toLowerCase().includes(pq)) &&
+      (!L || (L === '#' ? /^[0-9]/.test(p.name) : p.name.toUpperCase().startsWith(L))));
+    const pages = Math.max(1, Math.ceil(pastFilt.length / this.PAGE)); const page = Math.min(st.page, pages);
+    const pastShown = isOv ? pastFilt.slice(0, 5) : pastFilt.slice((page - 1) * this.PAGE, page * this.PAGE);
+    const pastRows = pastShown.map((p, i) => ({ name: p.name, year: p.year, open: p.open, close: p.close, price: f2(p.price), size: f2(p.size), bg: i % 2 ? 'var(--neutral-50)' : 'var(--paper)',
+      sumHref: '#', sumShow: p.sum ? 'inline' : 'none', proHref: '#', proShow: p.pro ? 'inline' : 'none' }));
+    const years = [...new Set(D.past.map(p => p.year))];
+    const pgBtn = (label, to, aria, dis) => ({ label, aria, dis, cur: 'false', bg: 'var(--paper)', fg: 'var(--ink)', fw: 400, bd: 'var(--neutral-400)', onClick: () => this.setState({ page: to }) });
+    const win0 = Math.max(1, Math.min(page - 4, pages - 9)); const nums = []; for (let n = win0; n <= Math.min(pages, win0 + 9); n++) nums.push(n);
+    const pagesList = [pgBtn('«', 1, 'First page', page === 1), pgBtn('‹', page - 1, 'Previous page', page === 1),
+      ...nums.map(n => ({ ...pgBtn(String(n), n, 'Page ' + n, false), cur: n === page ? 'page' : 'false', bg: n === page ? 'var(--ink)' : 'var(--paper)', fg: n === page ? 'var(--paper)' : 'var(--ink)', fw: n === page ? 700 : 400, bd: n === page ? 'var(--ink)' : 'var(--neutral-400)' })),
+      pgBtn('›', page + 1, 'Next page', page === pages), pgBtn('»', pages, 'Last page', page === pages)];
+    const a = (page - 1) * this.PAGE;
+    const letters = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '#'].map(c => { const on = L === c; return { label: c === '#' ? '1…9' : c, w: c === '#' ? '48px' : '32px', on: on ? 'true' : 'false', bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'var(--neutral-400)', onClick: () => this.setState({ letter: on ? '' : c, page: 1 }) }; });
+    const clearPast = () => this.setState({ pq: '', year: 'all', letter: '', page: 1 });
+
+    const counts = { upcoming: upAll.length, open: 0, past: D.past.length };
+    const T = { overview: ['IPO', 'Upcoming, open and past public offers in one place.'], upcoming: ['Upcoming IPOs', 'Companies preparing to list, with board, listing method and offer details.'], open: ['Open IPOs', 'Offers currently open for subscription.'], past: ['Past IPOs', 'Earlier public offers, with open and close dates, offer price and issue size.'] }[tab];
+    const tabs = [['overview', 'Overview', ''], ['upcoming', 'Upcoming', counts.upcoming], ['open', 'Open', counts.open], ['past', 'Past', counts.past]].map(([k, label, n], i) => { const on = tab === k;
+      return { label, n: String(n), sel: on ? 'true' : 'false', bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bl: i ? '1px solid var(--ink)' : '0', onClick: () => this.go(k) }; });
+
+    return {
+      title: T[0], subtitle: T[1], tabs, isOverview: isOv, isOpenTab: tab === 'open',
+      showUp: isOv || tab === 'upcoming', showOpen: isOv || tab === 'open', showPast: isOv || tab === 'past',
+      goUp: () => this.go('upcoming'), goOpen: () => this.go('open'), goPast: () => this.go('past'),
+      upFilters: tab === 'upcoming' && upAll.length > 0, q: st.q, board: st.board, status: st.status,
+      onQ: e => this.setState({ q: e.target.value }), onBoard: e => this.setState({ board: e.target.value }), onStatus: e => this.setState({ status: e.target.value }),
+      boardOpts: [{ v: 'all', l: 'All boards' }, { v: 'Main', l: 'Main board' }, { v: 'SME', l: 'SME board' }],
+      statusOpts: [{ v: 'all', l: 'All statuses' }, { v: 'Applied', l: 'Applied' }, { v: 'Approved', l: 'Approved' }, { v: 'Postponed', l: 'Postponed' }],
+      upCount: upFilt.length, upTotal: upAll.length, upRows, upHas: upRows.length > 0, upEmpty: upRows.length === 0, upFiltered, upNotFiltered: !upFiltered, clearUp,
+      upEmptyTitle: upFiltered ? 'No upcoming IPOs match your filters' : 'No upcoming IPOs right now',
+      upEmptyText: upFiltered ? 'Try a different name, board or status.' : 'No company has been announced for a public offer yet. New offers appear here as soon as they are approved.',
+      steps: [{ n: '1', t: 'Log in to your account', d: 'Sign in to the UFTCL trading portal with your investor ID.', bl: '0' }, { n: '2', t: 'Choose the offer', d: 'Pick the open IPO and enter the number of shares you want.', bl: '1px solid var(--neutral-300)' }, { n: '3', t: 'Confirm and fund', d: 'Review the amount and keep enough balance in your account before the close date.', bl: '1px solid var(--neutral-300)' }],
+      pastFilters: tab === 'past', pq: st.pq, year: st.year, onPq: e => this.setState({ pq: e.target.value, page: 1 }), onYear: e => this.setState({ year: e.target.value, page: 1 }),
+      yearOpts: [{ v: 'all', l: 'All years' }, ...years.map(y => ({ v: y, l: y }))], clearPast, clearShow: (pq || L || st.year !== 'all') ? 'inline-flex' : 'none',
+      pastCount: pastFilt.length, pastTotal: D.past.length, pastRows, pastEmpty: pastRows.length === 0,
+      pager: tab === 'past' && pastFilt.length > 0, pages: pagesList, range: pastFilt.length ? `${a + 1} - ${Math.min(a + this.PAGE, pastFilt.length)} of ${pastFilt.length} items` : '0 items', letters,
+    };
+  }
+}
+</script>
+</body>
+</html>
