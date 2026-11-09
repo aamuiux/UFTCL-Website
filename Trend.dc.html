@@ -74,19 +74,20 @@ a:hover { color: var(--blue-700); }
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
+const U0 = () => window.UFT || { bySym: {}, indices: {} };
 class Component extends DCLogic {
   state = { ready: !!window.UFT, tab: null, symbol: 'DSEX', topInd: 'MA', topP: '20', note: '',
-    irows: [{ ind: 'MA', p: '50' }, { ind: 'MA', p: '100' }, { ind: 'MA', p: '200' }, { ind: 'EMA', p: '15' }, { ind: '', p: '' }], srows: ['DSEX', 'ABBANK', 'ARAMITCEM', 'RAKCERAMIC', ''] };
+    irows: [{ ind: 'MA', p: '50' }, { ind: 'MA', p: '100' }, { ind: 'MA', p: '200' }, { ind: 'EMA', p: '15' }, { ind: '', p: '' }], srows: ['DSEX', 'BRACBANK', 'GP', 'SQURPHARMA', ''] };
   TF = ['1M', '5M', '15M', '30M', '1H', '4H', 'D', 'W', 'MN'];
   IND = { MA: { l: 'MA (Moving average)', p: '20' }, EMA: { l: 'EMA (Exponential MA)', p: '20' }, RSI: { l: 'RSI', p: '14' }, MACD: { l: 'MACD', p: '12,26,9' }, STO: { l: 'Stochastic', p: '14' }, CCI: { l: 'CCI', p: '20' }, MFI: { l: 'MFI', p: '14' }, WILLR: { l: 'Williams %R', p: '14' }, ROC: { l: 'ROC', p: '12' }, MOM: { l: 'Momentum', p: '10' }, BBPB: { l: 'Bollinger %B', p: '20,2' } };
-  componentDidMount() { try { const s = JSON.parse(localStorage.getItem('uftcl.trend') || 'null'); if (s && s.irows && s.srows) this.setState({ irows: s.irows, srows: s.srows, symbol: s.symbol || 'DSEX', topInd: s.topInd || 'MA', topP: s.topP || '20' }); } catch (e) { /* ignore */ }
+  componentDidMount() { try { const s = JSON.parse(localStorage.getItem('uftcl.trend') || 'null'); const ok = c => !c || U0().bySym[c] || U0().indices[c]; if (s && s.irows && s.srows && (window.UFT ? s.srows.every(ok) : true)) this.setState({ irows: s.irows, srows: s.srows, symbol: s.symbol || 'DSEX', topInd: s.topInd || 'MA', topP: s.topP || '20' }); } catch (e) { /* ignore */ }
     if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
   componentWillUnmount() { clearInterval(this.p); }
   series(U, code, tf) {
     this._c = this._c || {}; const key = code + '|' + tf; if (this._c[key]) return this._c[key];
     let out;
     if (tf === 'D' || tf === 'W' || tf === 'MN') out = U.chartBars(code, tf === 'MN' ? 'M' : tf).slice(-400);
-    else { const S = U.bySym[code], IX = U.indices[code]; const last = S ? S.ltp : IX.value; const vol = [0.0006, 0.0012, 0.002, 0.003, 0.0045, 0.008][this.TF.indexOf(tf)]; const r = U.rng(U.hash(code + tf)); const n = 300; const c = new Array(n); c[n - 1] = last;
+    else { const S = U.bySym[code], IX = U.indices[code]; if (!S && !IX) return (this._c[key] = []); const last = S ? S.ltp : IX.value; const vol = [0.0006, 0.0012, 0.002, 0.003, 0.0045, 0.008][this.TF.indexOf(tf)]; const r = U.rng(U.hash(code + tf)); const n = 300; const c = new Array(n); c[n - 1] = last;
       for (let i = n - 1; i > 0; i--) c[i - 1] = c[i] / (1 + (r() - 0.5) * 2 * vol); out = c.map((x, i) => ({ c: x, h: x * (1 + vol * 0.4), l: x * (1 - vol * 0.4), v: 1000 + r() * 4000 })); }
     return (this._c[key] = out);
   }

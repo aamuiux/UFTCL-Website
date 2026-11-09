@@ -51,7 +51,14 @@ a:hover { color: var(--blue-700); }
 <section class="rc-box" data-screen-label="Inputs">
   <div class="rc-head">Return calculator<span>Includes dividends and bonus shares</span></div>
   <div style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 16px; position: relative;">
-    <label class="rc-lab">Stock<input class="rc-in" list="rc-syms" placeholder="Stock" value="{{ stock }}" onChange="{{ onStock }}" aria-label="Stock"></label><datalist id="rc-syms"><sc-for list="{{ symbols }}" as="s"><option value="{{ s }}"></option></sc-for></datalist>
+    <div class="rc-lab" style="position: relative; z-index: {{ cbZ }};"><span id="rc-stock-label">Stock</span>
+      <sc-if value="{{ cbOpen }}"><div onClick="{{ onCbClose }}" style="position: fixed; inset: 0; z-index: -1;"></div></sc-if>
+      <span style="position: relative; display: block;"><input class="rc-in" role="combobox" aria-labelledby="rc-stock-label" aria-expanded="{{ cbStr }}" aria-controls="rc-listbox" aria-autocomplete="list" autocomplete="off" placeholder="Search by code or company" value="{{ cbText }}" onFocus="{{ onCbOpen }}" onClick="{{ onCbOpen }}" onInput="{{ onCbInput }}" onKeyDown="{{ onCbKey }}" style="padding-right: 32px;"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="position: absolute; right: 12px; top: 15px; pointer-events: none;"><path d="M3 6h10l-5 6z"></path></svg></span>
+      <sc-if value="{{ cbOpen }}"><div id="rc-listbox" role="listbox" aria-label="Stocks" style="position: absolute; left: 0; width: 380px; max-width: calc(100vw - 48px); top: 100%; margin-top: 2px; max-height: 300px; overflow-y: auto; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset); text-transform: none; letter-spacing: 0; font-weight: 400;">
+        <sc-for list="{{ cbOpts }}" as="o"><button role="option" aria-selected="{{ o.sel }}" onClick="{{ o.pick }}" onMouseEnter="{{ o.hover }}" style="font: inherit; font-size: 14px; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; width: 100%; padding: 8px 12px; border: 0; border-top: 1px solid var(--neutral-200); background: {{ o.bg }}; color: {{ o.fg }}; cursor: pointer; text-align: left;"><b>{{ o.code }}</b><span style="font-size: 12px; opacity: 0.8; text-align: right; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ o.name }}</span></button></sc-for>
+        <sc-if value="{{ cbNone }}"><div style="padding: 12px; font-size: 13px; color: var(--text-muted);">No stock matches "{{ cbQ }}".</div></sc-if>
+      </div></sc-if>
+    </div>
     <label class="rc-lab">Buy date<input class="rc-in" type="date" value="{{ buyDate }}" max="{{ maxDate }}" onChange="{{ onBuyDate }}"></label>
     <label class="rc-lab">Shares<input class="rc-in" type="number" min="1" placeholder="e.g. 1000" value="{{ sharesIn }}" onChange="{{ onShares }}"></label>
     <label class="rc-lab">Or amount ৳<input class="rc-in" type="number" min="0" value="{{ amountIn }}" onChange="{{ onAmount }}"></label>
@@ -112,7 +119,7 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, stock: '', buy: '', shares: '', amount: '50000', mode: 'cash', tax: true, bench: true, hist: false };
+  state = { ready: !!window.UFT, cbOpen: false, cbQ: '', cbHl: 0, stock: '', buy: '', shares: '', amount: '50000', mode: 'cash', tax: true, bench: true, hist: false };
   componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
   componentWillUnmount() { clearInterval(this.p); }
   // deterministic mock dividend / bonus declarations per stock and year
@@ -135,22 +142,27 @@ class Component extends DCLogic {
     const st = this.state; const f = (v, d = 2) => U.fmt(v, d); const pc = v => (v >= 0 ? '+' : '') + f(v * 100) + '%'; const money = v => '৳' + Math.round(v).toLocaleString('en-US');
     const ref = U.chartBars('DSEX', 'D'); const lastTs = ref[ref.length - 1].ts; const ymd = ts => new Date(ts).toISOString().slice(0, 10); const dmy = b => b.t;
     const defBuy = ymd(Date.UTC(2025, 10, 9)); const buyStr = st.buy || defBuy; const buyTs = new Date(buyStr + 'T00:00:00Z').getTime();
-    const code = st.stock.trim().toUpperCase(); const valid = !!U.bySym[code];
+    const code = st.stock; const valid = !!U.bySym[code];
+    const cq = st.cbQ.trim().toLowerCase(); const cbList = U.symbols.filter(c => !cq || c.toLowerCase().includes(cq) || U.company(c).toLowerCase().includes(cq)); const hl = Math.min(st.cbHl, Math.max(0, cbList.length - 1));
+    const choose = c => this.setState({ stock: c, cbOpen: false, cbQ: '', cbHl: 0 });
     const opts = { shares: Number(st.shares) || 0, amount: Number(st.amount) || 0, mode: st.mode, tax: st.tax };
     const R = valid ? this.run(U, code, buyTs, opts) : null;
     const dayMs = 86400000; const firstTs = ref[0].ts;
     const setBuy = ts => this.setState({ buy: ymd(Math.max(ts, firstTs)) });
     const spans = [['1Y', 1], ['3Y', 3], ['5Y', 5], ['Max', 99]].map(([l, y]) => { const ts = y === 99 ? firstTs : Math.round(lastTs - y * 365.25 * dayMs); const on = ymd(Math.max(ts, firstTs)) === buyStr; return { label: l, onClick: () => setBuy(ts), bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'var(--neutral-400)' }; });
     const amounts = [['50,000', 50000], ['1 lakh', 100000], ['5 lakh', 500000], ['10 lakh', 1000000]].map(([l, v]) => { const on = !opts.shares && Number(st.amount) === v; return { label: l, onClick: () => this.setState({ amount: String(v), shares: '' }), bg: on ? 'var(--ink)' : 'var(--paper)', fg: on ? 'var(--paper)' : 'var(--ink)', bd: on ? 'var(--ink)' : 'var(--neutral-400)' }; });
-    let out = { stock: st.stock, symbols: U.symbols, buyDate: buyStr, maxDate: ymd(lastTs), sharesIn: st.shares, amountIn: st.amount, spans, amounts,
-      onStock: e => this.setState({ stock: e.target.value.toUpperCase() }), onBuyDate: e => this.setState({ buy: e.target.value }), onShares: e => this.setState({ shares: e.target.value, amount: e.target.value ? '' : st.amount }), onAmount: e => this.setState({ amount: e.target.value, shares: e.target.value ? '' : st.shares }),
+    let out = { cbOpen: st.cbOpen, cbStr: st.cbOpen ? 'true' : 'false', cbZ: st.cbOpen ? 41 : 1, cbQ: st.cbQ, cbNone: cbList.length === 0, cbText: st.cbOpen ? st.cbQ : (valid ? code + ' — ' + U.company(code) : ''),
+      onCbOpen: () => !st.cbOpen && this.setState({ cbOpen: true, cbQ: '', cbHl: 0 }), onCbClose: () => this.setState({ cbOpen: false, cbQ: '' }), onCbInput: e => this.setState({ cbQ: e.target.value, cbHl: 0, cbOpen: true }),
+      onCbKey: e => { if (e.key === 'ArrowDown') { e.preventDefault(); this.setState({ cbOpen: true, cbHl: Math.min(cbList.length - 1, hl + 1) }); } else if (e.key === 'ArrowUp') { e.preventDefault(); this.setState({ cbHl: Math.max(0, hl - 1) }); } else if (e.key === 'Enter') { if (st.cbOpen && cbList[hl]) { e.preventDefault(); choose(cbList[hl]); } } else if (e.key === 'Escape' || e.key === 'Tab') this.setState({ cbOpen: false, cbQ: '' }); },
+      cbOpts: cbList.map((c, i) => ({ code: c, name: U.company(c), sel: c === code ? 'true' : 'false', bg: i === hl ? 'var(--ink)' : c === code ? 'var(--neutral-100)' : 'var(--paper)', fg: i === hl ? 'var(--paper)' : 'var(--ink)', pick: () => choose(c), hover: () => this.setState({ cbHl: i }) })), buyDate: buyStr, maxDate: ymd(lastTs), sharesIn: st.shares, amountIn: st.amount, spans, amounts,
+      onBuyDate: e => this.setState({ buy: e.target.value }), onShares: e => this.setState({ shares: e.target.value, amount: e.target.value ? '' : st.amount }), onAmount: e => this.setState({ amount: e.target.value, shares: e.target.value ? '' : st.shares }),
       modes: [['cash', 'Dividends kept as cash'], ['reinvest', 'Dividends reinvested']].map(([k, l], i) => ({ label: l, on: st.mode === k ? 'true' : 'false', bg: st.mode === k ? 'var(--ink)' : 'var(--paper)', fg: st.mode === k ? 'var(--paper)' : 'var(--ink)', fw: st.mode === k ? 700 : 400, bl: i ? '0' : '1px solid var(--ink)', onClick: () => this.setState({ mode: k }) })),
       onTax: () => this.setState(s => ({ tax: !s.tax })), taxStr: st.tax ? 'true' : 'false', taxBg: st.tax ? 'var(--ink)' : 'var(--paper)', taxMark: st.tax ? '✓' : '',
       onBench: () => this.setState(s => ({ bench: !s.bench })), benchStr: st.bench ? 'true' : 'false', benchBg: st.bench ? 'var(--ink)' : 'var(--paper)', benchMark: st.bench ? '✓' : '',
       onHist: () => this.setState(s => ({ hist: !s.hist })), histStr: st.hist ? 'true' : 'false', histOpen: st.hist && !!R, histRows: [],
       buyPriceLabel: R ? '৳' + f(R.buy.c) : '', buyBd: R ? 'var(--orange-t1)' : 'var(--neutral-400)', todayLabel: R ? '৳' + f(R.last.c) : '',
       footnote: R ? `Buy price is the close on ${dmy(R.buy)} (nearest prior session) and isn't editable. Price today is the close on ${dmy(R.last)}. ${opts.shares ? '' : money(opts.amount - R.invested) + ' of the amount couldn\'t buy a whole share and was excluded.'}` : 'Pick a stock, a buy date, and either a number of shares or an amount.',
-      empty: !R, emptyText: !st.stock ? 'Select a stock to begin — pick a stock, buy date and shares or amount to see your return.' : !valid ? `"${st.stock}" is not a listed instrument. Choose a trading code from the list.` : 'Enter a number of shares or an amount large enough to buy at least one share.',
+      empty: !R, emptyText: !st.stock ? 'Select a stock to begin — pick a stock, buy date and shares or amount to see your return.' : 'Enter a number of shares or an amount large enough to buy at least one share.',
       hasRes: !!R, hasGap: false, gapText: '', hasTop: !!R };
     if (R) {
       out.histRows = bars => [];
