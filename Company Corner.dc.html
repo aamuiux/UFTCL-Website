@@ -21,6 +21,21 @@ a { color: inherit; text-decoration: none; }
 .cc-btn { font: inherit; font-size: 13px; font-weight: 700; height: 34px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer; white-space: nowrap; }
 .cc-btn:hover { border-color: var(--ink); }
 .cc-sel { font: inherit; font-size: 13px; height: 34px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.cc-l1s { display: flex; flex-wrap: wrap; gap: 0 8px; border-bottom: 1px solid var(--neutral-300); }
+.cc-l1 { font: inherit; font-size: 15px; font-weight: 600; padding: 10px 16px 11px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cc-l1:hover { color: var(--ink); }
+.cc-l1[aria-selected="true"] { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
+.cc-seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--neutral-400); background: var(--neutral-100); padding: 2px; gap: 2px; }
+.cc-s2 { font: inherit; font-size: 13px; font-weight: 600; height: 34px; padding: 0 16px; border: 1px solid transparent; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cc-s2:hover { color: var(--ink); background: var(--neutral-200); }
+.cc-s2[aria-selected="true"] { background: var(--paper); color: var(--ink); font-weight: 700; border-color: var(--ink); }
+.cc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cc-chip { font: inherit; font-size: 12px; font-weight: 600; height: 28px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer; }
+.cc-chip:hover { border-color: var(--ink); }
+.cc-chip[aria-selected="true"], .cc-chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.cc-tog { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--neutral-200); }
+.cc-tg { font: inherit; font-size: 13px; font-weight: 600; height: 30px; min-width: 92px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cc-tg[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 .cc-opt { display: flex; gap: 10px; align-items: baseline; width: 100%; text-align: left; font: inherit; font-size: 13px; padding: 8px 12px; border: 0; background: var(--paper); color: var(--ink); cursor: pointer; }
 .cc-opt:hover { background: var(--neutral-100); }
 .cc-th { padding: 10px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); text-align: left; background: var(--neutral-100); border-bottom: 1px solid var(--ink); white-space: nowrap; }
@@ -56,7 +71,7 @@ a { color: inherit; text-decoration: none; }
   </div>
 </section>
 
-<div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; height: 36px; padding: 0 16px; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+<div role="tablist" class="cc-l1s"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5"><button role="tab" class="cc-l1" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
 
 <!-- PROFILE -->
 <sc-if value="{{ isProfile }}"><section style="border: 1px solid var(--ink); padding: 20px 24px; display: flex; flex-direction: column; gap: 20px;">
@@ -72,12 +87,12 @@ a { color: inherit; text-decoration: none; }
 <!-- FINANCIALS -->
 <sc-if value="{{ isFin }}"><section style="display: flex; flex-direction: column; gap: 16px;">
   <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
-    <div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ fTabs }}" as="t" hint-placeholder-count="4"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" class="cc-btn" style="border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div>
-    <div role="group" aria-label="Period" style="display: flex;"><sc-for list="{{ perBtns }}" as="b" hint-placeholder-count="2"><button class="cc-btn" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}" style="border-color: var(--ink); background: {{ b.bg }}; color: {{ b.fg }}; min-width: 96px;">{{ b.label }}</button></sc-for></div>
+    <div role="tablist" class="cc-seg"><sc-for list="{{ fTabs }}" as="t" hint-placeholder-count="4"><button role="tab" class="cc-s2" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
+    <div role="group" aria-label="Period" class="cc-tog"><sc-for list="{{ perBtns }}" as="b" hint-placeholder-count="2"><button class="cc-tg" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for></div>
   </div>
 
-  <sc-if value="{{ hasGroups }}"><div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ gTabs }}" as="t" hint-placeholder-count="4"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" class="cc-btn" style="height: 30px; font-size: 12px; border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div></sc-if>
-  <sc-if value="{{ hasMetrics }}"><div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ mTabs }}" as="t" hint-placeholder-count="3"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" class="cc-btn" style="height: 30px; font-size: 12px; border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div></sc-if>
+  <sc-if value="{{ hasGroups }}"><div role="tablist" class="cc-chips"><sc-for list="{{ gTabs }}" as="t" hint-placeholder-count="4"><button role="tab" class="cc-chip" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div></sc-if>
+  <sc-if value="{{ hasMetrics }}"><div role="tablist" class="cc-chips"><sc-for list="{{ mTabs }}" as="t" hint-placeholder-count="3"><button role="tab" class="cc-chip" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div></sc-if>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; align-items: start;">
     <div style="border: 1px solid var(--ink); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0;">
@@ -110,7 +125,7 @@ a { color: inherit; text-decoration: none; }
 
 <!-- CORPORATE ACTIONS -->
 <sc-if value="{{ isActions }}"><section style="display: flex; flex-direction: column; gap: 16px;">
-  <div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ aTabs }}" as="t" hint-placeholder-count="2"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" class="cc-btn" style="border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div>
+  <div role="tablist" class="cc-seg" style="align-self: flex-start;"><sc-for list="{{ aTabs }}" as="t" hint-placeholder-count="2"><button role="tab" class="cc-s2" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
   <sc-if value="{{ isDiv }}"><div style="border: 1px solid var(--ink); overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; min-width: 560px;">
     <thead><tr><th class="cc-th">Declaration date</th><th class="cc-th">Dividend</th><th class="cc-th">Record date</th><th class="cc-th">Year ended</th></tr></thead>
     <tbody><sc-for list="{{ divs }}" as="d" hint-placeholder-count="6"><tr><td class="cc-td">{{ d.decl }}</td><td class="cc-td cc-mono" style="font-weight: 700;">{{ d.div }}</td><td class="cc-td">{{ d.rec }}</td><td class="cc-td" style="color: var(--text-muted);">{{ d.ye }}</td></tr></sc-for></tbody>
@@ -124,7 +139,7 @@ a { color: inherit; text-decoration: none; }
 
 <!-- NEWS / PSI -->
 <sc-if value="{{ isNews }}"><section style="display: flex; flex-direction: column; gap: 16px;">
-  <div role="group" aria-label="News type" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ nTabs }}" as="t" hint-placeholder-count="6"><button class="cc-btn" aria-pressed="{{ t.sel }}" onClick="{{ t.onClick }}" style="height: 30px; font-size: 12px; border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div>
+  <div role="group" aria-label="News type" class="cc-chips"><sc-for list="{{ nTabs }}" as="t" hint-placeholder-count="6"><button class="cc-chip" aria-pressed="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
   <div style="border: 1px solid var(--ink); overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; min-width: 820px;">
     <thead><tr><th class="cc-th" style="width: 120px;">Post date</th><th class="cc-th" style="width: 200px;">Title</th><th class="cc-th" style="width: 120px;">News type</th><th class="cc-th">News</th></tr></thead>
     <tbody><sc-for list="{{ news }}" as="n" hint-placeholder-count="8"><tr><td class="cc-td" style="white-space: nowrap;">{{ n.date }}</td><td class="cc-td" style="font-weight: 700;">{{ n.title }}</td><td class="cc-td"><span style="display: inline-block; padding: 1px 8px; border: 1px solid var(--neutral-400); font-size: 12px; white-space: nowrap;">{{ n.type }}</span></td><td class="cc-td">{{ n.text }}</td></tr></sc-for></tbody>
@@ -136,7 +151,7 @@ a { color: inherit; text-decoration: none; }
 <sc-if value="{{ isHold }}"><section style="display: flex; flex-direction: column; gap: 16px;">
   <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
     <div style="display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px;"><sc-for list="{{ hLegend }}" as="l" hint-placeholder-count="5"><span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: {{ l.c }};"></span>{{ l.name }}</span></sc-for></div>
-    <div role="group" aria-label="View" style="display: flex;"><sc-for list="{{ hBtns }}" as="b" hint-placeholder-count="2"><button class="cc-btn" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}" style="border-color: var(--ink); background: {{ b.bg }}; color: {{ b.fg }}; min-width: 80px;">{{ b.label }}</button></sc-for></div>
+    <div role="group" aria-label="View" class="cc-tog"><sc-for list="{{ hBtns }}" as="b" hint-placeholder-count="2"><button class="cc-tg" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for></div>
   </div>
   <sc-if value="{{ hChart }}"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; align-items: start;">
     <div style="border: 1px solid var(--ink); padding: 16px; min-width: 0;">
