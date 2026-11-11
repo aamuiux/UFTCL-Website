@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Brokerage Research Reports — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+.br-tile { width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+.br-tile:hover { background: var(--ink); color: var(--paper); }
+.br-tile:hover .br-ico { background: var(--paper); color: var(--ink); }
+.br-tile:hover .br-sub { color: var(--neutral-300); }
+.br-ico { width: 48px; height: 48px; flex: none; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; background: var(--paper); color: var(--ink); }
+.br-sub { font-size: 13px; line-height: 19px; color: var(--text-muted); }
+.br-btn { font: inherit; font-size: 13px; font-weight: 700; height: 36px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.br-btn:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+.br-btn:disabled { opacity: 0.4; cursor: default; }
+.br-ctl { font: inherit; font-size: 13px; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.br-item { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 1px solid var(--neutral-300); background: var(--paper); min-width: 0; }
+.br-item:hover { border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.br-item:hover .br-t { text-decoration: underline; }
+.br-lbl { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="news" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+
+<!-- HUB -->
+<sc-if value="{{ isHub }}"><section style="display: flex; flex-direction: column; gap: 24px;">
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Brokerage Research Reports</h1>
+    <div style="color: var(--text-muted); max-width: 780px;">Daily, weekly and long-term research from the UFTCL desk. Pick a category to see its reports.</div>
+  </div>
+  <sc-if value="{{ hasNotice }}"><div role="status" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--ink); border-left-width: 6px; padding: 14px 16px; background: var(--neutral-50);">
+    <div style="display: flex; flex-direction: column; gap: 2px;"><b>{{ notice }} is for UFTCL clients</b><span style="color: var(--text-muted);">Log in with your trading account to read these reports. New here? Open a BO account first.</span></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;"><a class="br-btn" href="Trading%20Services.dc.html?s=bo" style="background: var(--ink); color: var(--paper);">Open BO account</a><button class="br-btn" onClick="{{ onCloseNotice }}">Dismiss</button></div>
+  </div></sc-if>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 24px 32px; align-items: start;">
+    <sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); padding-bottom: 6px; border-bottom: 1px solid var(--neutral-300);">{{ g.title }}</div>
+        <sc-for list="{{ g.items }}" as="c" hint-placeholder-count="6">
+          <button class="br-tile" onClick="{{ c.onClick }}">
+            <span class="br-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" aria-hidden="true"><path d="{{ c.icon }}"></path></svg></span>
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1;"><b style="font-family: var(--font-sans-b); font-size: 17px; line-height: 22px;">{{ c.title }}</b><span class="br-sub">{{ c.desc }}</span></span>
+            <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none;">
+              <sc-if value="{{ c.locked }}"><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 11h12v9H6z M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Clients</span></sc-if>
+              <sc-if value="{{ c.open }}"><span class="br-sub" style="white-space: nowrap;">{{ c.count }}</span></sc-if>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+</section></sc-if>
+
+<!-- LIST -->
+<sc-if value="{{ isList }}"><section style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;">
+    <a class="br-btn" href="Brokerage%20Research.dc.html" style="background: var(--ink); color: var(--paper);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4"></path></svg>Back</a>
+    <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+      <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 30px; line-height: 38px;">Research Report <span style="color: var(--text-muted);">/</span> {{ cat.title }}</h1>
+      <div style="color: var(--text-muted);">{{ cat.desc }}</div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; border: 1px solid var(--ink); padding: 14px 16px;">
+    <label class="br-lbl" style="flex: 1 1 240px; min-width: 0;">Search<input class="br-ctl" placeholder="Search report title" value="{{ q }}" onInput="{{ onQ }}" style="font-weight: 400; font-size: 14px; text-transform: none; letter-spacing: 0;"></label>
+    <label class="br-lbl">Year<select class="br-ctl" value="{{ year }}" onChange="{{ onYear }}" style="font-weight: 400; font-size: 14px; text-transform: none; letter-spacing: 0; min-width: 120px;"><option value="">All years</option><sc-for list="{{ years }}" as="y" hint-placeholder-count="5"><option value="{{ y }}">{{ y }}</option></sc-for></select></label>
+    <button class="br-btn" onClick="{{ onClear }}">Clear filter</button>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 14px; font-size: 13px;">
+    <button class="br-btn" disabled="{{ noPrev }}" onClick="{{ onPrev }}">Previous</button>
+    <button class="br-btn" disabled="{{ noNext }}" onClick="{{ onNext }}">Next</button>
+    <span style="padding: 0 4px;">Showing <b>{{ shown }}</b> of <b>{{ total }}</b></span>
+    <span style="padding: 0 4px;">Page <b>{{ page }}</b> of <b>{{ pages }}</b></span>
+    <label style="display: inline-flex; align-items: center; gap: 8px;">Go to page<input class="br-ctl" type="number" min="1" max="{{ pages }}" value="{{ goto }}" onChange="{{ onGoto }}" style="width: 70px;"></label>
+    <label style="display: inline-flex; align-items: center; gap: 8px;">Page size<select class="br-ctl" value="{{ size }}" onChange="{{ onSize }}"><option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option></select></label>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr)); gap: 12px;">
+    <sc-for list="{{ items }}" as="r" hint-placeholder-count="20">
+      <a class="br-item" href="{{ r.href }}" target="_blank" rel="noopener noreferrer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red-700)" stroke-width="1.6" stroke-linecap="square" aria-hidden="true" style="flex: none;"><path d="M6 2h9l4 4v16H6z M15 2v4h4 M9 14h6 M9 18h4"></path></svg>
+        <span class="br-t" style="flex: 1; min-width: 0; font-size: 15px; line-height: 22px; color: var(--blue-700);">{{ r.title }}</span>
+        <span style="flex: none; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px;">PDF<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3H3v10h10v-3M9 3h4v4M13 3L7 9"></path></svg></span>
+      </a>
+    </sc-for>
+  </div>
+  <sc-if value="{{ empty }}"><div style="padding: 40px 16px; text-align: center; color: var(--text-muted); border: 1px solid var(--neutral-300);">No reports match your search.</div></sc-if>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 14px; font-size: 13px;">
+    <button class="br-btn" disabled="{{ noPrev }}" onClick="{{ onPrev }}">Previous</button>
+    <button class="br-btn" disabled="{{ noNext }}" onClick="{{ onNext }}">Next</button>
+    <span style="padding: 0 4px;">Page <b>{{ page }}</b> of <b>{{ pages }}</b></span>
+  </div>
+  <div style="font-size: 12px; color: var(--text-muted);">Reports open in a new tab. The report files here are placeholders for design review.</div>
+</section></sc-if>
+
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CATS = [
+  { id: 'news', g: 0, title: 'Daily News Recap', desc: 'A quick recap of the day\'s market-moving news.', n: 2240, step: 1.4, icon: 'M4 4h13v16H4z M17 8h3v10a2 2 0 0 1-2 2H4 M7 8h7M7 12h7M7 16h4' },
+  { id: 'daily', g: 0, title: 'Daily Stock Market Report', desc: 'End-of-day summary of indices, sectors and turnover.', n: 1894, step: 1.5, icon: 'M3 20h18 M6 16v-5 M10 16V8 M14 16v-3 M18 16V6' },
+  { id: 'weekly', g: 0, title: 'Weekly Stock Market Report', desc: 'The week in review, with the movers and the outlook.', n: 392, step: 7, icon: 'M3 5h18v15H3z M3 10h18 M8 3v4 M16 3v4 M7 16l3-3 3 2 4-4' },
+  { id: 'monthly', g: 0, title: 'Monthly Wrap-up', desc: 'Month-end review of market performance and flows.', n: 87, step: 30.4, icon: 'M5 3h11l3 3v15H5z M8 9h8 M8 13h8 M8 17h5' },
+  { id: 'yearly', g: 0, title: 'Yearly Capital Market Review', desc: 'Annual review of the capital market.', n: 14, step: 365, icon: 'M5 3h14v18H5z M8 15l3-3 2 2 3-4' },
+  { id: 'featured', g: 0, title: 'Featured Insights', desc: 'Special themes and ideas from our research desk.', n: 156, step: 9, icon: 'M9 18h6 M10 21h4 M12 3a6 6 0 0 0-4 10c1 1 1 2 1 3h6c0-1 0-2 1-3a6 6 0 0 0-4-10z' },
+  { id: 'guide', g: 1, title: 'Investment Guide', desc: 'Plain-language guides for new and active investors.', n: 23, step: 60, icon: 'M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z M8 8h7' },
+  { id: 'valuation', g: 1, locked: true, title: 'Valuation Reports', desc: 'Fair-value estimates and models for listed companies.', n: 64, step: 20, icon: 'M5 3h14v18H5z M8 7h8 M8 11h2 M12 11h2 M8 15h2 M12 15h2' },
+  { id: 'company', g: 1, locked: true, title: 'Company Updates', desc: 'Result and event updates for individual companies.', n: 428, step: 3, icon: 'M4 21V8l8-5 8 5v13z M9 21v-6h6v6' },
+  { id: 'macro', g: 1, title: 'Macro Reports', desc: 'Inflation, rates, currency and economy commentary.', n: 112, step: 14, icon: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M3 12h18 M12 3c3 3 3 15 0 18 M12 3c-3 3-3 15 0 18' },
+  { id: 'earnings', g: 1, locked: true, title: 'Earnings Update', desc: 'Quarterly earnings summaries and surprises.', n: 206, step: 6, icon: 'M12 3v9h9 M20 14a8 8 0 1 1-10-10' },
+  { id: 'ipo', g: 1, title: 'IPO Notes', desc: 'Notes on upcoming and recent IPOs.', n: 37, step: 40, icon: 'M3 20h18 M5 20v-6h3v6 M11 20V9h3v11 M17 20V4h3v16' }
+];
+const MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const PDF = 'assets/sample-report.pdf';
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, cat: null, notice: '', q: '', year: '', page: 1, size: 20 };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  // all reports for a category, newest first; built once
+  build(U, c) {
+    this._b = this._b || {}; if (this._b[c.id]) return this._b[c.id];
+    const r = U.rng(U.hash('br' + c.id)); const syms = U.symbols; let t = Date.UTC(2026, 10, 11); const out = [];
+    for (let i = 0; i < c.n; i++) {
+      const d = new Date(t); const day = MON[d.getUTCMonth()] + ' ' + String(d.getUTCDate()).padStart(2, '0') + ', ' + d.getUTCFullYear(); const mon = MON[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); const yr = d.getUTCFullYear(); const co = syms[Math.floor(r() * syms.length)]; const q = 'Q' + (1 + Math.floor(d.getUTCMonth() / 3));
+      const title = { news: 'UFTCL Daily News Recap ' + day, daily: 'UFTCL Daily Stock Market Report ' + day, weekly: 'UFTCL Weekly Stock Market Report, week ending ' + day, monthly: 'UFTCL Monthly Wrap-up ' + mon, yearly: 'UFTCL Yearly Capital Market Review ' + yr,
+        featured: ['Sector outlook', 'Market strategy', 'Thematic note', 'Dividend ideas'][Math.floor(r() * 4)] + ' ' + day, guide: ['How to read a balance sheet', 'Understanding the circuit breaker', 'Getting started with IPOs', 'Basics of technical analysis', 'Risk management for investors'][i % 5] + (i >= 5 ? ' (' + (1 + Math.floor(i / 5)) + ')' : ''),
+        valuation: U.company(co) + ' valuation report ' + yr, company: U.company(co) + ' company update ' + day, macro: ['Inflation and rates', 'Currency and reserves', 'Budget review', 'Remittance and exports', 'Banking sector liquidity'][Math.floor(r() * 5)] + ' ' + mon, earnings: U.company(co) + ' ' + q + ' ' + yr + ' earnings update', ipo: U.company(co) + ' IPO note ' + day }[c.id];
+      out.push({ title, year: yr, href: PDF });
+      t -= Math.max(1, Math.round(c.step * (0.7 + r() * 0.6))) * 864e5;
+      if (c.step < 3) { const w = new Date(t).getUTCDay(); if (w === 5 || w === 6) t -= (w === 6 ? 1 : 0) * 864e5 + 864e5; }
+    }
+    return (this._b[c.id] = out);
+  }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const id = st.cat !== null ? st.cat : U.param('c', ''); const cat = CATS.find(c => c.id === id && !c.locked);
+    const open = c => { if (c.locked) this.setState({ notice: c.title }); else { this.setState({ cat: c.id, q: '', year: '', page: 1, notice: '' }); try { history.replaceState(null, '', 'Brokerage%20Research.dc.html?c=' + c.id); window.scrollTo(0, 0); } catch (e) { /* no history */ } } };
+    const out = { isHub: !cat, isList: !!cat, hasNotice: !!st.notice, notice: st.notice, onCloseNotice: () => this.setState({ notice: '' }),
+      groups: [['Market reports', 0], ['Research and guides', 1]].map(([title, g]) => ({ title, items: CATS.filter(c => c.g === g).map(c => ({ title: c.title, desc: c.desc, icon: c.icon, locked: !!c.locked, open: !c.locked, count: U.fmtInt(c.n) + ' reports', onClick: () => open(c) })) })) };
+    if (cat) {
+      const all = this.build(U, cat); const q = st.q.trim().toLowerCase(); const list = all.filter(x => (!st.year || String(x.year) === st.year) && (!q || x.title.toLowerCase().includes(q)));
+      const size = st.size; const pages = Math.max(1, Math.ceil(list.length / size)); const page = Math.min(st.page, pages); const items = list.slice((page - 1) * size, page * size);
+      const years = [...new Set(all.map(x => x.year))];
+      Object.assign(out, { cat, items, empty: !list.length, total: U.fmtInt(list.length), shown: items.length, page, pages, goto: page, size: String(size), q: st.q, year: st.year, years,
+        noPrev: page <= 1, noNext: page >= pages, onPrev: () => this.setState({ page: page - 1 }), onNext: () => this.setState({ page: page + 1 }),
+        onGoto: e => { const v = Math.max(1, Math.min(pages, parseInt(e.target.value, 10) || 1)); this.setState({ page: v }); }, onSize: e => this.setState({ size: parseInt(e.target.value, 10), page: 1 }),
+        onQ: e => this.setState({ q: e.target.value, page: 1 }), onYear: e => this.setState({ year: e.target.value, page: 1 }), onClear: () => this.setState({ q: '', year: '', page: 1 }) });
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>
