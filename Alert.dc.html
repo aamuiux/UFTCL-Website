@@ -49,7 +49,7 @@ a { color: inherit; text-decoration: none; }
 </section>
 
 <!-- Create alert -->
-<section aria-label="Create alert" style="border: 1px solid var(--ink); padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--neutral-50);">
+<section aria-label="Create alert" style="border: 1px solid var(--ink); padding: 20px; display: flex; flex-direction: column; gap: 12px; background: var(--neutral-50);">
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 16px; align-items: end;">
     <div class="al-lbl" style="position: relative;"><span id="al-sym">Symbol</span>
       <span style="position: relative; display: block;"><input class="al-ctl" role="combobox" aria-labelledby="al-sym" aria-expanded="{{ cbStr }}" aria-controls="al-list" aria-autocomplete="list" autocomplete="off" placeholder="Select symbol" value="{{ cbText }}" onFocus="{{ onCbOpen }}" onClick="{{ onCbOpen }}" onInput="{{ onCbInput }}" onBlur="{{ onCbBlur }}" onKeyDown="{{ onCbKey }}" style="padding-right: 32px; text-transform: none; letter-spacing: 0; font-weight: 400;"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="position: absolute; right: 12px; top: 14px; pointer-events: none;"><path d="M3 6h10l-5 6z"></path></svg></span>
@@ -65,7 +65,7 @@ a { color: inherit; text-decoration: none; }
     <button class="al-btn" onClick="{{ onCreate }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z M10 21h4"></path></svg>Create alert</button>
   </div>
   <sc-if value="{{ hasLtp }}"><div style="font-size: 13px; color: var(--text-muted);">{{ ltpNote }}</div></sc-if>
-  <div role="status" style="min-height: 20px; font-size: 13px; font-weight: 700; color: {{ msgColor }};">{{ msg }}</div>
+  <sc-if value="{{ hasMsg }}"><div role="status" style="font-size: 13px; font-weight: 700; color: {{ msgColor }};">{{ msg }}</div></sc-if>
   <div style="text-align: center; font-size: 13px; color: var(--text-muted);">You will get a notification alert when your alert condition is met. Alerts are saved in this browser.</div>
 </section>
 
@@ -157,7 +157,7 @@ class Component extends DCLogic {
       onCbOpen: () => { if (!st.open) this.setState({ open: true, q: '', hi: 0 }); }, onCbInput: e => this.setState({ open: true, q: e.target.value, hi: 0 }), onCbBlur: () => { clearTimeout(this.bt); this.bt = setTimeout(() => this.setState({ open: false, q: '' }), 120); },
       cond: st.cond, condOpts: Object.keys(COND).map(k => ({ v: k, l: COND[k].l })), onCond: e => this.setState({ cond: e.target.value, val: '', msg: '' }), dir: st.dir, onDir: e => this.setState({ dir: e.target.value }),
       val: st.val, valPh: C.ph, unit: C.unit, onVal: e => this.setState({ val: e.target.value, msg: '' }), onValKey: e => { if (e.key === 'Enter') create(); }, onCreate: create,
-      hasLtp: !!S, ltpNote, msg: st.msg, msgColor: st.err ? 'var(--red-700)' : 'var(--green-700)',
+      hasLtp: !!S, ltpNote, hasMsg: !!st.msg, msg: st.msg, msgColor: st.err ? 'var(--red-700)' : 'var(--green-700)',
       rows, empty: !filtered.length, emptyText: alerts.length ? 'No alerts for this letter.' : 'You have no alerts yet. Pick a symbol above to create one.',
       letters, noPrev: page <= 1, noNext: page >= pages, onFirst: () => this.setState({ page: 1 }), onPrev: () => this.setState({ page: page - 1 }), onNext: () => this.setState({ page: page + 1 }), onLast: () => this.setState({ page: pages }),
       pageBtns: pnums.map(n => ({ n, cur: n === page ? 'true' : 'false', onClick: () => this.setState({ page: n }) })),
