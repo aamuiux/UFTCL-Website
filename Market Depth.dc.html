@@ -18,70 +18,63 @@
 <style>
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
 a { color: inherit; text-decoration: none; }
-.md-term select { appearance: none; -webkit-appearance: none; }
-.md-q { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); text-align: center; }
-@media (max-width: 720px) { .md-q { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 </style>
 </helmet>
 <div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
 <dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
-<main style="padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: center;">
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
 
-  <div style="width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 4px;">
-    <h1 style="margin: 0; font-size: 22px;">Market Depth</h1>
-    <span style="font-size: 13px; color: var(--text-muted);">Order book terminal · live bid / ask ladder with quote summary · {{ asOf }}</span>
-  </div>
-
-  <div class="md-term" data-screen-label="Market depth terminal" style="width: 100%; max-width: 760px; background: #000; color: #fff; border: 1px solid #2a2d3a; font-family: var(--font-sans);">
-    <div style="display: flex; align-items: center; justify-content: space-between; background: #17181f; padding: 8px 14px; border-bottom: 1px solid #2a2d3a;">
-      <b style="color: #f5b400; font-size: 15px;">Market Depth 1</b>
-      <span style="display: flex; align-items: center; gap: 12px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #ffd400;"></span><a href="{{ chartHref }}" style="font-size: 12px; color: #9aa0b4; text-decoration: underline;">Chart</a></span>
-    </div>
-
-    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; background: #0c0d11;">
-      <span style="height: 36px; padding: 0 14px; border: 1px solid #3a3d4d; background: #15161c; display: inline-flex; align-items: center; color: #b9bdd0; font-weight: 600;">DSE</span>
-      <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; font-weight: 700; height: 36px; flex: 1; min-width: 180px; padding: 0 10px; border: 1px solid #3a3d4d; background: #15161c; color: #fff; cursor: pointer;">
-        <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.label }}</option></sc-for>
+  <section data-screen-label="Symbol bar" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px;">
+    <div style="display: flex; flex-direction: column;"><span style="font-weight: 700; font-size: 18px;">Market Depth · {{ code }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ name }} · {{ asOf }}</span></div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <span style="font-family: var(--font-mono); font-size: 22px; font-weight: 700;">{{ ltp }}</span><span style="font-family: var(--font-mono); font-size: 13px; color: {{ chgColor }};">{{ chg }}</span>
+      <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; font-weight: 700; height: 36px; min-width: 200px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
+        <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.code }}</option></sc-for>
       </select>
-      <select onChange="{{ onMode }}" value="{{ mode }}" style="font: inherit; height: 36px; min-width: 110px; padding: 0 10px; border: 1px solid #3a3d4d; background: #15161c; color: #b9bdd0; cursor: pointer;">
+      <select onChange="{{ onMode }}" value="{{ mode }}" style="font: inherit; height: 36px; min-width: 120px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
         <option value="price">By Price</option><option value="order">By Order</option>
       </select>
-      <span style="display: inline-flex; margin-left: auto; font-style: italic; font-weight: 800;"><a href="{{ buyHref }}" style="background: #12b05a; color: #fff; padding: 8px 20px; border-radius: 18px 0 0 18px;">BUY</a><a href="{{ sellHref }}" style="background: #e5334b; color: #fff; padding: 8px 20px; border-radius: 0 18px 18px 0;">SELL</a></span>
+      <span style="display: inline-flex; gap: 8px;"><a href="{{ buyHref }}" style="background: var(--green-700); color: var(--paper); padding: 8px 20px; font-weight: 700;">BUY</a><a href="{{ sellHref }}" style="background: var(--red-700); color: var(--paper); padding: 8px 20px; font-weight: 700;">SELL</a></span>
     </div>
+  </section>
 
-    <div style="padding: 8px 6px 4px; font-size: 13px;">
-      <div class="md-q" style="color: #8e93a8;"><sc-for list="{{ rowA }}" as="c"><span style="padding: 6px 0;">{{ c.l }}</span></sc-for></div>
-      <div class="md-q" style="font-weight: 600; font-size: 15px;"><sc-for list="{{ rowA }}" as="c"><span style="padding: 4px 0 10px; color: {{ c.c }};">{{ c.v }}</span></sc-for></div>
-      <div class="md-q" style="color: #8e93a8;"><sc-for list="{{ rowB }}" as="c"><span style="padding: 6px 0;">{{ c.l }}</span></sc-for></div>
-      <div class="md-q" style="font-weight: 600; font-size: 15px;"><sc-for list="{{ rowB }}" as="c"><span style="padding: 4px 0 10px; color: {{ c.c }};">{{ c.v }}</span></sc-for></div>
-    </div>
+  <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 24px; align-items: start;">
 
-    <div style="display: flex; align-items: center; gap: 10px; padding: 6px 10px 12px; font-weight: 700; font-size: 14px;">
-      <span>{{ buyPct }}%</span>
-      <div style="flex: 1; display: flex; height: 12px; border-radius: 6px; overflow: hidden;"><div style="width: {{ buyPct }}%; background: #065a45;"></div><div style="flex: 1; background: #7a1a33;"></div></div>
-      <span>{{ sellPct }}%</span>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; background: #2a2d3a; color: #9aa0b4; font-weight: 700; font-size: 13px;">
-      <div style="display: grid; grid-template-columns: 0.6fr 1.2fr 1.2fr 1fr; padding: 10px 8px; text-align: right;"><span style="text-align: left;">Ordr</span><span>CUM Q</span><span>BID Q</span><span>BID</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1.2fr 1.2fr 0.6fr; padding: 10px 8px; border-left: 2px solid #000;"><span>ASK</span><span style="text-align: right;">ASK Q</span><span style="text-align: right;">CUM Q</span><span style="text-align: right;">Ordr</span></div>
-    </div>
-    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; font-size: 14px; height: 40px; align-items: stretch;">
-        <div style="display: grid; grid-template-columns: 0.6fr 1.2fr 1.2fr 1fr; padding: 0 8px; align-items: center; text-align: right; background: #064436; border-bottom: 1px solid #000;">
-          <span style="text-align: left;">{{ r.bo }}</span><span>{{ r.bc }}</span><span style="display: flex; align-items: center; justify-content: flex-end; height: 100%; margin: 0 8px; padding-right: 8px; background: linear-gradient(270deg, #0a8a6c {{ r.bw }}%, transparent {{ r.bw }}%);">{{ r.bq }}</span><span style="font-weight: 600;">{{ r.bp }}</span>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1.2fr 1.2fr 0.6fr; padding: 0 8px; align-items: center; border-left: 2px solid #000; background: linear-gradient(90deg, #a8244a {{ r.aqw }}%, #5e1428 {{ r.aqw }}%); border-bottom: 1px solid #000;">
-          <span style="font-weight: 600;">{{ r.ap }}</span><span style="text-align: right;">{{ r.aq }}</span><span style="text-align: right;">{{ r.ac }}</span><span style="text-align: right;">{{ r.ao }}</span>
-        </div>
+    <div data-screen-label="Market depth" style="border: 1px solid var(--ink); min-width: 0;">
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Market Depth</div>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-family: var(--font-mono); font-weight: 700; font-size: 13px;">
+        <span style="color: var(--green-700);">{{ buyPct }}%</span>
+        <div style="flex: 1; display: flex; height: 10px;"><div style="width: {{ buyPct }}%; background: var(--green-700);"></div><div style="flex: 1; background: var(--red-700);"></div></div>
+        <span style="color: var(--red-700);">{{ sellPct }}%</span>
       </div>
-    </sc-for>
-  </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); background: var(--neutral-100);">
+        <div style="display: grid; grid-template-columns: 0.6fr 1.2fr 1.2fr 1fr; padding: 8px 12px; text-align: right;"><span style="text-align: left;">Ordr</span><span>CUM Q</span><span>BID Q</span><span>BID</span></div>
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr 1.2fr 0.6fr; padding: 8px 12px; border-left: 1px solid var(--ink);"><span>ASK</span><span style="text-align: right;">ASK Q</span><span style="text-align: right;">CUM Q</span><span style="text-align: right;">Ordr</span></div>
+      </div>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; font-family: var(--font-mono); font-size: 13px; height: 34px; border-bottom: 1px solid var(--neutral-200);">
+          <div style="display: grid; grid-template-columns: 0.6fr 1.2fr 1.2fr 1fr; padding: 0 12px; align-items: center; text-align: right; position: relative;">
+            <div style="position: absolute; right: 0; top: 0; bottom: 0; width: {{ r.bw }}%; background: oklch(52.7% 0.154 150 / 0.14);"></div>
+            <span style="position: relative; text-align: left;">{{ r.bo }}</span><span style="position: relative;">{{ r.bc }}</span><span style="position: relative;">{{ r.bq }}</span><span style="position: relative; color: var(--green-700); font-weight: 700;">{{ r.bp }}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr 1.2fr 0.6fr; padding: 0 12px; align-items: center; border-left: 1px solid var(--ink); position: relative;">
+            <div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{ r.aqw }}%; background: oklch(50.5% 0.213 27.5 / 0.14);"></div>
+            <span style="position: relative; color: var(--red-700); font-weight: 700;">{{ r.ap }}</span><span style="position: relative; text-align: right;">{{ r.aq }}</span><span style="position: relative; text-align: right;">{{ r.ac }}</span><span style="position: relative; text-align: right;">{{ r.ao }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
 
-  <div style="width: 100%; max-width: 760px; font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between;">
-    <span style="display: flex; flex-wrap: wrap; gap: 16px;"><a href="{{ histHref }}" style="text-decoration: underline;">Historical Data</a><a href="{{ stockHref }}" style="text-decoration: underline;">Stock page</a><a href="{{ chartHref }}" style="text-decoration: underline;">Stock chart</a><a href="{{ sectorHref }}" style="text-decoration: underline;">Sector performance</a></span>
-    <span>Depth is indicative and refreshed every few seconds on the exchange feed.</span>
-  </div>
+    <div data-screen-label="Quote summary" style="border: 1px solid var(--ink); min-width: 0;">
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Quote Summary</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr;">
+        <sc-for list="{{ quote }}" as="q" hint-placeholder-count="20"><div style="display: flex; justify-content: space-between; gap: 8px; padding: 9px 16px; border-bottom: 1px solid var(--neutral-200); border-right: 1px solid var(--neutral-200); font-size: 13px;"><span style="color: var(--text-muted);">{{ q.l }}</span><span style="font-family: var(--font-mono); font-weight: 700; color: {{ q.c }};">{{ q.v }}</span></div></sc-for>
+      </div>
+      <div style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; border-top: 1px solid var(--ink);">
+        <a href="{{ histHref }}" style="text-decoration: underline;">Historical Data</a><a href="{{ stockHref }}" style="text-decoration: underline;">Stock page</a><a href="{{ chartHref }}" style="text-decoration: underline;">Stock chart</a><a href="{{ sectorHref }}" style="text-decoration: underline;">Sector performance</a>
+      </div>
+    </div>
+  </section>
 
   <dc-import name="SymbolIndex" page="Market Depth" hint-size="100%,120px"></dc-import>
 </main>
@@ -103,12 +96,10 @@ class Component extends DCLogic {
     if (mode === 'order') { bids.sort((a, b) => b.orders - a.orders || b.price - a.price); asks.sort((a, b) => b.orders - a.orders || a.price - b.price); }
     let cb = 0, ca = 0; const mq = Math.max(...bids.map(b => b.qty), ...asks.map(a => a.qty));
     const rows = bids.map((b, i) => { const a = asks[i]; cb += b.qty; ca += a.qty; return { bo: b.orders, bc: fmtInt(cb), bq: fmtInt(b.qty), bp: fmt(b.price, 1), bw: Math.round(b.qty / mq * 100), ap: fmt(a.price, 1), aq: fmtInt(a.qty), ac: fmtInt(ca), ao: a.orders, aqw: Math.round(a.qty / mq * 100) }; });
-    const dn = S.change < 0 ? '#ff3b3b' : S.change > 0 ? '#2ee06f' : '#fff';
-    const vwap = S.volume ? S.value * 1e6 / S.volume : S.ltp; const lac = S.value * 10;
-    const W = '#fff';
-    const rowA = [['Last', fmt(S.ltp, 1), dn], ['Open', fmt(S.open, 1), W], ['Trade', fmtInt(S.trades), W], ['L.Vol', fmtInt(Math.round(S.volume / Math.max(S.trades, 1))), W], ['SH', '-', W], ['DH', fmt(S.high, 1), W], ['CH', '-', W], ['Net', fmt(S.change, 1), dn], ['D%', fmt(S.changePct, 2), dn], ['Ctg', S.cat || 'A', W]].map(([l, v, c]) => ({ l, v, c }));
-    const rowB = [['YCP', fmt(S.ycp, 1), W], ['Close', '-', W], ['Value', fmt(lac, 2) + ' lac', W], ['Vol', fmtInt(S.volume), W], ['SL', '-', W], ['DL', fmt(S.low, 1), W], ['CL', '-', W], ['52Wk', fmt(S.w52h, 1) + '/' + fmt(S.w52l, 1), W], ['VWAP', fmt(vwap, 2), W], ['Mkt', 'P', W]].map(([l, v, c]) => ({ l, v, c }));
-    return { code: S.code, mode, rows, rowA, rowB, buyPct: fmt(D.buyPct, 2), sellPct: fmt(D.sellPct, 2),
+        const vwap = S.volume ? S.value * 1e6 / S.volume : S.ltp; const lac = S.value * 10;
+    const up = 'var(--green-700)', dn = 'var(--red-700)', W = 'var(--ink)'; const mc = S.change < 0 ? dn : S.change > 0 ? up : W;
+    const quote = [['Last', fmt(S.ltp, 1), mc], ['Open', fmt(S.open, 1), W], ['Trade', fmtInt(S.trades), W], ['L.Vol', fmtInt(Math.round(S.volume / Math.max(S.trades, 1))), W], ['Net', fmt(S.change, 1), mc], ['D%', fmt(S.changePct, 2), mc], ['DH', fmt(S.high, 1), W], ['DL', fmt(S.low, 1), W], ['YCP', fmt(S.ycp, 1), W], ['Close', '-', W], ['Value', fmt(lac, 2) + ' lac', W], ['Vol', fmtInt(S.volume), W], ['52Wk', fmt(S.w52h, 1) + '/' + fmt(S.w52l, 1), W], ['VWAP', fmt(vwap, 2), W], ['Ctg', S.cat || 'A', W], ['Mkt', 'P', W]].map(([l, v, c]) => ({ l, v, c }));
+    return { code: S.code, mode, rows, quote, name: U.company(S.code), ltp: fmt(S.ltp, 1), chg: `${U.sign(S.change)} (${U.sign(S.changePct)}%)`, chgColor: U.tone(S.change), buyPct: fmt(D.buyPct, 2), sellPct: fmt(D.sellPct, 2),
       asOf: 'As of ' + U.dateStr(new Date(2026, 10, 8)) + ', 2:10 PM', chartHref: U.actions(S.code).chart, histHref: U.href('Historical Data', { symbol: S.code }),
       stockHref: U.actions(S.code).stock, sectorHref: U.href('Sector Share Price'), buyHref: U.href('Trading Services', { s: 'portal' }), sellHref: U.href('Trading Services', { s: 'portal' }),
       symbolOptions: U.symbols.map(code => ({ code, label: code + '.PUBLIC' })),
