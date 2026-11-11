@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Trading &amp; Services — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+.ts-card { border: 1px solid var(--ink); background: var(--paper); display: flex; flex-direction: column; gap: 14px; padding: 20px; scroll-margin-top: 24px; }
+.ts-btn { font: inherit; font-size: 14px; font-weight: 700; height: 40px; box-sizing: border-box; padding: 0 18px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+.ts-btn:hover { background: var(--paper); color: var(--ink); }
+.ts-soft { font-size: 12px; color: var(--text-muted); border: 1px dashed var(--neutral-400); padding: 9px 12px; display: inline-block; }
+.ts-h { font-family: var(--font-sans-b); font-size: 22px; line-height: 28px; margin: 0; }
+.ts-ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.ts-ul li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 22px; }
+.ts-ul li::before { content: ""; width: 8px; height: 8px; margin-top: 7px; flex-shrink: 0; background: var(--ink); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="trade" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 28px;">
+
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Trading &amp; Services</h1>
+  <div style="color: var(--text-muted); max-width: 760px;">Open a BO account, fund it, trade on UFTFAST and apply for IPOs. Everything a UFTCL client needs to get started, in one place.</div>
+</section>
+
+<section aria-label="Services" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 16px;">
+  <sc-for list="{{ cards }}" as="c" hint-placeholder-count="4">
+    <article id="{{ c.id }}" class="ts-card" style="box-shadow: {{ c.shadow }};">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="width: 44px; height: 44px; border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="{{ c.icon }}"></path></svg></span>
+        <span style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">{{ c.n }}</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+        <h2 style="margin: 0; font-family: var(--font-sans-b); font-size: 20px; line-height: 26px;">{{ c.title }}</h2>
+        <p style="margin: 0; color: var(--text-muted); line-height: 22px;">{{ c.text }}</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+        <sc-if value="{{ c.hasLink }}"><a class="ts-btn" href="{{ c.href }}" target="{{ c.target }}" rel="noopener noreferrer">{{ c.cta }}<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"></path></svg></a></sc-if>
+        <sc-if value="{{ c.noLink }}"><span class="ts-soft">Portal link will be added here</span></sc-if>
+        <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere;">{{ c.meta }}</span>
+      </div>
+    </article>
+  </sc-for>
+</section>
+
+<section aria-label="How to get started" style="display: flex; flex-direction: column; gap: 14px;">
+  <h2 class="ts-h">Get started in four steps</h2>
+  <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); border: 1px solid var(--ink);">
+    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4"><li style="padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; border-left: {{ s.bl }}; border-top: {{ s.bt }};"><span style="font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-muted);">STEP {{ s.n }}</span><b style="font-size: 16px;">{{ s.title }}</b><span style="color: var(--text-muted); line-height: 21px;">{{ s.text }}</span></li></sc-for>
+  </ol>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; align-items: start;">
+  <div class="ts-card" style="gap: 14px;">
+    <h2 class="ts-h">Opening a BO account</h2>
+    <p style="margin: 0; color: var(--text-muted); line-height: 22px;">Fill in the online form, then upload scans of the documents below. Our team contacts you to complete verification.</p>
+    <ul class="ts-ul"><sc-for list="{{ docs }}" as="d" hint-placeholder-count="6"><li>{{ d }}</li></sc-for></ul>
+    <div style="font-size: 12px; color: var(--text-muted);">The list is indicative. The online form shows the final requirements for your account type.</div>
+  </div>
+  <div class="ts-card" style="gap: 14px;">
+    <h2 class="ts-h">Fund deposit &amp; withdrawal</h2>
+    <p style="margin: 0; color: var(--text-muted); line-height: 22px;">Add money to your trading account and take it out through the CRM portal. Bank account details are shown after you sign in.</p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--neutral-300);">
+      <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;"><b>Deposit</b><ul class="ts-ul"><sc-for list="{{ dep }}" as="d"><li style="font-size: 13px; line-height: 20px;">{{ d }}</li></sc-for></ul></div>
+      <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid var(--neutral-300);"><b>Withdrawal</b><ul class="ts-ul"><sc-for list="{{ wd }}" as="d"><li style="font-size: 13px; line-height: 20px;">{{ d }}</li></sc-for></ul></div>
+    </div>
+    <div style="font-size: 12px; color: var(--text-muted);">Settlement timing follows the exchange's T+2 cycle for share sales.</div>
+  </div>
+</section>
+
+<section style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; border: 1px solid var(--ink); padding: 20px 24px; background: var(--neutral-50);">
+  <div style="display: flex; flex-direction: column; gap: 4px;"><b style="font-size: 18px;">Need help with your account?</b><span style="color: var(--text-muted);">Call customer care, Sunday to Thursday, 10 AM to 5 PM.</span></div>
+  <div style="display: flex; flex-wrap: wrap; gap: 8px;"><a class="ts-btn" href="tel:+8809610000000" style="background: var(--paper); color: var(--ink);">+880 9610 000 000</a><a class="ts-btn" href="About.dc.html?p=contact">Contact us</a></div>
+</section>
+
+<div style="font-size: 12px; color: var(--text-muted); max-width: 900px;">Investment in securities is subject to market risk. Read all related documents carefully before investing.</div>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, focus: '' };
+  componentDidMount() {
+    const go = () => { const s = window.UFT ? window.UFT.param('s', '') : ''; if (!s) return; this.setState({ focus: s }); setTimeout(() => { const el = document.getElementById(s); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, 150); };
+    if (window.UFT) go(); else this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); go(); } }, 50);
+  }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const f = this.state.focus;
+    const C = [
+      { id: 'portal', icon: 'M3 4h18v12H3z M8 20h8 M12 16v4', title: 'Online trading portal', text: 'Log in to the UFTFAST trading software or app to watch the market, place orders and track your portfolio.', cta: 'Log in to UFTFAST', href: 'https://oms.uftcl.com/', meta: 'oms.uftcl.com' },
+      { id: 'bo', icon: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M19 8v6 M22 11h-6', title: 'BO account opening', text: 'Apply online for a new BO account. The form comes with a step-by-step guide.', cta: 'Start application', href: 'https://onlinebo.uftfast.com/register', meta: 'onlinebo.uftfast.com/register' },
+      { id: 'funds', icon: 'M3 7h18v13H3z M3 7l3-4h12l3 4 M16 13.5h2', title: 'Fund deposit & withdrawal', text: 'Use the CRM portal to add funds, withdraw money and view bank account details.', cta: '', href: '', meta: 'CRM portal' },
+      { id: 'ipo', icon: 'M22 7l-8.5 8.5-5-5L2 17 M16 7h6v6', title: 'IPO application', text: 'See the IPOs open for subscription now and apply for the ones you want.', cta: 'View open IPOs', href: 'IPO.dc.html?tab=open', meta: 'Opens the IPO section' }
+    ];
+    return {
+      cards: C.map((c, i) => ({ ...c, n: String(i + 1).padStart(2, '0'), hasLink: !!c.href, noLink: !c.href, target: c.href.startsWith('http') ? '_blank' : '_self', shadow: f === c.id ? '6px 6px 0 var(--ink)' : 'none' })),
+      steps: [['Open a BO account', 'Apply online and upload your documents.'], ['Fund your account', 'Deposit money through the CRM portal.'], ['Trade on UFTFAST', 'Log in and place your first order.'], ['Apply for IPOs', 'Subscribe to open IPOs from your account.']].map(([title, text], i) => ({ n: i + 1, title, text, bl: i ? '1px solid var(--neutral-300)' : 'none', bt: 'none' })),
+      docs: ['Passport-size photograph of the applicant', 'National ID card or passport', 'Bank account details with a cancelled cheque leaf', 'Tax identification number (TIN), if available', 'Nominee details and a photograph of the nominee'],
+      dep: ['Sign in to the CRM portal', 'Choose the deposit method', 'Send the funds and confirm'], wd: ['Sign in to the CRM portal', 'Enter the amount to withdraw', 'Funds go to your registered bank account']
+    };
+  }
+}
+</script>
+</body>
+</html>
