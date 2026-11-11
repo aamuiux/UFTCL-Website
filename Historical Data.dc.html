@@ -19,66 +19,58 @@
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
 a { color: inherit; text-decoration: none; }
 .hd-tbl td, .hd-tbl th { padding: 9px 14px; white-space: nowrap; }
-.hd-tbl tbody tr:nth-child(even) { background: #111; }
-.hd-tbl tbody tr:nth-child(odd) { background: #000; }
+.hd-tbl tbody tr { border-bottom: 1px solid var(--neutral-200); }
 </style>
 </helmet>
 <div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
 <dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
-<main style="padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: center;">
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
 
-  <div style="width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 4px;">
-    <h1 style="margin: 0; font-size: 22px;">Historical Data</h1>
-    <span style="font-size: 13px; color: var(--text-muted);">View or download daily, weekly and monthly price and volume history for any share · {{ asOf }}</span>
-  </div>
-
-  <div data-screen-label="Historical volume window" style="width: 100%; max-width: 1100px; background: #0b0c0f; color: #fff; border: 1px solid #2a2d3a;">
-    <div style="background: linear-gradient(90deg, #00b4f0, #0a4fa8 60%, #0a1c8c); padding: 10px 16px; font-weight: 600; font-size: 16px;">Historical Volume Window</div>
-
-    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; background: #14161c;">
-      <span style="height: 36px; padding: 0 14px; border: 1px solid #3a3d4d; background: #101218; display: inline-flex; align-items: center; color: #b9bdd0;">DSE</span>
-      <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; height: 36px; min-width: 240px; padding: 0 10px; border: 1px solid #3a3d4d; background: #101218; color: #fff; cursor: pointer;">
-        <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.label }}</option></sc-for>
+  <section data-screen-label="Symbol bar" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px;">
+    <div style="display: flex; flex-direction: column;"><span style="font-weight: 700; font-size: 18px;">Historical Data · {{ code }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ name }} · View or download daily, weekly and monthly history · {{ asOf }}</span></div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; font-weight: 700; height: 36px; min-width: 200px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
+        <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.code }}</option></sc-for>
       </select>
-      <span style="display: inline-flex; border: 1px solid #3a3d4d;">
+      <span style="display: inline-flex; border: 1px solid var(--ink);">
         <sc-for list="{{ periods }}" as="p"><button onClick="{{ p.onClick }}" aria-pressed="{{ p.on }}" style="font: inherit; font-size: 13px; font-weight: 700; height: 34px; padding: 0 16px; border: 0; cursor: pointer; background: {{ p.bg }}; color: {{ p.fg }};">{{ p.label }}</button></sc-for>
       </span>
-      <span style="margin-left: auto; font-size: 12px; color: #9aa0b4;">{{ code }}.PUBLIC</span>
     </div>
+  </section>
 
-    <div style="padding: 8px 8px 0; position: relative;">
-      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 56px;">
-        <div style="position: relative; height: 300px; border-bottom: 1px solid #2a2d3a;">
-          <svg viewBox="0 0 1000 300" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
-            <sc-for list="{{ ch.grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="#23252e" vector-effect="non-scaling-stroke"></line></sc-for>
-            <sc-for list="{{ ch.candles }}" as="c"><line x1="{{ c.cx }}" x2="{{ c.cx }}" y1="{{ c.hy }}" y2="{{ c.ly }}" stroke="{{ c.color }}" vector-effect="non-scaling-stroke"></line><rect x="{{ c.x }}" y="{{ c.y }}" width="{{ c.w }}" height="{{ c.h }}" fill="{{ c.color }}"></rect></sc-for>
-            <sc-for list="{{ ch.vols }}" as="v"><rect x="{{ v.x }}" y="{{ v.y }}" width="{{ v.w }}" height="{{ v.h }}" fill="{{ v.color }}" opacity="0.75"></rect></sc-for>
-          </svg>
-        </div>
-        <div style="position: relative; height: 300px; font-family: var(--font-mono); font-size: 11px; color: #cfd2de;"><sc-for list="{{ ch.grid }}" as="g"><span style="position: absolute; left: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+  <section data-screen-label="Price and volume chart" style="border: 1px solid var(--ink);">
+    <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Price &amp; Volume</div>
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 56px; padding: 8px 0 0 8px;">
+      <div style="position: relative; height: 300px; border-bottom: 1px solid var(--ink);">
+        <svg viewBox="0 0 1000 300" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          <sc-for list="{{ ch.grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" vector-effect="non-scaling-stroke"></line></sc-for>
+          <sc-for list="{{ ch.candles }}" as="c"><line x1="{{ c.cx }}" x2="{{ c.cx }}" y1="{{ c.hy }}" y2="{{ c.ly }}" stroke="{{ c.color }}" vector-effect="non-scaling-stroke"></line><rect x="{{ c.x }}" y="{{ c.y }}" width="{{ c.w }}" height="{{ c.h }}" fill="{{ c.color }}"></rect></sc-for>
+          <sc-for list="{{ ch.vols }}" as="v"><rect x="{{ v.x }}" y="{{ v.y }}" width="{{ v.w }}" height="{{ v.h }}" fill="{{ v.color }}" opacity="0.45"></rect></sc-for>
+        </svg>
       </div>
-      <div style="position: relative; height: 22px; margin-right: 56px; font-family: var(--font-mono); font-size: 11px; color: #cfd2de;"><sc-for list="{{ ch.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%);">{{ x.label }}</span></sc-for></div>
+      <div style="position: relative; height: 300px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ ch.grid }}" as="g"><span style="position: absolute; left: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
     </div>
+    <div style="position: relative; height: 22px; margin: 0 56px 0 8px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ ch.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%);">{{ x.label }}</span></sc-for></div>
+  </section>
 
-    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; border-top: 1px solid #2a2d3a; background: #14161c;">
-      <span style="font-weight: 600;">Last</span>
-      <select onChange="{{ onCount }}" value="{{ count }}" style="font: inherit; height: 32px; padding: 0 8px; border: 1px solid #3a3d4d; background: #101218; color: #fff; cursor: pointer;">
+  <section data-screen-label="History table" style="border: 1px solid var(--ink);">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+      <b>Last</b>
+      <select onChange="{{ onCount }}" value="{{ count }}" style="font: inherit; height: 32px; padding: 0 8px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
         <sc-for list="{{ countOptions }}" as="c"><option value="{{ c }}">{{ c }}</option></sc-for>
       </select>
-      <span style="font-weight: 600;">{{ unit }}</span>
-      <button onClick="{{ onDownload }}" style="margin-left: auto; font: inherit; font-weight: 700; height: 34px; padding: 0 16px; border: 0; background: #1d6cf2; color: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">⬇ Download CSV</button>
+      <b>{{ unit }}</b>
+      <button onClick="{{ onDownload }}" style="margin-left: auto; font: inherit; font-weight: 700; height: 34px; padding: 0 16px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer;">Download CSV</button>
     </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 4px 12px; padding: 12px 14px; background: #14161c; border-top: 1px solid #23252e;">
-      <sc-for list="{{ summary }}" as="s"><div style="display: flex; flex-direction: column; gap: 4px;"><span style="color: #cfd2de; font-size: 13px;">{{ s.label }}</span><b style="font-family: var(--font-mono); font-weight: 500; color: {{ s.c }};">{{ s.value }}</b></div></sc-for>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); border-bottom: 1px solid var(--ink);">
+      <sc-for list="{{ summary }}" as="s"><div style="display: flex; justify-content: space-between; gap: 8px; padding: 9px 16px; border-bottom: 1px solid var(--neutral-200); border-right: 1px solid var(--neutral-200); font-size: 13px;"><span style="color: var(--text-muted);">{{ s.label }}</span><b style="font-family: var(--font-mono); color: {{ s.c }};">{{ s.value }}</b></div></sc-for>
     </div>
-
     <div style="overflow: auto; max-height: 520px;">
-      <table class="hd-tbl" style="width: 100%; border-collapse: collapse; font-size: 14px;">
-        <thead style="position: sticky; top: 0; background: #14161c; color: #cfd2de;"><tr>
-          <sc-for list="{{ cols }}" as="c"><th style="text-align: {{ c.al }}; font-weight: 500;">{{ c.label }}</th></sc-for>
+      <table class="hd-tbl" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead style="position: sticky; top: 0; background: var(--neutral-100); color: var(--text-muted);"><tr>
+          <sc-for list="{{ cols }}" as="c"><th style="text-align: {{ c.al }}; font-weight: 700; border-bottom: 1px solid var(--ink);">{{ c.label }}</th></sc-for>
         </tr></thead>
-        <tbody>
+        <tbody style="font-family: var(--font-mono);">
           <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12"><tr>
             <td>{{ r.date }}</td><td style="text-align: right;">{{ r.close }}</td><td style="text-align: right;">{{ r.vol }}</td>
             <td style="text-align: right; color: {{ r.c }};">{{ r.chg }}</td><td style="text-align: right; color: {{ r.c }};">{{ r.pct }}</td>
@@ -88,12 +80,10 @@ a { color: inherit; text-decoration: none; }
         </tbody>
       </table>
     </div>
-  </div>
-
-  <div style="width: 100%; max-width: 1100px; font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between;">
-    <span style="display: flex; flex-wrap: wrap; gap: 16px;"><a href="{{ depthHref }}" style="text-decoration: underline;">Market Depth</a><a href="{{ stockHref }}" style="text-decoration: underline;">Stock page</a><a href="{{ chartHref }}" style="text-decoration: underline;">Stock chart</a><a href="{{ vpaHref }}" style="text-decoration: underline;">Minute history (VPA Archive)</a></span>
-    <span>Weekly and monthly rows aggregate the daily session data (Sun–Thu).</span>
-  </div>
+    <div style="padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; border-top: 1px solid var(--ink);">
+      <a href="{{ depthHref }}" style="text-decoration: underline;">Market Depth</a><a href="{{ stockHref }}" style="text-decoration: underline;">Stock page</a><a href="{{ chartHref }}" style="text-decoration: underline;">Stock chart</a><a href="{{ vpaHref }}" style="text-decoration: underline;">Minute history (VPA Archive)</a>
+    </div>
+  </section>
 
   <dc-import name="SymbolIndex" page="Historical Data" hint-size="100%,120px"></dc-import>
 </main>
@@ -116,13 +106,13 @@ class Component extends DCLogic {
   renderVals() {
     const U = window.UFT; if (!U) return {};
     const { fmt, fmtInt, round } = U; const { S, tf, count, slice } = this.build();
-    const up = '#2ee06f', dn = '#ff4d4d', GR = '#00a97a', RD = '#e5334b';
+    const up = 'var(--green-700)', dn = 'var(--red-700)', GR = 'var(--green-700)', RD = 'var(--red-700)';
     const hi = Math.max(...slice.map(b => b.h)), lo = Math.min(...slice.map(b => b.l));
     const avgP = slice.reduce((a, b) => a + b.c, 0) / slice.length, avgV = slice.reduce((a, b) => a + b.v, 0) / slice.length;
     const vols = slice.map(b => b.v); const first = slice[0].c, last = slice[slice.length - 1].c; const chg = last - first, pct = chg / first * 100;
     const sgn = (v, d) => (v > 0 ? '+' : '') + fmt(v, d);
-    const col = v => v < 0 ? dn : v > 0 ? up : '#fff';
-    const summary = [['Avg Price:', fmt(avgP, 2), '#fff'], ['Max Price:', fmt(hi, 2), '#fff'], ['Min Price:', fmt(lo, 2), '#fff'], ['Change', sgn(chg, 1), col(chg)], ['Avg Volume:', fmt(avgV, 2), '#fff'], ['Max Volume:', fmt(Math.max(...vols), 2), '#fff'], ['Min Volume:', fmt(Math.min(...vols), 2), '#fff'], ['Change(%):', sgn(pct, 2) + '%', col(pct)]].map(([label, value, c]) => ({ label, value, c }));
+    const col = v => v < 0 ? dn : v > 0 ? up : 'var(--ink)';
+    const summary = [['Avg Price:', fmt(avgP, 2), 'var(--ink)'], ['Max Price:', fmt(hi, 2), 'var(--ink)'], ['Min Price:', fmt(lo, 2), 'var(--ink)'], ['Change', sgn(chg, 1), col(chg)], ['Avg Volume:', fmt(avgV, 2), 'var(--ink)'], ['Max Volume:', fmt(Math.max(...vols), 2), 'var(--ink)'], ['Min Volume:', fmt(Math.min(...vols), 2), 'var(--ink)'], ['Change(%):', sgn(pct, 2) + '%', col(pct)]].map(([label, value, c]) => ({ label, value, c }));
     // chart
     const W = 1000, H = 300, VH = 70; const sc = U.scaleY([hi, lo], H - VH - 10, 8); const n = slice.length, bw = W / n; const vmax = Math.max(...vols) || 1;
     const candles = slice.map((b, i) => { const x = i * bw, upc = b.c >= b.o, color = upc ? GR : RD; const yo = sc.y(b.o), yc = sc.y(b.c); return { x: (x + bw * 0.15).toFixed(2), cx: (x + bw / 2).toFixed(2), w: Math.max(bw * 0.7, 1).toFixed(2), y: Math.min(yo, yc).toFixed(2), h: Math.max(Math.abs(yo - yc), 1).toFixed(2), hy: sc.y(b.h).toFixed(2), ly: sc.y(b.l).toFixed(2), color }; });
@@ -132,7 +122,7 @@ class Component extends DCLogic {
     const x = slice.map((b, i) => i).filter(i => i % step === 0).map(i => ({ left: ((i + 0.5) / n * 100) + '%', label: slice[i].t }));
     const rows = slice.slice().reverse().map(b => ({ date: b.t, close: fmt(b.c, 1), vol: String(Math.round(b.v)), chg: sgn(b.chg, 1), pct: sgn(b.pct, 2) + '%', c: col(b.chg), value: fmt(b.value * 1e1, 2), trades: fmtInt(b.trades), open: fmt(b.o, 1), high: fmt(b.h, 1), low: fmt(b.l, 1) }));
     const TF = [['D', 'Daily'], ['W', 'Weekly'], ['M', 'Monthly']];
-    const periods = TF.map(([k, label]) => ({ label, on: k === tf, bg: k === tf ? '#1d6cf2' : '#101218', fg: k === tf ? '#fff' : '#b9bdd0', onClick: () => this.setState({ tf: k, count: 0 }) }));
+    const periods = TF.map(([k, label]) => ({ label, on: k === tf, bg: k === tf ? 'var(--ink)' : 'var(--paper)', fg: k === tf ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ tf: k, count: 0 }) }));
     const unit = { D: 'Working days', W: 'Weeks', M: 'Months' }[tf];
     const countOptions = { D: [20, 60, 100, 200, 300, 500], W: [13, 26, 52, 104, 156], M: [12, 24, 36, 48, 60] }[tf];
     const cols = [['Date', 'left'], ['Close', 'right'], ['Volume', 'right'], ['Change', 'right'], ['Ch(%)', 'right'], ['Value(mn)', 'right'], ['Trade', 'right'], ['Open', 'right'], ['High', 'right'], ['Low', 'right']].map(([label, al]) => ({ label, al }));
@@ -142,7 +132,7 @@ class Component extends DCLogic {
       const blob = new Blob([[head.join(','), ...body.reverse()].join('\n')], { type: 'text/csv' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${S.code}_${{ D: 'daily', W: 'weekly', M: 'monthly' }[tf]}_history.csv`; document.body.appendChild(a); a.click(); a.remove();
     };
-    return { code: S.code, ch: { candles, grid, x, vols: volBars }, summary, rows, cols, periods, unit, count, countOptions, onDownload,
+    return { code: S.code, name: U.company(S.code), ch: { candles, grid, x, vols: volBars }, summary, rows, cols, periods, unit, count, countOptions, onDownload,
       asOf: 'As of ' + U.dateStr(new Date(2026, 10, 8)),
       symbolOptions: U.symbols.map(code => ({ code, label: code + '.PUBLIC' })),
       stockHref: U.actions(S.code).stock, chartHref: U.actions(S.code).chart, vpaHref: U.href('VPA Archive', { symbol: S.code }), depthHref: U.href('Market Depth', { symbol: S.code }),
