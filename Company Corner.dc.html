@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Company Corner — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+.cc-btn { font: inherit; font-size: 13px; font-weight: 700; height: 34px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer; white-space: nowrap; }
+.cc-btn:hover { border-color: var(--ink); }
+.cc-sel { font: inherit; font-size: 13px; height: 34px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.cc-opt { display: flex; gap: 10px; align-items: baseline; width: 100%; text-align: left; font: inherit; font-size: 13px; padding: 8px 12px; border: 0; background: var(--paper); color: var(--ink); cursor: pointer; }
+.cc-opt:hover { background: var(--neutral-100); }
+.cc-th { padding: 10px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); text-align: left; background: var(--neutral-100); border-bottom: 1px solid var(--ink); white-space: nowrap; }
+.cc-td { padding: 12px; font-size: 13px; line-height: 20px; vertical-align: top; border-top: 1px solid var(--neutral-200); }
+.cc-mono { font-family: var(--font-mono); }
+.cc-dl dt { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 4px; }
+.cc-dl dd { margin: 0; font-size: 14px; line-height: 22px; }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="company" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+
+<section style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px;">
+  <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+    <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Company Corner</h1>
+    <div style="color: var(--text-muted);">Profile, financial reports, corporate actions, price sensitive information and shareholding for one listed company.</div>
+  </div>
+  <div style="position: relative; width: min(100%, 380px);">
+    <div id="cc-lbl" style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Company</div>
+    <span style="position: relative; display: block;"><input class="cc-sel" role="combobox" aria-labelledby="cc-lbl" aria-expanded="{{ cbStr }}" aria-controls="cc-list" aria-autocomplete="list" autocomplete="off" placeholder="Search by code or company" value="{{ cbText }}" onFocus="{{ onCbOpen }}" onClick="{{ onCbOpen }}" onInput="{{ onCbInput }}" onBlur="{{ onCbBlur }}" onKeyDown="{{ onCbKey }}" style="width: 100%; padding-right: 32px; height: 40px;"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="position: absolute; right: 12px; top: 14px; pointer-events: none;"><path d="M3 6h10l-5 6z"></path></svg></span>
+    <sc-if value="{{ cbOpen }}"><div id="cc-list" role="listbox" style="position: absolute; z-index: 30; left: 0; right: 0; top: 100%; margin-top: 2px; max-height: 280px; overflow-y: auto; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset, 4px 4px 0 var(--ink));">
+      <sc-for list="{{ cbOpts }}" as="o" hint-placeholder-count="6"><button role="option" class="cc-opt" aria-selected="{{ o.sel }}" onMouseDown="{{ o.onPick }}" style="background: {{ o.bg }};"><b class="cc-mono" style="min-width: 92px;">{{ o.code }}</b><span style="color: var(--text-muted); font-size: 12px; flex: 1; min-width: 0;">{{ o.name }}</span></button></sc-for>
+      <sc-if value="{{ cbEmpty }}"><div style="padding: 12px; font-size: 13px; color: var(--text-muted);">No company matches that search.</div></sc-if>
+    </div></sc-if>
+  </div>
+</section>
+
+<section style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; border: 1px solid var(--ink); padding: 14px 16px;">
+  <div style="display: flex; flex-direction: column; min-width: 0; flex: 1 1 260px;"><span style="font-family: var(--font-sans-b); font-size: 20px; line-height: 26px;">{{ co.name }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ co.code }} · {{ co.sector }} · Category {{ co.cat }}</span></div>
+  <div style="display: flex; flex-wrap: wrap; gap: 8px 28px;">
+    <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="display: flex; flex-direction: column;"><span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">{{ k.label }}</span><span class="cc-mono" style="font-size: 16px; font-weight: 700; color: {{ k.color }};">{{ k.v }}</span></div></sc-for>
+  </div>
+</section>
+
+<div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; font-weight: 700; height: 36px; padding: 0 16px; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for></div>
+
+<!-- PROFILE -->
+<sc-if value="{{ isProfile }}"><section style="border: 1px solid var(--ink); padding: 20px 24px; display: flex; flex-direction: column; gap: 20px;">
+  <dl class="cc-dl" style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px 32px;">
+    <sc-for list="{{ pShort }}" as="p" hint-placeholder-count="4"><div><dt>{{ p.k }}</dt><dd>{{ p.v }}</dd></div></sc-for>
+  </dl>
+  <dl class="cc-dl" style="margin: 0;"><dt>Company profile</dt><dd style="max-width: 940px;">{{ about }}</dd></dl>
+  <dl class="cc-dl" style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px 32px; border-top: 1px solid var(--neutral-200); padding-top: 20px;">
+    <sc-for list="{{ pContact }}" as="p" hint-placeholder-count="8"><div style="min-width: 0;"><dt>{{ p.k }}</dt><dd style="overflow-wrap: anywhere;">{{ p.v }}</dd></div></sc-for>
+  </dl>
+</section></sc-if>
+
+<!-- FINANCIALS -->
+<sc-if value="{{ isFin }}"><section style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+    <div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ fTabs }}" as="t" hint-placeholder-count="4"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" class="cc-btn" style="border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div>
+    <div role="group" aria-label="Period" style="display: flex;"><sc-for list="{{ perBtns }}" as="b" hint-placeholder-count="2"><button class="cc-btn" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}" style="border-color: var(--ink); background: {{ b.bg }}; color: {{ b.fg }}; min-width: 96px;">{{ b.label }}</button></sc-for></div>
+  </div>
+
+  <sc-if value="{{ hasGroups }}"><div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ gTabs }}" as="t" hint-placeholder-count="4"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" class="cc-btn" style="height: 30px; font-size: 12px; border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div></sc-if>
+  <sc-if value="{{ hasMetrics }}"><div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ mTabs }}" as="t" hint-placeholder-count="3"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" class="cc-btn" style="height: 30px; font-size: 12px; border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div></sc-if>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; align-items: start;">
+    <div style="border: 1px solid var(--ink); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px;"><sc-for list="{{ legend }}" as="l" hint-placeholder-count="3"><span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: {{ l.c }}; border-radius: {{ l.r }};"></span>{{ l.name }}</span></sc-for></div>
+        <sc-if value="{{ hasPick }}"><select class="cc-sel" aria-label="Chart metric" value="{{ pick }}" onChange="{{ onPick }}" style="height: 30px; font-size: 12px;"><sc-for list="{{ pickOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
+      </div>
+      <div style="position: relative; width: 100%; aspect-ratio: 600 / 280;">
+      <svg viewBox="0 0 600 280" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;" role="img" aria-label="{{ chartLabel }}">
+        <sc-for list="{{ ch.ticks }}" as="t" hint-placeholder-count="5"><line x1="52" x2="{{ ch.right }}" y1="{{ t.y }}" y2="{{ t.y }}" stroke="var(--neutral-200)" stroke-width="1"></line></sc-for>
+        <line x1="52" x2="{{ ch.right }}" y1="{{ ch.zeroY }}" y2="{{ ch.zeroY }}" stroke="var(--ink)" stroke-width="1"></line>
+        <sc-for list="{{ ch.bars }}" as="b" hint-placeholder-count="12"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.c }}"><title>{{ b.tip }}</title></rect></sc-for>
+        <path d="{{ ch.line }}" fill="none" stroke="{{ ch.lineColor }}" stroke-width="2"></path>
+        <sc-for list="{{ ch.dots }}" as="d" hint-placeholder-count="8"><circle cx="{{ d.x }}" cy="{{ d.y }}" r="3.5" fill="{{ d.c }}" stroke="var(--paper)" stroke-width="1.5"><title>{{ d.tip }}</title></circle></sc-for>
+      </svg>
+      <sc-for list="{{ ch.ticks }}" as="t" hint-placeholder-count="5"><span style="position: absolute; left: 0; width: 8%; top: {{ t.top }}; transform: translateY(-50%); text-align: right; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); white-space: nowrap;">{{ t.label }}</span></sc-for>
+      <sc-for list="{{ ch.y2 }}" as="t" hint-placeholder-count="3"><span style="position: absolute; left: {{ ch.rightPct }}; top: {{ t.top }}; transform: translate(4px, -50%); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); white-space: nowrap;">{{ t.label }}</span></sc-for>
+      <sc-for list="{{ ch.xl }}" as="x" hint-placeholder-count="6"><span style="position: absolute; left: {{ x.left }}; top: 93%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); white-space: nowrap;">{{ x.label }}</span></sc-for>
+      </div>
+    </div>
+    <div style="border: 1px solid var(--ink); min-width: 0;">
+      <div style="overflow: auto; max-height: 340px;"><table style="width: 100%; border-collapse: collapse; min-width: {{ tblMin }}px;">
+        <thead><tr><sc-for list="{{ tbl.heads }}" as="h" hint-placeholder-count="4"><th class="cc-th" style="text-align: {{ h.al }}; position: sticky; top: 0; z-index: 1;">{{ h.l }}</th></sc-for></tr></thead>
+        <tbody><sc-for list="{{ tbl.rows }}" as="r" hint-placeholder-count="6"><tr><sc-for list="{{ r.cells }}" as="c"><td class="cc-td {{ c.cls }}" style="text-align: {{ c.al }}; color: {{ c.color }}; font-weight: {{ c.fw }}; white-space: nowrap;">{{ c.v }}</td></sc-for></tr></sc-for></tbody>
+      </table></div>
+      <div style="padding: 10px 12px; border-top: 1px solid var(--neutral-200); font-size: 12px; color: var(--text-muted);">{{ unitNote }}</div>
+    </div>
+  </div>
+</section></sc-if>
+
+<!-- CORPORATE ACTIONS -->
+<sc-if value="{{ isActions }}"><section style="display: flex; flex-direction: column; gap: 16px;">
+  <div role="tablist" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ aTabs }}" as="t" hint-placeholder-count="2"><button role="tab" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}" class="cc-btn" style="border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div>
+  <sc-if value="{{ isDiv }}"><div style="border: 1px solid var(--ink); overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; min-width: 560px;">
+    <thead><tr><th class="cc-th">Declaration date</th><th class="cc-th">Dividend</th><th class="cc-th">Record date</th><th class="cc-th">Year ended</th></tr></thead>
+    <tbody><sc-for list="{{ divs }}" as="d" hint-placeholder-count="6"><tr><td class="cc-td">{{ d.decl }}</td><td class="cc-td cc-mono" style="font-weight: 700;">{{ d.div }}</td><td class="cc-td">{{ d.rec }}</td><td class="cc-td" style="color: var(--text-muted);">{{ d.ye }}</td></tr></sc-for></tbody>
+  </table></div>
+  <div style="font-size: 12px; color: var(--text-muted);">C = cash dividend, S = stock (bonus) dividend, both as a percentage of the face value.</div></sc-if>
+  <sc-if value="{{ isIns }}"><div style="border: 1px solid var(--ink); overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; min-width: 760px;">
+    <thead><tr><th class="cc-th" style="width: 130px;">Declaration date</th><th class="cc-th" style="width: 200px;">News title</th><th class="cc-th">News</th></tr></thead>
+    <tbody><sc-for list="{{ insiders }}" as="d" hint-placeholder-count="6"><tr><td class="cc-td" style="white-space: nowrap;">{{ d.date }}</td><td class="cc-td" style="font-weight: 700;">{{ d.title }}</td><td class="cc-td">{{ d.text }}</td></tr></sc-for></tbody>
+  </table></div></sc-if>
+</section></sc-if>
+
+<!-- NEWS / PSI -->
+<sc-if value="{{ isNews }}"><section style="display: flex; flex-direction: column; gap: 16px;">
+  <div role="group" aria-label="News type" style="display: flex; flex-wrap: wrap; gap: 4px;"><sc-for list="{{ nTabs }}" as="t" hint-placeholder-count="6"><button class="cc-btn" aria-pressed="{{ t.sel }}" onClick="{{ t.onClick }}" style="height: 30px; font-size: 12px; border-color: {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for></div>
+  <div style="border: 1px solid var(--ink); overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; min-width: 820px;">
+    <thead><tr><th class="cc-th" style="width: 120px;">Post date</th><th class="cc-th" style="width: 200px;">Title</th><th class="cc-th" style="width: 120px;">News type</th><th class="cc-th">News</th></tr></thead>
+    <tbody><sc-for list="{{ news }}" as="n" hint-placeholder-count="8"><tr><td class="cc-td" style="white-space: nowrap;">{{ n.date }}</td><td class="cc-td" style="font-weight: 700;">{{ n.title }}</td><td class="cc-td"><span style="display: inline-block; padding: 1px 8px; border: 1px solid var(--neutral-400); font-size: 12px; white-space: nowrap;">{{ n.type }}</span></td><td class="cc-td">{{ n.text }}</td></tr></sc-for></tbody>
+  </table></div>
+  <sc-if value="{{ newsEmpty }}"><div style="font-size: 13px; color: var(--text-muted);">No announcements of this type for the selected company.</div></sc-if>
+</section></sc-if>
+
+<!-- HOLDINGS -->
+<sc-if value="{{ isHold }}"><section style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12px;"><sc-for list="{{ hLegend }}" as="l" hint-placeholder-count="5"><span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: {{ l.c }};"></span>{{ l.name }}</span></sc-for></div>
+    <div role="group" aria-label="View" style="display: flex;"><sc-for list="{{ hBtns }}" as="b" hint-placeholder-count="2"><button class="cc-btn" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}" style="border-color: var(--ink); background: {{ b.bg }}; color: {{ b.fg }}; min-width: 80px;">{{ b.label }}</button></sc-for></div>
+  </div>
+  <sc-if value="{{ hChart }}"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; align-items: start;">
+    <div style="border: 1px solid var(--ink); padding: 16px; min-width: 0;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <sc-for list="{{ hRows }}" as="r" hint-placeholder-count="16"><div style="display: grid; grid-template-columns: 68px 1fr; gap: 10px; align-items: center;"><span class="cc-mono" style="font-size: 12px; text-align: right; color: var(--text-muted);">{{ r.label }}</span>
+          <div style="display: flex; height: 22px; background: var(--neutral-100);"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="5"><span title="{{ s.tip }}" style="width: {{ s.w }}%; background: {{ s.c }}; color: {{ s.fg }}; font-family: var(--font-mono); font-size: 11px; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap;">{{ s.t }}</span></sc-for></div></div></sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: 68px 1fr; gap: 10px; margin-top: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);"><span></span><div style="display: flex; justify-content: space-between;"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100 %</span></div></div>
+    </div>
+    <div style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0;">
+      <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">Latest: {{ hLatest }}</div>
+      <svg viewBox="0 0 240 240" style="width: min(100%, 300px); height: auto; display: block; margin: 0 auto;" role="img" aria-label="Latest shareholding pattern"><sc-for list="{{ hArcs }}" as="a" hint-placeholder-count="5"><path d="{{ a.d }}" fill="{{ a.c }}" stroke="var(--paper)" stroke-width="2"><title>{{ a.tip }}</title></path></sc-for></svg>
+      <div style="display: flex; flex-direction: column;"><sc-for list="{{ hSplit }}" as="l" hint-placeholder-count="5"><div style="display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--neutral-200); font-size: 13px;"><span style="width: 10px; height: 10px; background: {{ l.c }};"></span><span style="flex: 1;">{{ l.name }}</span><span class="cc-mono" style="font-weight: 700;">{{ l.v }}%</span></div></sc-for></div>
+    </div>
+  </div></sc-if>
+  <sc-if value="{{ hTable }}"><div style="border: 1px solid var(--ink); overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; min-width: 620px;">
+    <thead><tr><th class="cc-th">Month</th><sc-for list="{{ hHeads }}" as="h" hint-placeholder-count="5"><th class="cc-th" style="text-align: right;">{{ h }} (%)</th></sc-for></tr></thead>
+    <tbody><sc-for list="{{ hRows }}" as="r" hint-placeholder-count="16"><tr><td class="cc-td" style="font-weight: 700;">{{ r.label }}</td><sc-for list="{{ r.segs }}" as="s"><td class="cc-td cc-mono" style="text-align: right;">{{ s.v }}</td></sc-for></tr></sc-for></tbody>
+  </table></div></sc-if>
+  <div style="font-size: 12px; color: var(--text-muted);">Month-end shareholding as reported to the exchange. Pattern shown is a mock preview.</div>
+</section></sc-if>
+
+<div style="font-size: 12px; color: var(--text-muted); max-width: 900px;">All figures on this page are mock data for design review. They are not drawn from published company filings.</div>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const TABS = [['profile', 'Profile'], ['financials', 'Financials'], ['actions', 'Corporate actions'], ['news', 'News & PSI'], ['holdings', 'Holdings']];
+const HCOL = ['oklch(52.7% 0.154 150)', 'oklch(45% 0.18 300)', 'oklch(52% 0.17 262)', 'oklch(76% 0.16 80)', 'oklch(55% 0.2 22)'];
+const HNAME = ['Sponsor/Director', 'Govt', 'Institute', 'Foreign', 'Public'];
+const BLUE = 'oklch(52% 0.17 262)', GREEN = 'oklch(52.7% 0.154 150)', AMBER = 'oklch(76% 0.16 80)', RED = 'oklch(55% 0.2 22)';
+const FIN = {
+  inc: { l: 'Income', m: { eps: 'EPS', rev: 'Revenue', ebit: 'EBIT', ni: 'Net income' } },
+  bal: { l: 'Balance', m: { bvps: 'BVPS', ta: 'Total assets', te: 'Total equity', tl: 'Total liabilities' } },
+  cf: { l: 'Cash flow', m: { nocf: 'NOCFPS', ocf: 'Operating', icf: 'Investing', fcf: 'Financing' } },
+  rat: { l: 'Finance ratio', m: { roe: 'ROE (%)', roa: 'ROA (%)', nm: 'Net margin (%)', de: 'Debt / equity' } }
+};
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, sym: null, tab: null, q: '', open: false, hi: 0, fsub: 'forecast', fgrp: 'inc', per: 'A', pick: {}, ist: 'ni', cst: 'ocf', asub: 'div', ntype: 'All', hview: 'chart' };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); clearTimeout(this.bt); }
+  url(sym, tab) { try { history.replaceState(null, '', 'Company Corner.dc.html?tab=' + tab + '&symbol=' + encodeURIComponent(sym)); } catch (e) { /* no history */ } }
+  dstr(d) { return d.getDate() + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear(); }
+  dlong(d) { return MONL[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); }
+  // ---- mock financials; index 0 = newest period ----
+  fin(U, code, per) {
+    this._f = this._f || {}; const key = code + per; if (this._f[key]) return this._f[key];
+    const s = U.bySym[code]; const r = U.rng(U.hash(code) + 91); const shares = s.mcap * 1e6 / s.ltp / 1e6; const A = per === 'A'; const n = A ? 6 : 8; const tot = n + (A ? 1 : 4);
+    const ni0 = (s.eps || 1) * shares * (A ? 1 : 0.25); const margin = 0.06 + r() * 0.2; const eq0 = s.nav * shares * (A ? 1 : 1.02); const lev = 3 + r() * 9; const ocfK = (r() < 0.25 ? -1 : 1) * (0.3 + r() * 1.5);
+    const f = [1]; for (let i = 1; i < tot; i++) f.push(f[i - 1] * (1 - ((A ? 0.28 : 0.08) * (r() - 0.35))));
+    const ye = new Date(A ? 2025 : 2026, A ? 11 : 8, A ? 31 : 30); const labels = [];
+    for (let i = 0; i < tot; i++) { const d = A ? new Date(2025 - i, 11, 31) : new Date(2026, 8 - 3 * i, 0 + 30); if (!A) { const m = 8 - 3 * i; const yy = 2026 + Math.floor(m / 12); const mm = ((m % 12) + 12) % 12; const last = new Date(yy, mm + 1, 0); labels.push(last.getFullYear() + '-' + String(mm + 1).padStart(2, '0') + '-' + String(last.getDate()).padStart(2, '0')); } else labels.push(d.getFullYear() + '-12-31'); }
+    const rows = [];
+    for (let i = 0; i < tot; i++) { const seas = A ? 1 : 0.85 + r() * 0.3; const ni = ni0 * f[i] * seas; const rev = Math.abs(ni) / margin + 40 * shares * 0.02; const ebit = ni * (1.3 + r() * 0.3); const eq = eq0 * (1 - 0.05 * i * (A ? 1 : 0.25) + (r() - 0.5) * 0.01); const ta = eq * lev; const tl = ta - eq; const ocf = ni * ocfK * (0.8 + r() * 0.4); const icf = -(0.15 + r() * 0.7) * Math.abs(ni); const fcf = -(ocf + icf) + (r() - 0.5) * Math.abs(ni) * 0.6; const mult = A ? 1 : 4;
+      rows.push({ eps: ni / shares, rev, ebit, ni, bvps: eq / shares, ta, te: eq, tl, nocf: ocf / shares, ocf, icf, fcf, roe: ni * mult / eq * 100, roa: ni * mult / ta * 100, nm: ni / rev * 100, de: tl / eq }); }
+    return (this._f[key] = { labels, rows, n, step: A ? 1 : 4 });
+  }
+  series(F, k) { return F.rows.slice(0, F.n).map(r => r[k]); }
+  yoy(F, k) { return F.rows.slice(0, F.n).map((r, i) => { const p = F.rows[i + F.step]; return p && Math.abs(p[k]) > 1e-9 ? (r[k] - p[k]) / Math.abs(p[k]) * 100 : null; }); }
+  // chart builder: labels newest first; series [{name,color,vals}]; o.yoy or o.line
+  chart(U, labels, series, o) {
+    o = o || {}; const W = 600, L = 52, R = o.yoy ? 46 : 14, T = 16, B = 34, PH = 280 - T - B, PW = W - L - R; const n = labels.length; const ord = [...Array(n).keys()].reverse();
+    const all = series.flatMap(s => s.vals); let mn = Math.min(0, ...all), mx = Math.max(0, ...all); if (o.line) { const lo = Math.min(...all), hi = Math.max(...all); const pad = (hi - lo || 1) * 0.15; mn = lo - pad; mx = hi + pad; } if (mx === mn) mx = mn + 1;
+    const y = v => T + PH * (1 - (v - mn) / (mx - mn)); const ticks = [0, 1, 2, 3, 4].map(i => { const v = mn + (mx - mn) * i / 4; const yy = y(v); return { y: yy, top: (yy / 280 * 100).toFixed(2) + '%', label: Math.abs(v) >= 1000 ? U.fmt(v, 0) : Math.abs(v) >= 10 ? U.fmt(v, 0) : U.fmt(v, 2) }; });
+    const gw = PW / n; const bars = [], dots = []; let line = ''; const k = series.length;
+    if (o.line) { const pts = ord.map((idx, j) => ({ x: L + gw * (j + 0.5), y: y(series[0].vals[idx]), v: series[0].vals[idx], l: labels[idx] })); line = pts.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(''); pts.forEach(p => dots.push({ x: p.x, y: p.y, c: series[0].color, tip: p.l + ': ' + U.fmt(p.v, 2) })); }
+    else { const bw = Math.min(gw * 0.7 / k, 34); ord.forEach((idx, j) => series.forEach((s, si) => { const v = s.vals[idx]; const x = L + gw * (j + 0.5) - bw * k / 2 + bw * si; const y0 = y(0), y1 = y(v); bars.push({ x: x.toFixed(1), y: Math.min(y0, y1).toFixed(1), w: (bw - 1).toFixed(1), h: Math.max(Math.abs(y0 - y1), 1).toFixed(1), c: s.color, tip: s.name + ' · ' + labels[idx] + ': ' + U.fmt(v, 1) }); })); }
+    let y2 = [], lineColor = 'transparent';
+    if (o.yoy) { const yv = ord.map(i => o.yoy[i]); const ok = yv.filter(v => v != null); if (ok.length) { const lo = Math.min(...ok), hi = Math.max(...ok); const a = lo - (hi - lo || 1) * 0.2, b = hi + (hi - lo || 1) * 0.2; const yy = v => T + PH * (1 - (v - a) / (b - a)); lineColor = GREEN; let pen = false; ord.forEach((idx, j) => { const v = o.yoy[idx]; if (v == null) { pen = false; return; } const x = L + gw * (j + 0.5); line += (pen ? 'L' : 'M') + x.toFixed(1) + ' ' + yy(v).toFixed(1); pen = true; dots.push({ x, y: yy(v), c: GREEN, tip: 'YoY ' + labels[idx] + ': ' + U.fmt(v, 2) + '%' }); }); y2 = [0, 2, 4].map(i => { const v = a + (b - a) * i / 4; return { top: (yy(v) / 280 * 100).toFixed(2) + '%', label: U.fmt(v, 0) + '%' }; }); } }
+    if (o.line) lineColor = series[0].color;
+    const step = Math.ceil(n / 8); const xl = ord.map((idx, j) => ({ left: ((L + gw * (j + 0.5)) / W * 100).toFixed(2) + '%', label: labels[idx].slice(o.short ? 0 : 0, o.short ? 4 : 10) })).filter((_, j) => j % step === 0);
+    return { ticks, bars, dots, line, lineColor, xl, y2, zeroY: y(0), right: W - R, rightPct: ((W - R) / W * 100).toFixed(2) + '%' };
+  }
+  seed(U, code) { return U.rng(U.hash(code) + 5); }
+  news(U, code, r) {
+    const T = ['EPS', 'Board meeting', 'Dividend', 'Buy/Sell', 'Query']; const out = []; const names = ['Mr. Rahim Uddin', 'Ms. Nasrin Akter', 'Mr. Kamal Hossain', 'Mr. Farhad Ahmed']; const roles = ['Sponsor Director', 'Director', 'Sponsor']; let d = new Date(2026, 9, 29);
+    for (let i = 0; i < 14; i++) { const ty = i < 4 ? T[i % 3] : T[Math.floor(r() * 5)]; d = new Date(d.getTime() - (4 + Math.floor(r() * 24)) * 864e5); const eps = U.fmt(0.4 + r() * 3, 2), peps = U.fmt(0.3 + r() * 3, 2), nav = U.fmt(20 + r() * 60, 2); const q = ['Q1', 'Q2', 'Q3'][i % 3]; const ds = this.dstr(new Date(d.getTime() + 6 * 864e5));
+      let title, text;
+      if (ty === 'EPS') { title = code + ': ' + q + ' Financials'; text = '(' + q + ' Un-audited) Consolidated EPS was Tk. ' + eps + ' for the period under review as against Tk. ' + peps + ' for the same period of the previous year. Consolidated NOCFPS was Tk. ' + U.fmt(r() * 6 - 1, 2) + ' against Tk. ' + U.fmt(r() * 6 - 1, 2) + '. Consolidated NAV per share was Tk. ' + nav + '. (cont.)'; }
+      else if (ty === 'Board meeting') { title = code + ': Board Meeting'; text = 'Pursuant to Regulation 19 of the Dhaka Stock Exchange (Listing) Regulations, 2015, the Company has informed that a meeting of its Board of Directors will be held on ' + ds + ' at ' + (2 + Math.floor(r() * 4)) + ':30 PM to consider, among other things, the un-audited financial statements of the Company.'; }
+      else if (ty === 'Dividend') { title = code + ': Dividend Declaration'; text = 'The Board of Directors has recommended ' + (5 + Math.floor(r() * 20)) + '% cash dividend for the year ended 31 December 2025. Record date: ' + ds + '. The date and venue of the AGM will be notified later.'; }
+      else if (ty === 'Buy/Sell') { title = code + ': Sale Declaration of a Sponsor'; text = names[i % 4] + ', ' + roles[i % 3] + ' of the Company, has expressed his/her intention to sell ' + U.fmt(1e5 * (1 + Math.floor(r() * 9)), 0) + ' shares at the prevailing market price through the exchange within the next 30 working days.'; }
+      else { title = code + ': Reply to DSE Query'; text = 'In reply to the exchange\'s query on the recent unusual price movement, the Company has stated that it has no undisclosed price sensitive information that could have caused the movement.'; }
+      out.push({ d: new Date(d), type: ty, title, text }); }
+    return out;
+  }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const sym = st.sym || (U.bySym[U.param('symbol', '')] ? U.param('symbol', '') : 'BRACBANK'); const S = U.bySym[sym]; const P = U.profile(sym);
+    const tab = st.tab || (TABS.some(t => t[0] === U.param('tab', '')) ? U.param('tab', '') : 'profile'); const r = this.seed(U, sym);
+    // combobox
+    const q = st.q.trim().toLowerCase(); const list = U.symbols.filter(c => !q || c.toLowerCase().includes(q) || U.company(c).toLowerCase().includes(q)).slice(0, 40); const hi = Math.min(st.hi, Math.max(list.length - 1, 0));
+    const pickSym = c => { this.setState({ sym: c, open: false, q: '', hi: 0, ntype: 'All' }); this.url(c, tab); };
+    const cbOpts = list.map((c, i) => ({ code: c, name: U.company(c), sel: c === sym ? 'true' : 'false', bg: i === hi ? 'var(--neutral-100)' : 'var(--paper)', onPick: e => { e.preventDefault(); pickSym(c); } }));
+    const onCbKey = e => { if (e.key === 'ArrowDown') { e.preventDefault(); this.setState({ open: true, hi: Math.min(hi + 1, list.length - 1) }); } else if (e.key === 'ArrowUp') { e.preventDefault(); this.setState({ hi: Math.max(hi - 1, 0) }); } else if (e.key === 'Enter') { e.preventDefault(); if (list[hi]) pickSym(list[hi]); } else if (e.key === 'Escape') this.setState({ open: false, q: '' }); };
+    const go = k => { this.setState({ tab: k }); this.url(sym, k); };
+    const tabs = TABS.map(([k, l]) => ({ label: l, sel: tab === k ? 'true' : 'false', bg: tab === k ? 'var(--ink)' : 'var(--paper)', fg: tab === k ? 'var(--paper)' : 'var(--ink)', bd: tab === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => go(k) }));
+    const seg = (items, cur, set) => items.map(([k, l]) => ({ label: l, sel: cur === k ? 'true' : 'false', bg: cur === k ? 'var(--ink)' : 'var(--paper)', fg: cur === k ? 'var(--paper)' : 'var(--ink)', bd: cur === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => set(k) }));
+    const out = {
+      cbStr: st.open ? 'true' : 'false', cbOpen: st.open, cbText: st.open ? st.q : sym + ' · ' + U.company(sym), cbOpts, cbEmpty: !list.length,
+      onCbOpen: () => { if (!st.open) this.setState({ open: true, q: '', hi: 0 }); }, onCbInput: e => this.setState({ open: true, q: e.target.value, hi: 0 }), onCbBlur: () => { clearTimeout(this.bt); this.bt = setTimeout(() => this.setState({ open: false, q: '' }), 120); }, onCbKey,
+      co: { name: U.company(sym), code: sym, sector: S.sector, cat: S.cat },
+      kpis: [{ label: 'LTP', v: U.fmt(S.ltp, 1), color: 'var(--ink)' }, { label: 'Change', v: U.sign(S.changePct) + '%', color: S.changePct > 0 ? 'var(--green-700)' : S.changePct < 0 ? 'var(--red-700)' : 'var(--ink)' }, { label: 'EPS', v: U.fmt(S.eps, 2), color: 'var(--ink)' }, { label: 'NAV', v: U.fmt(S.nav, 2), color: 'var(--ink)' }, { label: 'Market cap (mn)', v: U.fmtInt(S.mcap), color: 'var(--ink)' }],
+      tabs, isProfile: tab === 'profile', isFin: tab === 'financials', isActions: tab === 'actions', isNews: tab === 'news', isHold: tab === 'holdings',
+      // empty defaults so unrelated bindings stay defined
+      ch: { ticks: [], bars: [], dots: [], xl: [], y2: [], line: '', lineColor: 'transparent', zeroY: 0, right: 0, rightPct: '0%' }, tbl: { heads: [], rows: [] }
+    };
+    if (tab === 'profile') {
+      const sec = S.sector; const cs = ['Mohammad Mahbubur Rahman FCS', 'Shaheen Alam ACS', 'Farzana Karim FCS', 'Tanvir Hasan ACS'][U.hash(sym) % 4];
+      Object.assign(out, {
+        pShort: [{ k: 'Sector', v: sec }, { k: 'Category', v: S.cat === 'A' ? 'A (regular dividend)' : S.cat }, { k: 'Employees', v: U.fmtInt(280 + U.hash(sym) % 7400) }, { k: 'Listed since', v: String(P.listed) }, { k: 'Financial year end', v: P.yearEnd }, { k: 'Face value', v: 'Tk. ' + P.face }, { k: 'Paid-up capital (mn)', v: U.fmt(P.paid, 2) }, { k: 'Authorised capital (mn)', v: U.fmtInt(P.auth) }],
+        about: P.name + ' is a Bangladesh-based company in the ' + sec.toLowerCase() + ' sector. It is listed on the Dhaka Stock Exchange and the Chittagong Stock Exchange. The company serves retail and corporate customers through its head office and a nationwide network, and reports its results every quarter in line with the listing regulations. Its latest annual report, board decisions and price sensitive information are available under the other tabs.',
+        pContact: [{ k: 'Address', v: P.address }, { k: 'Contact', v: P.phone }, { k: 'Fax', v: P.phone.replace(/\d{2}$/, '10') }, { k: 'Email', v: P.email }, { k: 'Web address', v: P.web }, { k: 'Company secretary', v: cs }, { k: 'Cell no.', v: '+8801' + (700000000 + U.hash(sym) % 299999999) }, { k: 'Telephone no.', v: P.phone + ' (Ext. ' + (1000 + U.hash(sym) % 8000) + ')' }, { k: 'Secretary email', v: cs.split(' ')[1].toLowerCase() + '@' + P.web.replace('www.', '') }]
+      });
+    }
+    if (tab === 'financials') {
+      const per = st.per; const F = this.fin(U, sym, per); const A = per === 'A'; const isF = st.fsub === 'forecast'; const sub = st.fsub; const grp = st.fgrp;
+      const fmtV = (k, v) => ['eps', 'bvps', 'nocf', 'de'].includes(k) ? U.fmt(v, 2) : ['roe', 'roa', 'nm'].includes(k) ? U.fmt(v, 2) : U.fmt(v, 1);
+      const col = v => v < 0 ? 'var(--red-700)' : 'var(--ink)';
+      let ch, tbl, legend, pickOpts = [], pickV = '', unit = 'BDT in millions, except per-share values and ratios.';
+      const heads = (arr) => arr.map((l, i) => ({ l, al: i ? 'right' : 'left' }));
+      if (isF) {
+        const M = FIN[grp].m; const keys = Object.keys(M); pickV = st.pick[grp] && M[st.pick[grp]] ? st.pick[grp] : keys[0];
+        pickOpts = keys.map(k => ({ v: k, l: M[k] })); ch = this.chart(U, F.labels.slice(0, F.n), [{ name: M[pickV], color: RED, vals: this.series(F, pickV) }], { line: true }); legend = [{ name: M[pickV], c: RED, r: '50%' }];
+        tbl = { heads: [{ l: 'Period', al: 'left' }, ...F.labels.slice(0, F.n).map(l => ({ l, al: 'right' }))], rows: keys.map(k => ({ cells: [{ v: M[k], al: 'left', fw: 700, color: 'var(--ink)', cls: '' }, ...this.series(F, k).map(v => ({ v: fmtV(k, v), al: 'right', fw: 400, color: col(v), cls: 'cc-mono' }))] })) };
+      } else if (sub === 'income' || sub === 'cash') {
+        const M = sub === 'income' ? { ni: 'Net income', rev: 'Revenue', ebit: 'Operating income' } : { ocf: 'Operating', icf: 'Investing', fcf: 'Financing' }; const cur = sub === 'income' ? st.ist : st.cst; const k = M[cur] ? cur : Object.keys(M)[0];
+        const vals = this.series(F, k), yo = this.yoy(F, k); ch = this.chart(U, F.labels.slice(0, F.n), [{ name: M[k] + ' (BDT mn)', color: BLUE, vals }], { yoy: yo, short: A });
+        legend = [{ name: M[k] + ' (BDT mn)', c: BLUE, r: '0' }, { name: 'YoY (%)', c: GREEN, r: '50%' }];
+        tbl = { heads: heads([A ? 'Year' : 'Quarter ended', M[k], 'YoY (%)']), rows: vals.map((v, i) => ({ cells: [{ v: F.labels[i], al: 'left', fw: 700, color: 'var(--ink)', cls: 'cc-mono' }, { v: fmtV(k, v), al: 'right', fw: 400, color: col(v), cls: 'cc-mono' }, { v: yo[i] == null ? '-' : U.sign(yo[i], 2), al: 'right', fw: 400, color: yo[i] == null ? 'var(--text-muted)' : yo[i] > 0 ? 'var(--green-700)' : yo[i] < 0 ? 'var(--red-700)' : 'var(--ink)', cls: 'cc-mono' }] })) };
+      } else {
+        const ks = [['ta', 'Total assets', BLUE], ['te', 'Total equity', GREEN], ['tl', 'Total liabilities', AMBER]]; ch = this.chart(U, F.labels.slice(0, F.n), ks.map(([k, name, color]) => ({ name, color, vals: this.series(F, k) })), { short: A });
+        legend = ks.map(([, name, c]) => ({ name, c, r: '0' }));
+        tbl = { heads: heads([A ? 'Year' : 'Quarter ended', ...ks.map(x => x[1])]), rows: F.labels.slice(0, F.n).map((l, i) => ({ cells: [{ v: l, al: 'left', fw: 700, color: 'var(--ink)', cls: 'cc-mono' }, ...ks.map(([k]) => ({ v: fmtV(k, F.rows[i][k]), al: 'right', fw: 400, color: 'var(--ink)', cls: 'cc-mono' }))] })) };
+      }
+      const mk = (obj, cur, set) => Object.keys(obj).map(k => ({ label: obj[k], sel: cur === k ? 'true' : 'false', bg: cur === k ? 'var(--ink)' : 'var(--paper)', fg: cur === k ? 'var(--paper)' : 'var(--ink)', bd: cur === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => set(k) }));
+      const hasM = sub === 'income' || sub === 'cash';
+      Object.assign(out, {
+        fTabs: seg([['forecast', 'Financial forecast'], ['income', 'Income statement'], ['balance', 'Balance sheet'], ['cash', 'Cash flow']], sub, k => this.setState({ fsub: k })),
+        perBtns: seg([['Q', 'Quarterly'], ['A', 'Annual']], per, k => this.setState({ per: k })).map(b => ({ ...b, bd: undefined })),
+        hasGroups: isF, gTabs: mk(Object.fromEntries(Object.keys(FIN).map(k => [k, FIN[k].l])), grp, k => this.setState({ fgrp: k })),
+        hasMetrics: hasM, mTabs: hasM ? mk(sub === 'income' ? { ni: 'Net income', rev: 'Revenue', ebit: 'Operating income' } : { ocf: 'Operating', icf: 'Investing', fcf: 'Financing' }, sub === 'income' ? st.ist : st.cst, k => this.setState(sub === 'income' ? { ist: k } : { cst: k })) : [],
+        ch, tbl, legend, hasPick: isF, pick: pickV, pickOpts, onPick: e => this.setState(s => ({ pick: { ...s.pick, [grp]: e.target.value } })), tblMin: isF ? 80 + F.n * 92 : 360, unitNote: unit,
+        chartLabel: 'Chart of ' + legend.map(l => l.name).join(', ')
+      });
+    }
+    if (tab === 'actions') {
+      const yrs = [2026, 2025, 2024, 2023, 2022, 2021]; const divs = yrs.map((y, i) => { const cash = Math.max(0, Math.round((S.eps > 0 ? 6 + r() * 22 : 0) / 2.5) * 2.5); const stock = r() < 0.5 ? Math.round(2 + r() * 13) : 0; const decl = new Date(y, 3, 3 + Math.floor(r() * 26)); const rec = new Date(y, 4, 5 + Math.floor(r() * 20)); return { decl: this.dlong(decl), div: (cash % 1 ? cash.toFixed(2).replace(/0$/, '') : cash) + '%C | ' + stock + '%S', rec: this.dlong(rec), ye: 'Dec 31, ' + (y - 1) }; });
+      const nn = this.news(U, sym, this.seed(U, sym + 'x')).filter(n => n.type === 'Buy/Sell'); const ins = []; for (let i = 0; i < 6; i++) { const n = nn[i % Math.max(nn.length, 1)] || { text: 'A sponsor has expressed an intention to sell shares through the exchange.', title: sym + ': Sale Declaration of a Sponsor' }; ins.push({ date: this.dlong(new Date(2026, 9 - i * 2, 20 - i)), title: n.title, text: n.text }); }
+      Object.assign(out, { aTabs: seg([['div', 'Dividends'], ['ins', 'Insider activity']], st.asub, k => this.setState({ asub: k })), isDiv: st.asub === 'div', isIns: st.asub === 'ins', divs, insiders: ins });
+    }
+    if (tab === 'news') {
+      const all = this.news(U, sym, this.seed(U, sym + 'n')); const types = ['All', 'EPS', 'Board meeting', 'Dividend', 'Buy/Sell', 'Query']; const shown = all.filter(n => st.ntype === 'All' || n.type === st.ntype);
+      Object.assign(out, { nTabs: seg(types.map(t => [t, t]), st.ntype, k => this.setState({ ntype: k })), news: shown.map(n => ({ date: this.dstr(n.d), title: n.title, type: n.type, text: n.text })), newsEmpty: !shown.length });
+    }
+    if (tab === 'holdings') {
+      const rr = U.rng(U.hash(sym) + 61); const cur = P.holding.map(h => h.now); const months = []; let v = cur.slice(); for (let i = 0; i < 16; i++) { const d = new Date(2026, 9 - i, 1); months.push({ label: MON[d.getMonth()] + ',' + d.getFullYear(), v: v.map(x => U.round(x, 2)) }); const n = v.slice(); n[2] = Math.max(0, n[2] + (rr() - 0.5) * 1.6); n[3] = Math.max(0, n[3] + (rr() - 0.5) * 1.6); n[4] = Math.max(0, 100 - n[0] - n[1] - n[2] - n[3]); v = n; }
+      const hrows = months.map(m => ({ label: m.label, segs: m.v.map((x, j) => ({ w: x, c: HCOL[j], fg: j === 3 ? 'var(--ink)' : '#fff', t: x >= 4 ? U.fmt(x, 2) : '', tip: HNAME[j] + ': ' + U.fmt(x, 2) + '%', v: U.fmt(x, 2) })) }));
+      const latest = months[0].v; let a0 = -Math.PI / 2; const arcs = latest.map((x, j) => { const a1 = a0 + x / 100 * Math.PI * 2; const big = a1 - a0 > Math.PI ? 1 : 0; const p = (a, rad) => [(120 + rad * Math.cos(a)).toFixed(2), (120 + rad * Math.sin(a)).toFixed(2)]; const [x0, y0] = p(a0, 110), [x1, y1] = p(a1 - 0.0001, 110); const d = x <= 0 ? '' : x >= 99.99 ? 'M120 10A110 110 0 1 1 119.99 10Z' : 'M120 120L' + x0 + ' ' + y0 + 'A110 110 0 ' + big + ' 1 ' + x1 + ' ' + y1 + 'Z'; a0 = a1; return { d, c: HCOL[j], tip: HNAME[j] + ': ' + U.fmt(x, 2) + '%' }; });
+      Object.assign(out, { hLegend: HNAME.map((n, j) => ({ name: n, c: HCOL[j] })), hBtns: seg([['chart', 'Chart'], ['table', 'Table']], st.hview, k => this.setState({ hview: k })).map(b => ({ ...b })), hChart: st.hview === 'chart', hTable: st.hview === 'table', hRows: hrows, hHeads: HNAME, hLatest: months[0].label.replace(',', ' '), hArcs: arcs, hSplit: latest.map((x, j) => ({ name: HNAME[j], c: HCOL[j], v: U.fmt(x, 2) })) });
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>
