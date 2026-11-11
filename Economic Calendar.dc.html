@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Economic Calendar — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+.ec-pill { font: inherit; font-size: 14px; font-weight: 600; height: 38px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.ec-pill:hover { border-color: var(--ink); }
+.ec-pill[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.ec-chip { font: inherit; font-size: 12px; font-weight: 600; height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer; }
+.ec-chip:hover { border-color: var(--ink); }
+.ec-chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.ec-ctl { font: inherit; font-size: 13px; height: 34px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); }
+.ec-sel { font: inherit; font-size: 14px; font-weight: 700; border: 0; background: transparent; color: var(--blue-700); cursor: pointer; padding: 0 2px; }
+.ec-th { padding: 12px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); background: var(--neutral-100); border-bottom: 1px solid var(--ink); white-space: nowrap; }
+.ec-td { padding: 12px; font-size: 14px; border-top: 1px solid var(--neutral-200); vertical-align: middle; }
+.ec-mono { font-family: var(--font-mono); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="news" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Economic Calendar</h1>
+  <div style="color: var(--text-muted); max-width: 820px;">When key local and global economic indicators are released, with the forecast, the previous reading and the actual result once published.</div>
+</section>
+
+<section style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+  <div role="group" aria-label="Date range" style="display: flex; flex-wrap: wrap; gap: 8px;">
+    <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="6"><button class="ec-pill" aria-pressed="{{ r.sel }}" onClick="{{ r.onClick }}"><sc-if value="{{ r.cal }}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="3" width="12" height="11"></rect><path d="M2 6.5h12M5 1.5v3M11 1.5v3"></path></svg></sc-if>{{ r.label }}</button></sc-for>
+  </div>
+  <button class="ec-pill" aria-expanded="{{ fOpenStr }}" onClick="{{ onToggleF }}" style="border-radius: 0; border-color: var(--ink); height: 40px;">Filters<span style="font-family: var(--font-mono); font-size: 12px; opacity: 0.7;">{{ fCount }}</span><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="transform: rotate({{ fRot }}deg);"><path d="M3 6l5 5 5-5"></path></svg></button>
+</section>
+
+<sc-if value="{{ isCustom }}"><section style="display: flex; flex-wrap: wrap; align-items: end; gap: 12px;">
+  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">From<input type="date" class="ec-ctl" value="{{ from }}" onChange="{{ onFrom }}"></label>
+  <label style="display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">To<input type="date" class="ec-ctl" value="{{ to }}" onChange="{{ onTo }}"></label>
+  <span style="font-size: 12px; color: var(--text-muted); padding-bottom: 9px;">Up to 31 days.</span>
+</section></sc-if>
+
+<sc-if value="{{ fOpen }}"><section style="border: 1px solid var(--ink); padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px 28px;">
+  <div style="display: flex; flex-direction: column; gap: 8px;"><div style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">Importance</div><div style="display: flex; gap: 6px;"><sc-for list="{{ impBtns }}" as="b" hint-placeholder-count="3"><button class="ec-chip" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for></div></div>
+  <div style="display: flex; flex-direction: column; gap: 8px; grid-column: span 2; min-width: 0;"><div style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">Country</div><div style="display: flex; flex-wrap: wrap; gap: 6px;"><sc-for list="{{ ccBtns }}" as="b" hint-placeholder-count="12"><button class="ec-chip" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}" title="{{ b.name }}">{{ b.label }}</button></sc-for></div></div>
+  <label style="display: flex; flex-direction: column; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">Event<input class="ec-ctl" placeholder="Search events" value="{{ q }}" onInput="{{ onQ }}" style="font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 14px; height: 36px;"></label>
+  <div style="display: flex; align-items: end;"><button class="ec-chip" onClick="{{ onReset }}" style="height: 36px; border-radius: 0; border-color: var(--ink);">Reset filters</button></div>
+</section></sc-if>
+
+<section style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; font-size: 14px;">
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px;">
+    <span style="display: inline-flex; align-items: center; gap: 8px; color: var(--blue-700);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.5"></circle><path d="M8 4v4l2.5 1.5"></path></svg><b style="font-weight: 600;">Current time:</b> <b class="ec-mono" style="color: var(--ink);">{{ clock }}</b>
+      <select class="ec-sel" aria-label="Time zone" value="{{ tz }}" onChange="{{ onTz }}"><sc-for list="{{ tzOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></span>
+    <span style="display: inline-flex; align-items: center; gap: 6px; color: var(--blue-700); border-left: 1px solid var(--neutral-300); padding-left: 20px;"><b style="font-weight: 600;">Display time:</b>
+      <select class="ec-sel" aria-label="Display time" value="{{ mode }}" onChange="{{ onMode }}"><option value="clock">Event time</option><option value="remaining">Time remaining</option></select></span>
+  </div>
+  <div style="color: var(--text-muted); font-size: 13px;">Sample data for design review. Not live market data.</div>
+</section>
+
+<section style="border: 1px solid var(--ink); overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; min-width: 820px;">
+    <thead><tr>
+      <th class="ec-th" style="text-align: left; width: 120px;">Time</th>
+      <th class="ec-th" style="text-align: left; width: 90px;">Cur.</th>
+      <th class="ec-th" style="text-align: left;">Event</th>
+      <th class="ec-th" style="text-align: left; width: 90px;">Imp.</th>
+      <th class="ec-th" style="text-align: right; width: 110px;">Actual</th>
+      <th class="ec-th" style="text-align: right; width: 110px;">Forecast</th>
+      <th class="ec-th" style="text-align: right; width: 110px;">Previous</th>
+    </tr></thead>
+    <tbody>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+        <tr>
+          <sc-if value="{{ r.isDay }}"><td colspan="7" style="text-align: center; padding: 14px 12px; font-family: var(--font-sans-b); font-size: 17px; font-weight: 700; background: var(--neutral-50); border-top: 1px solid var(--ink);">{{ r.day }}<span style="font-size: 12px; font-weight: 400; color: var(--text-muted); margin-left: 10px;">{{ r.count }}</span></td></sc-if>
+          <sc-if value="{{ r.isNow }}"><td colspan="7" style="padding: 0; border-top: 2px solid var(--red-700); position: relative; height: 0;"><span style="position: absolute; left: 12px; top: -10px; background: var(--red-700); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; padding: 1px 8px;">NOW {{ r.at }}</span><span style="display: block; height: 14px;"></span></td></sc-if>
+          <sc-if value="{{ r.isEv }}">
+            <td class="ec-td ec-mono" title="{{ r.title }}" style="white-space: nowrap;">{{ r.time }}</td>
+            <td class="ec-td"><span class="ec-mono" style="display: inline-block; min-width: 30px; text-align: center; padding: 1px 6px; border: 1px solid var(--neutral-400); font-size: 12px; font-weight: 700;" title="{{ r.cname }}">{{ r.cc }}</span></td>
+            <td class="ec-td" style="font-weight: 500;"><span style="display: inline-flex; align-items: center; gap: 10px;">{{ r.event }}
+              <sc-if value="{{ r.speech }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.7" aria-label="Speech"><path d="M4 9v6h4l5 4V5L8 9z"></path><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"></path></svg></sc-if>
+              <sc-if value="{{ r.report }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.7" aria-label="Report"><rect x="5" y="3" width="14" height="18"></rect><path d="M8.5 8h7M8.5 12h7M8.5 16h4"></path></svg></sc-if></span></td>
+            <td class="ec-td" style="white-space: nowrap; letter-spacing: 1px; font-size: 16px;" title="{{ r.impTitle }}"><span style="color: var(--ink);">{{ r.on }}</span><span style="color: var(--neutral-300);">{{ r.off }}</span></td>
+            <td class="ec-td ec-mono" style="text-align: right; font-weight: 700; color: {{ r.aColor }};">{{ r.actual }}</td>
+            <td class="ec-td ec-mono" style="text-align: right;">{{ r.forecast }}</td>
+            <td class="ec-td ec-mono" style="text-align: right; color: {{ r.pColor }}; text-decoration: {{ r.pDeco }};" title="{{ r.pTitle }}">{{ r.prev }}</td>
+          </sc-if>
+        </tr>
+      </sc-for>
+    </tbody>
+  </table>
+  <sc-if value="{{ empty }}"><div style="padding: 40px 16px; text-align: center; color: var(--text-muted); border-top: 1px solid var(--neutral-200);">No events match these dates and filters.<br><button class="ec-chip" onClick="{{ onReset }}" style="margin-top: 12px;">Reset filters</button></div></sc-if>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 12px; color: var(--text-muted);">
+  <span><b style="color: var(--green-700);">Green</b> actual is better than forecast</span>
+  <span><b style="color: var(--red-700);">Red</b> actual is worse than forecast</span>
+  <span><b style="color: var(--red-700); text-decoration: underline dotted;">Dotted underline</b> previous value was revised</span>
+  <span>★★★ high impact · ★★ medium · ★ low</span>
+</div>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CC = { BD: 'Bangladesh', US: 'United States', UK: 'United Kingdom', EU: 'Eurozone', DE: 'Germany', JP: 'Japan', CN: 'China', IN: 'India', AU: 'Australia', NZ: 'New Zealand', CA: 'Canada', KR: 'South Korea' };
+const TZ = [['6', 'Dhaka (GMT+6:00)'], ['0', 'UTC (GMT+0:00)'], ['-5', 'New York (GMT-5:00)'], ['9', 'Tokyo (GMT+9:00)'], ['8', 'Singapore (GMT+8:00)']];
+// c country, t title, k kind, i importance, h/m UTC time, b base, s spread, inv = lower is better, n names
+const POOL = [
+  ['BD', 'CPI Inflation (YoY)', 'p2', 3, 4, 0, 8.4, 1.2], ['BD', 'Remittance Inflow (USD)', 'b', 3, 4, 30, 2.4, 0.5], ['BD', 'Export Receipts (YoY)', 'p1', 2, 4, 0, 6, 8], ['BD', 'Import Payments (YoY)', 'p1', 2, 4, 0, -4, 9], ['BD', 'Forex Reserves (USD)', 'b', 2, 5, 0, 26, 1.5], ['BD', 'Policy Rate Decision', 'p2', 3, 5, 30, 10, 0.5], ['BD', 'Private Sector Credit Growth (YoY)', 'p1', 2, 4, 30, 8.5, 1.5],
+  ['US', '10-Year Note Auction', 'p3', 3, 18, 0, 4.4, 0.4], ['US', 'CPI (MoM)', 'p1', 3, 13, 30, 0.3, 0.3], ['US', 'Core CPI (YoY)', 'p1', 3, 13, 30, 3.1, 0.4], ['US', 'Non-Farm Payrolls', 'k', 3, 13, 30, 180, 120], ['US', 'Unemployment Rate', 'p1', 3, 13, 30, 4.2, 0.3, 1], ['US', 'Initial Jobless Claims', 'k', 2, 13, 30, 225, 30, 1], ['US', 'Retail Sales (MoM)', 'p1', 3, 13, 30, 0.4, 0.6], ['US', 'ISM Manufacturing PMI', 'i', 3, 15, 0, 49.5, 2], ['US', 'API Weekly Crude Oil Stock', 'm', 2, 21, 30, -1, 6], ['US', 'EIA Crude Oil Inventories', 'm', 2, 15, 30, -1, 5], ['US', 'Cleveland CPI (MoM)', 'p1', 1, 18, 0, 0.3, 0.2], ['US', 'Fed {n} Speaks', 's', 2, 18, 30, 0, 0, 0, ['Schmid', 'Waller', 'Williams', 'Logan']], ['US', 'FOMC Member {n} Speaks', 's', 2, 14, 30, 0, 0, 0, ['Bowman', 'Jefferson', 'Barr']],
+  ['UK', 'BoE MPC Member {n} Speaks', 's', 2, 18, 30, 0, 0, 0, ['Pill', 'Mann', 'Greene']], ['UK', 'GDP (QoQ)', 'p1', 3, 7, 0, 0.4, 0.3], ['UK', 'CPI (YoY)', 'p1', 3, 7, 0, 3.4, 0.5], ['UK', 'Retail Sales (MoM)', 'p1', 2, 7, 0, 0.3, 0.8],
+  ['EU', 'ECB President Lagarde Speaks', 's', 3, 12, 0, 0, 0], ['EU', 'Eurozone Manufacturing PMI', 'i', 2, 8, 0, 47.8, 2], ['DE', 'German CPI (MoM)', 'p1', 3, 13, 0, 0.1, 0.4], ['DE', 'German CPI (YoY)', 'p1', 3, 13, 0, 2.4, 0.5], ['DE', 'Ifo Business Climate', 'i', 2, 9, 0, 87.4, 2.5],
+  ['JP', 'Machine Tool Orders (YoY)', 'p1', 1, 6, 0, 20, 40], ['JP', 'M2 Money Stock (YoY)', 'p1', 1, 23, 50, 2.1, 0.4], ['JP', 'Reuters Tankan Index', 'i', 1, 23, 0, 24, 8], ['JP', 'BoJ Governor Ueda Speaks', 's', 3, 5, 0, 0, 0],
+  ['CN', 'Caixin Manufacturing PMI', 'i', 3, 1, 45, 50.4, 1.5], ['CN', 'CPI (YoY)', 'p1', 2, 1, 30, 0.4, 0.5], ['CN', 'Industrial Production (YoY)', 'p1', 2, 2, 0, 5.5, 1.5], ['CN', 'Trade Balance (USD)', 'b', 2, 3, 0, 85, 10],
+  ['AU', 'Home Loans (MoM)', 'p1', 2, 0, 30, -1, 5], ['AU', 'Employment Change', 'k', 3, 0, 30, 25, 30], ['AU', 'RBA Meeting Minutes', 'r', 2, 0, 30, 0, 0],
+  ['NZ', 'RBNZ Press Conference', 's', 2, 20, 0, 0, 0], ['NZ', 'RBNZ Financial Stability Report', 'r', 2, 20, 0, 0, 0],
+  ['CA', 'BOC Summary of Deliberations', 'r', 1, 18, 30, 0, 0], ['CA', 'Employment Change', 'k', 3, 13, 30, 20, 25], ['CA', 'CPI (MoM)', 'p1', 3, 13, 30, 0.2, 0.3],
+  ['KR', 'Unemployment Rate', 'p1', 1, 23, 0, 2.6, 0.3, 1], ['IN', 'RBI Interest Rate Decision', 'p2', 3, 4, 30, 6.5, 0.25], ['IN', 'CPI (YoY)', 'p2', 3, 12, 0, 4.8, 0.8]
+].map(a => ({ c: a[0], t: a[1], k: a[2], i: a[3], h: a[4], m: a[5], b: a[6], s: a[7], inv: !!a[8], n: a[9] }));
+const FMT = { p1: v => v.toFixed(1) + '%', p2: v => v.toFixed(2) + '%', p3: v => v.toFixed(3) + '%', m: v => v.toFixed(3) + 'M', b: v => v.toFixed(1) + 'B', k: v => Math.round(v) + 'K', i: v => v.toFixed(1) };
+const pad = n => String(n).padStart(2, '0');
+const keyOf = ms => new Date(ms).toISOString().slice(0, 10);
+const addDays = (key, n) => keyOf(Date.parse(key + 'T00:00:00Z') + n * 864e5);
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, now: Date.now(), range: 'today', from: '', to: '', tz: '6', mode: 'clock', fOpen: false, imps: [1, 2, 3], ccs: [], q: '' };
+  componentDidMount() { this.t = setInterval(() => this.setState({ now: Date.now() }), 15000); if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.t); clearInterval(this.p); }
+  // events for one UTC date key, deterministic
+  day(U, key) {
+    this._d = this._d || {}; if (this._d[key]) return this._d[key];
+    const r = U.rng(U.hash('ec' + key)); const dow = new Date(key + 'T00:00:00Z').getUTCDay(); const wk = dow === 0 || dow === 6;
+    const pool = POOL.map(e => ({ e, o: r() })).sort((a, b) => a.o - b.o).map(x => x.e); const n = wk ? 3 + Math.floor(r() * 3) : 15 + Math.floor(r() * 7); const base = Date.parse(key + 'T00:00:00Z');
+    const out = pool.slice(0, n).map(e => { const ms = base + (e.h * 60 + e.m) * 6e4; const hasVal = !['s', 'r'].includes(e.k); const f = e.b + (r() - 0.5) * e.s * 0.4; const prevRaw = e.b + (r() - 0.5) * e.s; const rev = hasVal && r() < 0.15; const prev = rev ? prevRaw + (r() - 0.5) * e.s * 0.2 : prevRaw; const act = f + (r() - 0.5) * e.s * 0.7; const fm = FMT[e.k];
+      return { ms, c: e.c, title: e.t.replace('{n}', e.n ? e.n[Math.floor(r() * e.n.length)] : ''), speech: e.k === 's', report: e.k === 'r', i: e.i, hasVal, inv: e.inv, aN: act, fN: f, actual: hasVal ? fm(act) : '', forecast: hasVal && r() < 0.8 ? fm(f) : '', prev: hasVal ? fm(prev) : '', prevOld: rev ? fm(prevRaw) : '' }; });
+    return (this._d[key] = out);
+  }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const off = parseFloat(st.tz) * 36e5; const local = ms => ms + off; const lkey = ms => keyOf(local(ms));
+    const todayK = lkey(st.now); const dowT = new Date(todayK + 'T00:00:00Z').getUTCDay(); const mon = addDays(todayK, -((dowT + 6) % 7));
+    const from = st.from || todayK, to = st.to || addDays(todayK, 7);
+    let a, b; switch (st.range) { case 'yesterday': a = b = addDays(todayK, -1); break; case 'tomorrow': a = b = addDays(todayK, 1); break; case 'week': a = mon; b = addDays(mon, 6); break; case 'next': a = addDays(mon, 7); b = addDays(mon, 13); break; case 'custom': a = from <= to ? from : to; b = from <= to ? to : from; if (Date.parse(b) - Date.parse(a) > 30 * 864e5) b = addDays(a, 30); break; default: a = b = todayK; }
+    // gather events whose LOCAL date lies within [a,b]
+    let evs = []; for (let k = addDays(a, -1); k <= addDays(b, 1); k = addDays(k, 1)) evs = evs.concat(this.day(U, k));
+    evs = evs.filter(e => { const lk = lkey(e.ms); return lk >= a && lk <= b; });
+    const q = st.q.trim().toLowerCase(); evs = evs.filter(e => st.imps.includes(e.i) && (!st.ccs.length || st.ccs.includes(e.c)) && (!q || e.title.toLowerCase().includes(q))).sort((x, y) => x.ms - y.ms);
+    const clk = ms => { const d = new Date(local(ms)); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()); };
+    const rel = ms => { const d = ms - st.now; const ab = Math.abs(d); if (ab < 6e4) return 'now'; const mins = Math.floor(ab / 6e4); const t = mins >= 1440 ? Math.floor(mins / 1440) + 'd ' + Math.floor((mins % 1440) / 60) + 'h' : mins >= 60 ? Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm' : mins + 'm'; return d > 0 ? 'in ' + t : t + ' ago'; };
+    const rows = []; let curDay = null; let nowDone = false;
+    const dayLabel = k => new Date(k + 'T00:00:00Z').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+    const nowAt = clk(st.now);
+    evs.forEach(e => { const k = lkey(e.ms);
+      if (k !== curDay) { curDay = k; const c = evs.filter(x => lkey(x.ms) === k).length; rows.push({ isDay: true, day: dayLabel(k), count: c + (c === 1 ? ' event' : ' events') }); }
+      if (!nowDone && k === todayK && e.ms > st.now) { rows.push({ isNow: true, at: nowAt }); nowDone = true; }
+      const past = e.ms <= st.now; let aColor = 'var(--ink)'; if (past && e.hasVal && e.forecast) { const diff = e.aN - e.fN; if (Math.abs(diff) > 1e-9) aColor = (diff > 0) !== e.inv ? 'var(--green-700)' : 'var(--red-700)'; }
+      rows.push({ isEv: true, time: st.mode === 'remaining' ? rel(e.ms) : clk(e.ms), title: st.mode === 'remaining' ? clk(e.ms) : rel(e.ms), cc: e.c, cname: CC[e.c], event: e.title, speech: e.speech, report: e.report, on: '★'.repeat(e.i), off: '★'.repeat(3 - e.i), impTitle: ['', 'Low impact', 'Medium impact', 'High impact'][e.i],
+        actual: past ? e.actual : '', aColor, forecast: e.forecast, prev: e.prev, pColor: e.prevOld ? 'var(--red-700)' : 'var(--ink)', pDeco: e.prevOld ? 'underline dotted' : 'none', pTitle: e.prevOld ? 'Revised from ' + e.prevOld : '' }); });
+    const setR = k => () => this.setState({ range: k });
+    const toggle = (arr, v) => arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
+    const nowD = new Date(local(st.now)); const clock = pad(nowD.getUTCHours()) + ':' + pad(nowD.getUTCMinutes());
+    const fc = (st.imps.length < 3 ? 1 : 0) + (st.ccs.length ? 1 : 0) + (q ? 1 : 0);
+    return {
+      ranges: [['yesterday', 'Yesterday'], ['today', 'Today'], ['tomorrow', 'Tomorrow'], ['week', 'This week'], ['next', 'Next week'], ['custom', 'Custom dates']].map(([k, l]) => ({ label: l, cal: k === 'custom', sel: st.range === k ? 'true' : 'false', onClick: setR(k) })),
+      isCustom: st.range === 'custom', from, to, onFrom: e => this.setState({ from: e.target.value }), onTo: e => this.setState({ to: e.target.value }),
+      fOpen: st.fOpen, fOpenStr: st.fOpen ? 'true' : 'false', fRot: st.fOpen ? 180 : 0, fCount: fc ? '(' + fc + ')' : '', onToggleF: () => this.setState({ fOpen: !st.fOpen }),
+      impBtns: [[3, '★★★ High'], [2, '★★ Medium'], [1, '★ Low']].map(([v, l]) => ({ label: l, sel: st.imps.includes(v) ? 'true' : 'false', onClick: () => this.setState(s => ({ imps: toggle(s.imps, v) })) })),
+      ccBtns: Object.keys(CC).map(c => ({ label: c, name: CC[c], sel: st.ccs.includes(c) ? 'true' : 'false', onClick: () => this.setState(s => ({ ccs: toggle(s.ccs, c) })) })),
+      q: st.q, onQ: e => this.setState({ q: e.target.value }), onReset: () => this.setState({ imps: [1, 2, 3], ccs: [], q: '' }),
+      clock, tz: st.tz, tzOpts: TZ.map(([v, l]) => ({ v, l })), onTz: e => this.setState({ tz: e.target.value }), mode: st.mode, onMode: e => this.setState({ mode: e.target.value }),
+      rows, empty: !evs.length
+    };
+  }
+}
+</script>
+</body>
+</html>
