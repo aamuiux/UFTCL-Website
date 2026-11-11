@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Alert — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+.al-ctl { font: inherit; font-size: 14px; height: 40px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.al-ctl:focus-visible { outline: 2px solid var(--blue-700); outline-offset: 1px; }
+.al-lbl { display: flex; flex-direction: column; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); min-width: 0; }
+.al-btn { font: inherit; font-size: 14px; font-weight: 700; height: 40px; box-sizing: border-box; padding: 0 18px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+.al-btn:hover { background: var(--paper); color: var(--ink); }
+.al-sm { font: inherit; font-size: 13px; font-weight: 700; height: 32px; padding: 0 12px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.al-sm:hover { background: var(--red-700); border-color: var(--red-700); color: #fff; }
+.al-opt { display: flex; gap: 10px; align-items: baseline; width: 100%; text-align: left; font: inherit; font-size: 13px; padding: 8px 12px; border: 0; background: var(--paper); color: var(--ink); cursor: pointer; }
+.al-opt:hover { background: var(--neutral-100); }
+.al-th { padding: 12px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--neutral-100); border-bottom: 1px solid var(--ink); white-space: nowrap; }
+.al-td { padding: 12px; font-size: 14px; border-top: 1px solid var(--neutral-200); }
+.al-pg { min-width: 34px; height: 34px; padding: 0 8px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.al-pg:hover:not(:disabled) { border-color: var(--ink); }
+.al-pg:disabled { opacity: 0.35; cursor: default; }
+.al-pg[aria-current="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.al-az { min-width: 36px; height: 36px; padding: 0 8px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.al-az:hover:not(:disabled) { border-color: var(--ink); }
+.al-az:disabled { color: var(--neutral-400); cursor: default; }
+.al-az[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+
+<section style="display: flex; flex-direction: column; gap: 4px;">
+  <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Alert</h1>
+  <div style="color: var(--text-muted); max-width: 780px;">Set a price, change or volume level for any share. We notify you when the condition is met.</div>
+</section>
+
+<!-- Create alert -->
+<section aria-label="Create alert" style="border: 1px solid var(--ink); padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--neutral-50);">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 16px; align-items: end;">
+    <div class="al-lbl" style="position: relative;"><span id="al-sym">Symbol</span>
+      <span style="position: relative; display: block;"><input class="al-ctl" role="combobox" aria-labelledby="al-sym" aria-expanded="{{ cbStr }}" aria-controls="al-list" aria-autocomplete="list" autocomplete="off" placeholder="Select symbol" value="{{ cbText }}" onFocus="{{ onCbOpen }}" onClick="{{ onCbOpen }}" onInput="{{ onCbInput }}" onBlur="{{ onCbBlur }}" onKeyDown="{{ onCbKey }}" style="padding-right: 32px; text-transform: none; letter-spacing: 0; font-weight: 400;"><svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" style="position: absolute; right: 12px; top: 14px; pointer-events: none;"><path d="M3 6h10l-5 6z"></path></svg></span>
+      <sc-if value="{{ cbOpen }}"><div id="al-list" role="listbox" style="position: absolute; z-index: 30; left: 0; right: 0; top: 100%; margin-top: 2px; max-height: 260px; overflow-y: auto; background: var(--paper); border: 1px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); text-transform: none; letter-spacing: 0; font-weight: 400;">
+        <sc-for list="{{ cbOpts }}" as="o" hint-placeholder-count="6"><button role="option" class="al-opt" aria-selected="{{ o.sel }}" onMouseDown="{{ o.onPick }}" style="background: {{ o.bg }};"><b style="font-family: var(--font-mono); min-width: 92px; color: var(--ink);">{{ o.code }}</b><span style="color: var(--text-muted); font-size: 12px; flex: 1; min-width: 0;">{{ o.name }}</span></button></sc-for>
+        <sc-if value="{{ cbEmpty }}"><div style="padding: 12px; font-size: 13px; color: var(--text-muted);">No symbol matches that search.</div></sc-if>
+      </div></sc-if>
+    </div>
+    <label class="al-lbl">Condition<select class="al-ctl" value="{{ cond }}" onChange="{{ onCond }}" style="text-transform: none; letter-spacing: 0; font-weight: 400;"><sc-for list="{{ condOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></label>
+    <label class="al-lbl">When it goes<select class="al-ctl" value="{{ dir }}" onChange="{{ onDir }}" style="text-transform: none; letter-spacing: 0; font-weight: 400;"><option value="above">Above</option><option value="below">Below</option></select></label>
+    <label class="al-lbl">Value
+      <span style="display: flex;"><input class="al-ctl" inputmode="decimal" placeholder="{{ valPh }}" value="{{ val }}" onInput="{{ onVal }}" onKeyDown="{{ onValKey }}" style="border-right: 0; text-transform: none; letter-spacing: 0; font-weight: 400;"><span style="display: flex; align-items: center; padding: 0 12px; border: 1px solid var(--ink); background: var(--neutral-200); color: var(--ink); font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: none; min-width: 52px; justify-content: center;">{{ unit }}</span></span></label>
+    <button class="al-btn" onClick="{{ onCreate }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z M10 21h4"></path></svg>Create alert</button>
+  </div>
+  <sc-if value="{{ hasLtp }}"><div style="font-size: 13px; color: var(--text-muted);">{{ ltpNote }}</div></sc-if>
+  <div role="status" style="min-height: 20px; font-size: 13px; font-weight: 700; color: {{ msgColor }};">{{ msg }}</div>
+  <div style="text-align: center; font-size: 13px; color: var(--text-muted);">You will get a notification alert when your alert condition is met. Alerts are saved in this browser.</div>
+</section>
+
+<!-- Alert list -->
+<section aria-label="Your alerts" style="display: flex; flex-direction: column; gap: 0; border: 1px solid var(--ink);">
+  <div style="overflow-x: auto;">
+  <table style="width: 100%; border-collapse: collapse; min-width: 860px;">
+    <thead><tr>
+      <th class="al-th" style="text-align: left;">Symbol</th><th class="al-th" style="text-align: left;">Condition</th><th class="al-th" style="text-align: right;">Value</th><th class="al-th" style="text-align: center;">Created</th><th class="al-th" style="text-align: center;">Status</th><th class="al-th" style="text-align: center;">Matched</th><th class="al-th" style="text-align: center;">Action</th>
+    </tr></thead>
+    <tbody>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="5"><tr>
+        <td class="al-td" style="font-weight: 700;"><a href="{{ r.href }}" style="text-decoration: underline; text-underline-offset: 3px;">{{ r.code }}</a></td>
+        <td class="al-td">{{ r.cond }}</td>
+        <td class="al-td" style="text-align: right; font-family: var(--font-mono);">{{ r.value }}</td>
+        <td class="al-td" style="text-align: center; font-family: var(--font-mono); font-size: 13px;">{{ r.created }}</td>
+        <td class="al-td" style="text-align: center;"><span style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: {{ r.sColor }};"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{ r.sColor }};"></span>{{ r.status }}</span></td>
+        <td class="al-td" style="text-align: center; font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">{{ r.matched }}</td>
+        <td class="al-td" style="text-align: center;"><button class="al-sm" aria-label="{{ r.label }}" onClick="{{ r.onDelete }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v6 M14 11v6"></path></svg>Delete</button></td>
+      </tr></sc-for>
+    </tbody>
+  </table>
+  <sc-if value="{{ empty }}"><div style="padding: 36px 16px; text-align: center; color: var(--text-muted); border-top: 1px solid var(--neutral-200);">{{ emptyText }}</div></sc-if>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 10px 12px; border-top: 1px solid var(--ink); background: var(--neutral-100);">
+    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+      <button class="al-pg" aria-label="First page" disabled="{{ noPrev }}" onClick="{{ onFirst }}">⏮</button>
+      <button class="al-pg" aria-label="Previous page" disabled="{{ noPrev }}" onClick="{{ onPrev }}">◀</button>
+      <sc-for list="{{ pageBtns }}" as="b" hint-placeholder-count="3"><button class="al-pg" aria-current="{{ b.cur }}" onClick="{{ b.onClick }}">{{ b.n }}</button></sc-for>
+      <button class="al-pg" aria-label="Next page" disabled="{{ noNext }}" onClick="{{ onNext }}">▶</button>
+      <button class="al-pg" aria-label="Last page" disabled="{{ noNext }}" onClick="{{ onLast }}">⏭</button>
+    </div>
+    <div style="font-size: 14px; color: var(--text-muted);">{{ range }}</div>
+  </div>
+</section>
+
+<section aria-label="Filter by first letter" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
+  <sc-for list="{{ letters }}" as="l" hint-placeholder-count="27"><button class="al-az" aria-pressed="{{ l.sel }}" disabled="{{ l.off }}" onClick="{{ l.onClick }}">{{ l.label }}</button></sc-for>
+</section>
+
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const KEY = 'uftcl.alerts';
+const COND = { price: { l: 'Price', unit: 'Tk', ph: 'e.g. 50.0' }, change: { l: 'Change %', unit: '%', ph: 'e.g. 3' }, volume: { l: 'Volume', unit: 'shares', ph: 'e.g. 500000' } };
+const pad = n => String(n).padStart(2, '0');
+const stamp = ms => { const d = new Date(ms); let h = d.getHours(); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear() + ' ' + pad(h) + ':' + pad(d.getMinutes()) + ' ' + ap; };
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, alerts: null, sym: '', q: '', open: false, hi: 0, cond: 'price', dir: 'above', val: '', msg: '', err: false, letter: '', page: 1 };
+  componentDidMount() {
+    let a = null; try { a = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { /* ignore */ }
+    if (!Array.isArray(a)) a = [{ id: 1, code: 'BRACBANK', cond: 'price', dir: 'above', value: 66.4, created: new Date(2026, 10, 7, 22, 37).getTime(), status: 'matched', matched: new Date(2026, 10, 8, 10, 0).getTime() }];
+    this.setState({ alerts: a });
+    if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50);
+  }
+  componentWillUnmount() { clearInterval(this.p); clearTimeout(this.bt); }
+  save(a) { this.setState({ alerts: a }); try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) { /* storage unavailable */ } }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const alerts = st.alerts || []; const C = COND[st.cond]; const S = U.bySym[st.sym];
+    // combobox
+    const q = st.q.trim().toLowerCase(); const list = U.symbols.filter(c => !q || c.toLowerCase().includes(q) || U.company(c).toLowerCase().includes(q)).slice(0, 40); const hi = Math.min(st.hi, Math.max(list.length - 1, 0));
+    const pick = c => { const s = U.bySym[c]; this.setState({ sym: c, open: false, q: '', hi: 0, msg: '', val: st.cond === 'price' && !st.val ? String(s.ltp) : st.val }); };
+    const onCbKey = e => { if (e.key === 'ArrowDown') { e.preventDefault(); this.setState({ open: true, hi: Math.min(hi + 1, list.length - 1) }); } else if (e.key === 'ArrowUp') { e.preventDefault(); this.setState({ hi: Math.max(hi - 1, 0) }); } else if (e.key === 'Enter') { if (st.open && list[hi]) { e.preventDefault(); pick(list[hi]); } } else if (e.key === 'Escape') this.setState({ open: false, q: '' }); };
+    const create = () => {
+      const v = parseFloat(String(st.val).replace(/,/g, ''));
+      if (!st.sym) return this.setState({ msg: 'Select a symbol first.', err: true });
+      if (!(v > 0) && !(st.cond === 'change' && v > 0)) return this.setState({ msg: 'Enter a value greater than zero.', err: true });
+      if (alerts.some(a => a.status === 'active' && a.code === st.sym && a.cond === st.cond && a.dir === st.dir && a.value === v)) return this.setState({ msg: 'You already have this alert.', err: true });
+      if (alerts.filter(a => a.status === 'active').length >= 20) return this.setState({ msg: 'You can keep up to 20 active alerts. Delete one to add another.', err: true });
+      const cur = st.cond === 'price' ? S.ltp : st.cond === 'change' ? S.changePct : S.volume; const met = st.dir === 'above' ? cur >= v : cur <= v;
+      if (met && cur != null) return this.setState({ msg: 'That condition is already met right now (' + C.l.toLowerCase() + ' is ' + U.fmt(cur, st.cond === 'volume' ? 0 : 2) + '). Choose a level that has not been reached.', err: true });
+      const id = Math.max(0, ...alerts.map(a => a.id)) + 1; this.save([{ id, code: st.sym, cond: st.cond, dir: st.dir, value: v, created: Date.now(), status: 'active', matched: null }, ...alerts]);
+      this.setState({ msg: 'Alert created for ' + st.sym + '.', err: false, val: '', page: 1, letter: '' });
+    };
+    // list
+    const filtered = alerts.filter(a => !st.letter || (st.letter === '#' ? /^\d/.test(a.code) : a.code.charAt(0) === st.letter));
+    const size = 10; const pages = Math.max(1, Math.ceil(filtered.length / size)); const page = Math.min(st.page, pages); const slice = filtered.slice((page - 1) * size, page * size);
+    const rows = slice.map(a => ({ code: a.code, href: U.href('Stock Chart', { symbol: a.code }), cond: COND[a.cond].l + ' ' + a.dir, value: a.cond === 'volume' ? U.fmtInt(a.value) : U.fmt(a.value, a.cond === 'change' ? 2 : 1) + (a.cond === 'change' ? '%' : ''), created: stamp(a.created), status: a.status === 'matched' ? 'Matched' : 'Active', sColor: a.status === 'matched' ? 'var(--green-700)' : 'var(--blue-700)', matched: a.matched ? stamp(a.matched) : '-', label: 'Delete alert for ' + a.code, onDelete: () => { this.save(alerts.filter(x => x.id !== a.id)); this.setState({ msg: 'Alert for ' + a.code + ' deleted.', err: false }); } }));
+    const lettersUsed = new Set(alerts.map(a => /^\d/.test(a.code) ? '#' : a.code.charAt(0)));
+    const letters = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '#'].map(l => ({ label: l === '#' ? '1…9' : l, sel: st.letter === l ? 'true' : 'false', off: !lettersUsed.has(l) && st.letter !== l, onClick: () => this.setState({ letter: st.letter === l ? '' : l, page: 1 }) }));
+    const pnums = []; for (let i = Math.max(1, page - 2); i <= Math.min(pages, page + 2); i++) pnums.push(i);
+    const ltpNote = S ? (S.code + ': ' + U.company(S.code) + ' · LTP ' + U.fmt(S.ltp, 1) + ' · ' + U.sign(S.changePct) + '% today') : '';
+    return {
+      cbStr: st.open ? 'true' : 'false', cbOpen: st.open, cbText: st.open ? st.q : st.sym, cbEmpty: !list.length, onCbKey,
+      cbOpts: list.map((c, i) => ({ code: c, name: U.company(c), sel: c === st.sym ? 'true' : 'false', bg: i === hi ? 'var(--neutral-100)' : 'var(--paper)', onPick: e => { e.preventDefault(); pick(c); } })),
+      onCbOpen: () => { if (!st.open) this.setState({ open: true, q: '', hi: 0 }); }, onCbInput: e => this.setState({ open: true, q: e.target.value, hi: 0 }), onCbBlur: () => { clearTimeout(this.bt); this.bt = setTimeout(() => this.setState({ open: false, q: '' }), 120); },
+      cond: st.cond, condOpts: Object.keys(COND).map(k => ({ v: k, l: COND[k].l })), onCond: e => this.setState({ cond: e.target.value, val: '', msg: '' }), dir: st.dir, onDir: e => this.setState({ dir: e.target.value }),
+      val: st.val, valPh: C.ph, unit: C.unit, onVal: e => this.setState({ val: e.target.value, msg: '' }), onValKey: e => { if (e.key === 'Enter') create(); }, onCreate: create,
+      hasLtp: !!S, ltpNote, msg: st.msg, msgColor: st.err ? 'var(--red-700)' : 'var(--green-700)',
+      rows, empty: !filtered.length, emptyText: alerts.length ? 'No alerts for this letter.' : 'You have no alerts yet. Pick a symbol above to create one.',
+      letters, noPrev: page <= 1, noNext: page >= pages, onFirst: () => this.setState({ page: 1 }), onPrev: () => this.setState({ page: page - 1 }), onNext: () => this.setState({ page: page + 1 }), onLast: () => this.setState({ page: pages }),
+      pageBtns: pnums.map(n => ({ n, cur: n === page ? 'true' : 'false', onClick: () => this.setState({ page: n }) })),
+      range: filtered.length ? ((page - 1) * size + 1) + ' - ' + Math.min(page * size, filtered.length) + ' of ' + filtered.length + ' items' : '0 items'
+    };
+  }
+}
+</script>
+</body>
+</html>
