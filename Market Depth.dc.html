@@ -79,7 +79,7 @@ a { color: inherit; text-decoration: none; }
   </div>
 
   <div style="width: 100%; max-width: 760px; font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between;">
-    <span>Looking for session history? <a href="{{ histHref }}" style="text-decoration: underline;">Open Historical Data</a></span>
+    <span style="display: flex; flex-wrap: wrap; gap: 16px;"><a href="{{ histHref }}" style="text-decoration: underline;">Historical Data</a><a href="{{ stockHref }}" style="text-decoration: underline;">Stock page</a><a href="{{ chartHref }}" style="text-decoration: underline;">Stock chart</a><a href="{{ sectorHref }}" style="text-decoration: underline;">Sector performance</a></span>
     <span>Depth is indicative and refreshed every few seconds on the exchange feed.</span>
   </div>
 
@@ -110,7 +110,7 @@ class Component extends DCLogic {
     const rowB = [['YCP', fmt(S.ycp, 1), W], ['Close', '-', W], ['Value', fmt(lac, 2) + ' lac', W], ['Vol', fmtInt(S.volume), W], ['SL', '-', W], ['DL', fmt(S.low, 1), W], ['CL', '-', W], ['52Wk', fmt(S.w52h, 1) + '/' + fmt(S.w52l, 1), W], ['VWAP', fmt(vwap, 2), W], ['Mkt', 'P', W]].map(([l, v, c]) => ({ l, v, c }));
     return { code: S.code, mode, rows, rowA, rowB, buyPct: fmt(D.buyPct, 2), sellPct: fmt(D.sellPct, 2),
       asOf: 'As of ' + U.dateStr(new Date(2026, 10, 8)) + ', 2:10 PM', chartHref: U.actions(S.code).chart, histHref: U.href('Historical Data', { symbol: S.code }),
-      buyHref: U.href('Trading Services', { s: 'portal' }), sellHref: U.href('Trading Services', { s: 'portal' }),
+      stockHref: U.actions(S.code).stock, sectorHref: U.href('Sector Share Price'), buyHref: U.href('Trading Services', { s: 'portal' }), sellHref: U.href('Trading Services', { s: 'portal' }),
       symbolOptions: U.symbols.map(code => ({ code, label: code + '.PUBLIC' })),
       onSymbol: e => { location.href = U.href('Market Depth', { symbol: e.target.value, mode }); },
       onMode: e => { location.href = U.href('Market Depth', { symbol: S.code, mode: e.target.value }); } };
