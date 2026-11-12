@@ -19,6 +19,28 @@
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
 a { color: inherit; text-decoration: none; }
 a:hover { color: var(--blue-700); }
+.cc-btn { font: inherit; font-size: 13px; font-weight: 700; height: 34px; box-sizing: border-box; padding: 0 14px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer; white-space: nowrap; }
+.cc-btn:hover { border-color: var(--ink); }
+.cc-l1s { display: flex; flex-wrap: wrap; gap: 0 8px; border-bottom: 1px solid var(--neutral-300); }
+.cc-l1 { font: inherit; font-size: 15px; font-weight: 600; padding: 10px 16px 11px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cc-l1:hover { color: var(--ink); }
+.cc-l1[aria-selected="true"] { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
+.cc-seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--neutral-400); background: var(--neutral-100); padding: 2px; gap: 2px; }
+.cc-s2 { font: inherit; font-size: 13px; font-weight: 600; height: 34px; padding: 0 16px; border: 1px solid transparent; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cc-s2:hover { color: var(--ink); background: var(--neutral-200); }
+.cc-s2[aria-selected="true"] { background: var(--paper); color: var(--ink); font-weight: 700; border-color: var(--ink); }
+.cc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cc-chip { font: inherit; font-size: 12px; font-weight: 600; height: 28px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--neutral-300); background: var(--paper); color: var(--ink); cursor: pointer; }
+.cc-chip:hover { border-color: var(--ink); }
+.cc-chip[aria-selected="true"], .cc-chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.cc-tog { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--neutral-200); }
+.cc-tg { font: inherit; font-size: 13px; font-weight: 600; height: 30px; min-width: 76px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.cc-tg[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+.scn-forms { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.scn-form { font: inherit; font-size: 13px; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 0 14px; border: 0; border-bottom: 1px solid var(--neutral-200); border-right: 1px solid var(--neutral-200); background: var(--paper); color: var(--ink); cursor: pointer; text-align: left; }
+.scn-form:hover { background: var(--neutral-100); }
+.scn-form[aria-pressed="true"] { background: var(--ink); color: var(--paper); font-weight: 700; }
+.scn-count { font-family: var(--font-mono); font-weight: 700; min-width: 36px; text-align: right; }
 .scn-cells { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 .scn-panels { display: grid; grid-template-columns: minmax(170px, 0.8fr) minmax(210px, 1fr) minmax(300px, 1.6fr) minmax(240px, 1fr); border: 1px solid var(--ink); }
 .scn-panels > div { min-width: 0; border-right: 1px solid var(--ink); display: flex; flex-direction: column; }
@@ -50,76 +72,68 @@ a:hover { color: var(--blue-700); }
 <dc-import name="Header" active="scanner" hint-size="100%,140px"></dc-import>
 <main style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
 
-  <nav data-screen-label="Scanner tabs" style="display: flex; flex-wrap: wrap; gap: 4px; font-size: 13px;">
-    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3"><a href="{{ t.href }}" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border: 1px solid {{ t.bd }}; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; background: {{ t.bg }}; color: {{ t.fg }};" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);">{{ t.label }}</a></sc-for>
-  </nav>
+  <section style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px;">
+    <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+      <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Stock Scanner</h1>
+      <div style="color: var(--text-muted);">Filter every listed security by technical and fundamental conditions, browse ready-made pre scanners, or build your own formulas.</div>
+    </div>
+    <sc-if value="{{ showTf }}"><div style="display: flex; flex-direction: column; gap: 4px;">
+      <span id="scn-tf-lbl" style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">Time frame</span>
+      <div role="group" aria-labelledby="scn-tf-lbl" class="cc-tog"><sc-for list="{{ tfBtns }}" as="b" hint-placeholder-count="3"><button class="cc-tg" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for></div>
+    </div></sc-if>
+  </section>
+
+  <div role="tablist" aria-label="Scanner type" class="cc-l1s" data-screen-label="Scanner tabs"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3"><button role="tab" class="cc-l1" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
 
   <sc-if value="{{ isTech }}">
   <section data-screen-label="Technical scanners" style="display: flex; flex-direction: column; gap: 16px;">
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
-      <div style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink);">
-        <sc-for list="{{ subTabs }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.onClick }}" style="font: inherit; font-weight: 700; height: 40px; padding: 0 18px; border: 0; border-right: 1px solid var(--ink); background: {{ s.bg }}; color: {{ s.fg }}; cursor: pointer;">{{ s.label }}</button></sc-for>
-      </div>
+      <div role="tablist" aria-label="Scanner set" class="cc-seg"><sc-for list="{{ subTabs }}" as="t" hint-placeholder-count="3"><button role="tab" class="cc-s2" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
       <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-        <button class="scn-btn" onClick="{{ onLoad }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v8M4.5 6.5L8 10l3.5-3.5M3 13h10"></path></svg>Load scanner</button>
-        <button class="scn-btn scn-btn-primary" onClick="{{ onSave }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 10V2M4.5 5.5L8 2l3.5 3.5M3 13h10"></path></svg>Save scanner</button>
+        <button class="cc-btn" onClick="{{ onLoad }}">Load scanner</button>
+        <button class="cc-btn" onClick="{{ onSave }}" style="background: var(--ink); color: var(--paper); border-color: var(--ink);">Save scanner</button>
       </div>
     </div>
 
-    <div class="scn-cells" data-screen-label="Scanner selectors">
-      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="15"><select onChange="{{ c.onChange }}" value="{{ c.value }}" aria-label="Scanner condition" style="font: inherit; font-size: 13px; height: 40px; padding: 0 10px; border: 1px solid {{ c.bd }}; background: {{ c.bg }}; color: var(--ink); font-weight: {{ c.fw }}; cursor: pointer; min-width: 0; width: 100%;"><sc-for list="{{ c.opts }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-for>
-    </div>
-
-    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px;">
-      <span>Total <b style="font-family: var(--font-mono);">{{ total }}</b> using Day period for:</span>
-      <sc-for list="{{ chips }}" as="ch" hint-placeholder-count="1"><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 4px 0 10px; background: var(--ink); color: var(--paper); font-size: 12px; font-weight: 700;">{{ ch.label }}<button onClick="{{ ch.onRemove }}" aria-label="Remove {{ ch.label }}" style="font: inherit; width: 22px; height: 22px; border: 0; background: transparent; color: var(--paper); cursor: pointer; font-size: 16px; line-height: 1;">×</button></span></sc-for>
-      <sc-if value="{{ noChips }}"><span style="color: var(--text-muted);">No condition selected, showing every security. Pick one or more above.</span></sc-if>
+    <div style="border: 1px solid var(--ink); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+      <div class="scn-cells" data-screen-label="Scanner selectors">
+        <sc-for list="{{ cells }}" as="c" hint-placeholder-count="15"><select onChange="{{ c.onChange }}" value="{{ c.value }}" aria-label="Scanner condition" style="font: inherit; font-size: 13px; height: 40px; padding: 0 10px; border: 1px solid {{ c.bd }}; background: {{ c.bg }}; color: var(--ink); font-weight: {{ c.fw }}; cursor: pointer; min-width: 0; width: 100%;"><sc-for list="{{ c.opts }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; border-top: 1px solid var(--neutral-200); padding-top: 12px;">
+        <span>Total <b style="font-family: var(--font-mono);">{{ total }}</b> using {{ tfName }} period for:</span>
+        <sc-for list="{{ chips }}" as="ch" hint-placeholder-count="1"><span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 4px 0 10px; background: var(--ink); color: var(--paper); font-size: 12px; font-weight: 700;">{{ ch.label }}<button onClick="{{ ch.onRemove }}" aria-label="Remove {{ ch.label }}" style="font: inherit; width: 22px; height: 22px; border: 0; background: transparent; color: var(--paper); cursor: pointer; font-size: 16px; line-height: 1;">×</button></span></sc-for>
+        <sc-if value="{{ noChips }}"><span style="color: var(--text-muted);">No condition selected, showing every security. Pick one or more above.</span></sc-if>
+      </div>
     </div>
   </section>
   </sc-if>
 
   <sc-if value="{{ isPre }}">
-  <section data-screen-label="Pre scanner" style="display: flex; flex-direction: column; gap: 12px;">
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
-      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">Time frame<select onChange="{{ onTf }}" value="{{ tf }}" aria-label="Time frame" style="font: inherit; font-size: 13px; font-weight: 700; height: 36px; min-width: 120px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;"><sc-for list="{{ tfOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></div>
-      <span style="font-size: 12px; color: var(--text-muted);">Pick an indicator, then a formula. The matching securities are listed below.</span>
-    </div>
-    <div class="scn-panels" data-screen-label="Pre scanner builder">
-      <div>
-        <div class="scn-panel-head">Groups</div>
-        <sc-for list="{{ preGroups }}" as="g" hint-placeholder-count="10"><button class="scn-row" onClick="{{ g.onClick }}" style="background: {{ g.bg }}; color: {{ g.fg }}; font-weight: {{ g.fw }};">{{ g.label }}</button></sc-for>
+  <section data-screen-label="Pre scanner" style="display: flex; flex-direction: column; gap: 16px;">
+    <div role="tablist" aria-label="Scanner group" class="cc-seg" style="align-self: flex-start;"><sc-for list="{{ preGroups }}" as="t" hint-placeholder-count="10"><button role="tab" class="cc-s2" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
+    <sc-if value="{{ preHasInds }}"><div role="tablist" aria-label="Indicator" class="cc-chips"><sc-for list="{{ preInds }}" as="t" hint-placeholder-count="4"><button role="tab" class="cc-chip" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div></sc-if>
+    <sc-if value="{{ preEmpty }}"><div style="border: 1px solid var(--ink); padding: 20px 16px; font-size: 13px; color: var(--text-muted);">Scanners for this group are coming soon.</div></sc-if>
+    <sc-if value="{{ preHasInds }}"><div data-screen-label="Pre scanner formulas" style="border: 1px solid var(--ink);">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 14px; background: var(--neutral-100); border-bottom: 1px solid var(--ink);">
+        <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">Formulas · matching securities</span>
+        <span style="font-size: 12px; color: var(--text-muted);">Select a formula to list its securities below. Select it again to hide the list.</span>
       </div>
-      <div>
-        <div class="scn-panel-head">Indicators</div>
-        <sc-for list="{{ preInds }}" as="i" hint-placeholder-count="4"><button class="scn-row" onClick="{{ i.onClick }}" style="background: {{ i.bg }}; color: {{ i.fg }}; font-weight: {{ i.fw }};">{{ i.label }}</button></sc-for>
-        <sc-if value="{{ preEmpty }}"><div style="padding: 14px; font-size: 12px; color: var(--text-muted);">Scanners for this group are coming soon.</div></sc-if>
-      </div>
-      <div>
-        <div class="scn-panel-head">Formulas · securities</div>
-        <sc-for list="{{ preForms }}" as="f" hint-placeholder-count="6"><button class="scn-row" onClick="{{ f.onClick }}" style="background: {{ f.bg }}; color: {{ f.fg }}; font-weight: {{ f.fw }};"><span>{{ f.label }}</span><span style="font-family: var(--font-mono); color: {{ f.countColor }};">{{ f.count }}</span></button></sc-for>
-      </div>
-      <div>
-        <div class="scn-panel-head">How it works</div>
-        <div style="padding: 14px; font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;"><span>Counts follow the selected time frame.</span><span>Select a formula to list the matching securities below. Select it again to hide the list.</span><span>Export the filtered list as CSV.</span></div>
-      </div>
-    </div>
+      <div class="scn-forms"><sc-for list="{{ preForms }}" as="f" hint-placeholder-count="6"><button class="scn-form" aria-pressed="{{ f.sel }}" onClick="{{ f.onClick }}"><span>{{ f.label }}</span><span class="scn-count">{{ f.count }}</span></button></sc-for></div>
+    </div></sc-if>
   </section>
   </sc-if>
 
   <sc-if value="{{ isCustom }}">
-  <section data-screen-label="Custom scanner" style="display: flex; flex-direction: column; gap: 12px;">
-    <div class="scn-panels" data-screen-label="Custom scanner builder">
-      <div>
-        <div class="scn-panel-head">Groups</div>
-        <sc-for list="{{ cGroups }}" as="g" hint-placeholder-count="6"><button class="scn-row" onClick="{{ g.onClick }}" style="background: {{ g.bg }}; color: {{ g.fg }}; font-weight: {{ g.fw }};">{{ g.label }}</button></sc-for>
-      </div>
-      <div>
-        <div class="scn-panel-head">Indicators</div>
-        <sc-for list="{{ cInds }}" as="i" hint-placeholder-count="4"><div class="scn-row" style="cursor: pointer; background: {{ i.bg }}; color: {{ i.fg }}; font-weight: {{ i.fw }};" onClick="{{ i.onClick }}"><span>{{ i.label }}</span><sc-if value="{{ i.hasP }}"><input class="scn-input" type="number" min="2" max="100" value="{{ cPeriodStr }}" aria-label="RSI period" onChange="{{ onPeriod }}" onClick="{{ stopClick }}"></sc-if></div></sc-for>
-        <sc-if value="{{ cEmpty }}"><div style="padding: 14px; font-size: 12px; color: var(--text-muted);">Formulas for this indicator are coming soon.</div></sc-if>
-      </div>
-      <div>
-        <div class="scn-panel-head">Formulas</div>
+  <section data-screen-label="Custom scanner" style="display: flex; flex-direction: column; gap: 16px;">
+    <div role="tablist" aria-label="Indicator group" class="cc-seg" style="align-self: flex-start;"><sc-for list="{{ cGroups }}" as="t" hint-placeholder-count="6"><button role="tab" class="cc-s2" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+      <div role="tablist" aria-label="Indicator" class="cc-chips"><sc-for list="{{ cInds }}" as="t" hint-placeholder-count="7"><button role="tab" class="cc-chip" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
+      <sc-if value="{{ cIsRsi }}"><label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600;">Period <input class="scn-input" type="number" min="2" max="100" value="{{ cPeriodStr }}" aria-label="RSI period" onChange="{{ onPeriod }}"></label></sc-if>
+    </div>
+    <sc-if value="{{ cEmpty }}"><div style="border: 1px solid var(--ink); padding: 20px 16px; font-size: 13px; color: var(--text-muted);">Formulas for this group are coming soon.</div></sc-if>
+    <sc-if value="{{ cHasForms }}"><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; align-items: start;">
+      <div data-screen-label="Custom formulas" style="border: 1px solid var(--ink); min-width: 0;">
+        <div class="scn-panel-head">{{ cFormTitle }}</div>
         <sc-for list="{{ cForms }}" as="f" hint-placeholder-count="8"><div onClick="{{ f.onSelect }}" style="display: flex; align-items: center; gap: 10px; box-sizing: border-box; height: 40px; padding: 0 14px; border-bottom: 1px solid var(--neutral-200); cursor: pointer; background: {{ f.bg }}; color: {{ f.fg }};">
           <span style="flex: 1; min-width: 0; font-size: 13px; font-weight: {{ f.fw }};">{{ f.name }}</span>
           <sc-if value="{{ f.sel }}"><div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 8px; flex-shrink: 0; font-size: 12px; color: var(--text-muted);">
@@ -128,8 +142,9 @@ a:hover { color: var(--blue-700); }
             <button class="scn-btn" style="height: 28px; padding: 0 14px;" onClick="{{ f.onAdd }}">Add</button>
           </div></sc-if>
         </div></sc-for>
+        <sc-if value="{{ cNoForms }}"><div style="padding: 14px; font-size: 12px; color: var(--text-muted);">Formulas for this indicator are coming soon.</div></sc-if>
       </div>
-      <div>
+      <div data-screen-label="Selected formulas" style="border: 1px solid var(--ink); min-width: 0; display: flex; flex-direction: column;">
         <div class="scn-panel-head">Selected formulas</div>
         <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 10px 14px; min-height: 120px;">
           <sc-for list="{{ chips }}" as="ch" hint-placeholder-count="1"><div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 6px 6px 10px; background: var(--ink); color: var(--paper); font-size: 12px; font-weight: 700;"><span>{{ ch.label }}</span><button onClick="{{ ch.onRemove }}" aria-label="Remove {{ ch.label }}" style="font: inherit; width: 22px; height: 22px; border: 0; background: transparent; color: var(--paper); cursor: pointer; font-size: 16px; line-height: 1;">×</button></div></sc-for>
@@ -138,15 +153,14 @@ a:hover { color: var(--blue-700); }
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--ink);">
           <button class="scn-btn scn-btn-primary" onClick="{{ onRun }}" style="flex: 1 1 100%; justify-content: center;"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z" fill="currentColor"></path></svg>Run scanner</button>
-          <button class="scn-btn" onClick="{{ onCSave }}">Save</button>
-          <button class="scn-btn" onClick="{{ onCLoad }}">Load</button>
-          <button class="scn-btn" onClick="{{ onClear }}">Clear</button>
+          <button class="cc-btn" onClick="{{ onCSave }}">Save</button>
+          <button class="cc-btn" onClick="{{ onCLoad }}">Load</button>
+          <button class="cc-btn" onClick="{{ onClear }}">Clear</button>
         </div>
       </div>
-    </div>
+    </div></sc-if>
   </section>
   </sc-if>
-
   <sc-if value="{{ hasMsg }}"><div role="status" style="font-size: 12px; color: var(--text-muted);">{{ msg }}</div></sc-if>
 
   <sc-if value="{{ showResults }}">
@@ -215,7 +229,7 @@ class Component extends DCLogic {
   cIndicators = { Oscillators: ['RSI', 'MACD', 'CCI', 'Fast Stochastic', 'Slow Stochastic', 'William %R', 'MFI'] };
   preGroupList = ['Pattern', 'Fundamental', 'Trend', 'Volatility', 'Bands', 'Oscillators', 'PriceVolume', 'Native', 'Price Action', 'Volume'];
   state = {
-    ready: !!window.UFT, sub: 'technical', msg: '', q: '', sort: { k: 'pct', d: -1 },
+    ready: !!window.UFT, tab: null, sub: 'technical', msg: '', q: '', sort: { k: 'pct', d: -1 },
     picks: { SMA20: 'SMA20:below' },
     preGroup: 'Oscillators', preInd: 'RSI (14)', preF: -1, cSel: -1, tf: 'D', setOpen: false, tbl: { compact: false, fs: 'sm', hidden: {} },
     cGroup: 'Oscillators', cInd: 'RSI', cPeriod: 14,
@@ -628,13 +642,20 @@ class Component extends DCLogic {
   renderVals() {
     const U = window.UFT; if (!U) return {};
     const st = this.state; const C = this.ctxMap(); const lastOf = a => a[a.length - 1];
-    const t0 = U.param('tab', 'technical'); const tab = t0 === 'pre' || t0 === 'custom' ? t0 : 'technical';
+    const t0 = st.tab || U.param('tab', 'technical'); const tab = t0 === 'pre' || t0 === 'custom' ? t0 : 'technical';
     const sub = st.sub;
+    const TFN = { D: 'Day', W: 'Week', M: 'Month' }[st.tf] || 'Day';
 
-    const TABS = [['technical', 'Scanner', null], ['pre', 'Pre scanner', { tab: 'pre' }], ['custom', 'Custom scanner', { tab: 'custom' }]];
+    const TABS = [['technical', 'Scanner'], ['pre', 'Pre scanner'], ['custom', 'Custom scanner']];
+    const goTab = k => {
+      try { const u = new URL(location.href); if (k === 'technical') u.searchParams.delete('tab'); else u.searchParams.set('tab', k); history.replaceState(null, '', u.pathname + u.search + u.hash); } catch (e) {}
+      this.setState({ tab: k, msg: '', setOpen: false });
+    };
     const out = {
-      tabs: TABS.map(([k, label, q]) => ({ label, href: U.href('Stock Scanner', q), bd: k === tab ? 'var(--ink)' : 'var(--neutral-300)', bg: k === tab ? 'var(--ink)' : 'var(--paper)', fg: k === tab ? 'var(--paper)' : 'var(--ink)' })),
+      tabs: TABS.map(([k, label]) => ({ label, sel: String(k === tab), onClick: () => goTab(k) })),
       isTech: tab === 'technical', isPre: tab === 'pre', isCustom: tab === 'custom',
+      showTf: tab !== 'custom', tfName: TFN,
+      tfBtns: [['D', 'Day'], ['W', 'Week'], ['M', 'Month']].map(([k, label]) => ({ label, sel: String(st.tf === k), onClick: () => this.setState({ tf: k, preF: -1 }) })),
       universe: U.stocks.length, msg: st.msg, hasMsg: !!st.msg, q: st.q,
       onQ: e => this.setState({ q: e.target.value }),
     };
@@ -647,22 +668,22 @@ class Component extends DCLogic {
       const inds = defs.filter(d => sub === 'all' || (sub === 'fundamental' ? d.group === 'fund' : d.group === 'tech'));
       const optMap = {}; defs.forEach(d => d.opts.forEach(o => { optMap[o.id] = o; }));
       const active = inds.filter(d => optMap[picks[d.key]]).map(d => ({ d, o: optMap[picks[d.key]] }));
-      list = U.stocks.filter(s => active.every(x => x.o.test(C[s.code])));
+      const Ct = this.ctxMap(st.tf);
+      list = U.stocks.filter(s => active.every(x => x.o.test(Ct[s.code])));
       out.total = list.length; out.noChips = active.length === 0;
       out.chips = active.map(x => ({ label: x.o.label, onRemove: () => this.setPick(x.d.key, '') }));
       out.cells = inds.map(d => { const v = optMap[picks[d.key]] ? picks[d.key] : '';
         return { value: v, bg: v ? 'color-mix(in srgb, var(--green-700) 16%, var(--paper))' : 'var(--paper)', bd: v ? 'var(--green-700)' : 'var(--neutral-300)', fw: v ? 700 : 400,
           opts: [{ value: '', label: d.name }, ...d.opts.map(o => ({ value: o.id, label: o.label }))], onChange: e => this.setPick(d.key, e.target.value) }; });
-      out.subTabs = [['technical', 'Technical scanners'], ['fundamental', 'Fundamental scanners'], ['all', 'All scanners']].map(([k, label]) => ({ label, bg: k === sub ? 'var(--ink)' : 'var(--paper)', fg: k === sub ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ sub: k }) }));
+      out.subTabs = [['technical', 'Technical scanners'], ['fundamental', 'Fundamental scanners'], ['all', 'All scanners']].map(([k, label]) => ({ label, sel: String(k === sub), onClick: () => this.setState({ sub: k }) }));
       out.onSave = () => { const ok = this.writeStore('uftcl.scanner.picks', picks); this.setState({ msg: ok ? 'Scanner saved in this browser.' : 'Could not save in this browser.' }); };
       out.onLoad = () => { const v = this.readStore('uftcl.scanner.picks'); if (v && typeof v === 'object' && !Array.isArray(v)) this.setState({ picks: v, msg: 'Scanner loaded.' }); else this.setState({ msg: 'No saved scanner yet.' }); };
-      out.resultTitle = `Total ${list.length} using Day period`;
+      out.resultTitle = `Total ${list.length} using ${TFN} period`;
       out.footnote = 'Mock data, deterministic per symbol. Trail-stop scanners use ATR-based stops: VTS (7) is 2x ATR, Trail Stop (20) is 3x ATR, Dynamic Trail Stop (10) widens as volatility rises.';
     }
 
     if (tab === 'pre') {
-      const Cp = this.ctxMap(st.tf); const TFN = { D: 'Day', W: 'Week', M: 'Month' }[st.tf];
-      out.tf = st.tf; out.tfOpts = [{ value: 'D', label: 'Day' }, { value: 'W', label: 'Week' }, { value: 'M', label: 'Month' }]; out.onTf = e => this.setState({ tf: e.target.value });
+      const Cp = this.ctxMap(st.tf);
       const defs = this.preDefs(); const inds = defs[st.preGroup] || [];
       const ind = inds.find(i => i.n === st.preInd) || inds[0] || null;
       if (ind) {
@@ -670,15 +691,15 @@ class Component extends DCLogic {
         list = U.stocks.filter(s => fIdx < 0 || ind.f[fIdx][1](Cp[s.code]));
         xOf = s => ind.v(Cp[s.code]); xFmt = v => U.fmt(v, ind.d); showX = true; xLabel = ind.n.toUpperCase();
         out.preForms = ind.f.map(([label, test], idx) => { const cnt = U.stocks.filter(s => test(Cp[s.code])).length; const sel = fIdx === idx;
-          return { label, count: U.fmtInt(cnt), countColor: sel ? 'var(--paper)' : 'var(--ink)', bg: sel ? 'var(--ink)' : 'var(--paper)', fg: sel ? 'var(--paper)' : 'var(--ink)', fw: sel ? 700 : 400, onClick: () => this.setState({ preF: sel ? -1 : idx }) }; });
+          return { label, count: U.fmtInt(cnt), sel: String(sel), onClick: () => this.setState({ preF: sel ? -1 : idx }) }; });
         out.resultTitle = `${list.length} securities · ${TFN} · ${ind.n}${fIdx >= 0 ? ' · ' + ind.f[fIdx][0] : ''}`;
       } else {
         list = []; out.preForms = []; out.resultTitle = '0 securities';
         emptyText = 'Scanners for this group are coming soon.';
       }
-      out.preEmpty = inds.length === 0;
-      out.preGroups = this.preGroupList.map(g => { const sel = g === st.preGroup; return { label: g, bg: sel ? 'var(--ink)' : 'var(--paper)', fg: sel ? 'var(--paper)' : 'var(--ink)', fw: sel ? 700 : 400, onClick: () => this.setState({ preGroup: g, preInd: (defs[g] && defs[g][0]) ? defs[g][0].n : '', preF: -1 }) }; });
-      out.preInds = inds.map(i => { const sel = ind && i.n === ind.n; return { label: i.n, bg: sel ? 'var(--ink)' : 'var(--paper)', fg: sel ? 'var(--paper)' : 'var(--ink)', fw: sel ? 700 : 400, onClick: () => this.setState({ preInd: i.n, preF: -1 }) }; });
+      out.preEmpty = inds.length === 0; out.preHasInds = inds.length > 0;
+      out.preGroups = this.preGroupList.map(g => { const sel = g === st.preGroup; return { label: g, sel: String(sel), onClick: () => this.setState({ preGroup: g, preInd: (defs[g] && defs[g][0]) ? defs[g][0].n : '', preF: -1 }) }; });
+      out.preInds = inds.map(i => { const sel = !!ind && i.n === ind.n; return { label: i.n, sel: String(sel), onClick: () => this.setState({ preInd: i.n, preF: -1 }) }; });
       out.onExport = () => this.exportCsv(out.rows || [], 'scanner-pre.csv');
       out.footnote = 'Counts and values use the selected time frame. Mock data, deterministic per symbol.';
     }
@@ -692,10 +713,10 @@ class Component extends DCLogic {
       out.noChips = st.chips.length === 0;
       out.chips = [];
       out.cStale = JSON.stringify(st.chips) !== JSON.stringify(run || null) && !!(st.chips.length || run);
-      out.cGroups = this.cGroups.map(g => { const sel = g === st.cGroup; return { label: g, bg: sel ? 'var(--ink)' : 'var(--paper)', fg: sel ? 'var(--paper)' : 'var(--ink)', fw: sel ? 700 : 400, onClick: () => this.setState({ cGroup: g }) }; });
+      out.cGroups = this.cGroups.map(g => { const sel = g === st.cGroup; return { label: g, sel: String(sel), onClick: () => this.setState(s2 => ({ cGroup: g, cInd: (this.cIndicators[g] || [])[0] || s2.cInd, cSel: -1 })) }; });
       const inds = this.cIndicators[st.cGroup] || [];
-      out.cEmpty = inds.length === 0;
-      out.cInds = inds.map(n => { const sel = n === st.cInd; return { label: n, hasP: n === 'RSI', bg: sel ? 'var(--ink)' : 'var(--paper)', fg: sel ? 'var(--paper)' : 'var(--ink)', fw: sel ? 700 : 400, onClick: () => this.setState({ cInd: n }) }; });
+      out.cEmpty = inds.length === 0; out.cHasForms = inds.length > 0; out.cIndName = st.cInd; out.cFormTitle = `${st.cInd} formulas`; out.cIsRsi = st.cInd === 'RSI' && inds.includes('RSI'); out.cNoForms = st.cInd !== 'RSI';
+      out.cInds = inds.map(n => { const sel = n === st.cInd; return { label: n, sel: String(sel), onClick: () => this.setState({ cInd: n, cSel: -1 }) }; });
       out.cPeriodStr = String(p);
       out.onPeriod = e => { const v = Math.max(2, Math.min(100, Math.round(+e.target.value) || 14)); this.setState({ cPeriod: v }); };
       out.stopClick = e => e.stopPropagation();
@@ -734,7 +755,7 @@ class Component extends DCLogic {
     out.emptyText = emptyText;
     out.showResults = tab !== 'pre' || st.preF >= 0;
     out.showX = showX; out.xLabel = xLabel;
-    if (tab === 'technical') { out.total = base.length; out.resultTitle = `Total ${base.length} using Day period`; }
+    if (tab === 'technical') { out.total = base.length; out.resultTitle = `Total ${base.length} using ${TFN} period`; }
     if (!out.onExport) out.onExport = () => this.exportCsv(out.rows, 'scanner-technical.csv');
     out.resultTitle = out.resultTitle || 'Results';
 
