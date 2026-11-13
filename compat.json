@@ -44,6 +44,11 @@
       "path": "InstrumentBar.dc.html",
       "title": "InstrumentBar",
       "kind": "component"
+    },
+    {
+      "path": "Sector Performance.dc.html",
+      "title": "Sector Performance",
+      "kind": "page"
     }
   ],
   "migratorVersion": "artifact-migrator (claude-design-backend ed667f7ac9c1)",

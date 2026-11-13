@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Sector Performance — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <section style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Sector performance</h1>
+      <div style="color: var(--text-muted);">{{ sub }}</div>
+    </div>
+    <div style="display: flex; border: 1px solid var(--ink);">
+      <sc-for list="{{ tabs }}" as="t"><button onClick="{{ t.go }}" style="font: inherit; cursor: pointer; border: 0; border-left: {{ t.bl }}; height: 32px; padding: 0 14px; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for>
+    </div>
+  </section>
+
+  <sc-if value="{{ isSector }}" hint-placeholder-val="{{ true }}">
+    <section style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--ink);">
+        <sc-for list="{{ legend }}" as="l"><div style="padding: 6px 10px; text-align: right; font-family: var(--font-mono); font-size: 12px; font-weight: 700; background: {{ l.bg }}; color: {{ l.fg }};">{{ l.label }}</div></sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px;">
+        <sc-for list="{{ tiles }}" as="s" hint-placeholder-count="12">
+          <a href="{{ s.href }}" style="display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--ink); background: {{ s.bg }}; color: {{ s.fg }};">
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;">{{ s.name }}</span>
+            <span style="font-family: var(--font-mono); font-size: 26px;">{{ s.pct }}</span>
+            <span style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; font-weight: 700;"><span>{{ s.gain }} ▲</span><span>{{ s.unch }} −</span><span>{{ s.lose }} ▼</span></span>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isTvt }}">
+    <section style="border: 1px solid var(--ink);">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <sc-for list="{{ metrics }}" as="m"><button onClick="{{ m.go }}" style="font: inherit; cursor: pointer; height: 30px; padding: 0 12px; border: 1px solid var(--ink); background: {{ m.bg }}; color: {{ m.fg }};">{{ m.label }}</button></sc-for>
+        </div>
+        <div style="display: flex; gap: 16px; font-size: 13px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: var(--blue-700);"></span>{{ aName }}</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; background: var(--neutral-400);"></span>{{ bName }}</span>
+        </div>
+      </div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+        <sc-for list="{{ tvt }}" as="r" hint-placeholder-count="12">
+          <div style="display: grid; grid-template-columns: minmax(110px, 220px) minmax(0, 1fr); gap: 12px; align-items: center; font-size: 13px;">
+            <span style="text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ r.name }}</span>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; align-items: center; gap: 6px;"><div style="height: 9px; width: {{ r.aw }}; background: var(--blue-700);"></div><span style="font-family: var(--font-mono); font-size: 11px;">{{ r.a }}</span></div>
+              <div style="display: flex; align-items: center; gap: 6px;"><div style="height: 9px; width: {{ r.bw }}; background: var(--neutral-400);"></div><span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">{{ r.b }}</span></div>
+            </div>
+          </div>
+        </sc-for>
+        <div style="text-align: right; font-size: 12px; color: var(--text-muted);">{{ axis }}</div>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isMap }}">
+    <section style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--ink);">
+        <sc-for list="{{ legend }}" as="l"><div style="padding: 6px 10px; text-align: right; font-family: var(--font-mono); font-size: 12px; font-weight: 700; background: {{ l.bg }}; color: {{ l.fg }};">{{ l.label }}</div></sc-for>
+      </div>
+      <div style="position: relative; width: 100%; aspect-ratio: 1000 / 560; border: 1px solid var(--ink); background: var(--neutral-100); overflow: hidden;">
+        <sc-for list="{{ cells }}" as="c">
+          <a href="{{ c.href }}" title="{{ c.title }}" style="position: absolute; left: {{ c.x }}%; top: {{ c.y }}%; width: {{ c.w }}%; height: {{ c.h }}%; box-sizing: border-box; border: 1px solid var(--paper); background: {{ c.bg }}; color: {{ c.fg }}; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 3px 5px; font-size: 11px; line-height: 1.2;">{{ c.label }}</a>
+        </sc-for>
+        <sc-for list="{{ groups }}" as="g">
+          <div style="position: absolute; left: {{ g.x }}%; top: {{ g.y }}%; width: {{ g.w }}%; height: {{ g.h }}%; box-sizing: border-box; border: 2px solid var(--ink); pointer-events: none;"><span style="display: inline-block; background: var(--ink); color: var(--paper); font-weight: 700; font-size: 12px; padding: 1px 6px; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; box-sizing: border-box;">{{ g.label }}</span></div>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted);">Area = turnover · Colour = price change · Click a share to open it.</div>
+    </section>
+  </sc-if>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tab: (window.UFT && window.UFT.param('tab', 'sector')) || 'sector', metric: 'value' };
+  setTab(t) { this.setState({ tab: t }); try { history.replaceState(null, '', '?tab=' + t); } catch (e) {} }
+  squarify(items, x, y, w, h) {
+    const out = []; const total = items.reduce((a, i) => a + i.v, 0) || 1; const k = w * h / total;
+    const list = items.map(i => ({ it: i, a: i.v * k }));
+    const worst = (row, side) => { const s = row.reduce((a, r) => a + r.a, 0); const mx = Math.max(...row.map(r => r.a)), mn = Math.min(...row.map(r => r.a)); return Math.max(side * side * mx / (s * s), s * s / (side * side * mn)); };
+    let row = [];
+    const flush = () => { const s = row.reduce((a, r) => a + r.a, 0); if (w >= h) { const cw = s / h; let cy = y; row.forEach(r => { const rh = r.a / cw; out.push({ it: r.it, x, y: cy, w: cw, h: rh }); cy += rh; }); x += cw; w -= cw; } else { const ch = s / w; let cx = x; row.forEach(r => { const rw = r.a / ch; out.push({ it: r.it, x: cx, y, w: rw, h: ch }); cx += rw; }); y += ch; h -= ch; } row = []; };
+    list.forEach(r => { const side = Math.min(w, h); if (row.length && worst(row.concat(r), side) > worst(row, side)) flush(); row.push(r); });
+    if (row.length) flush();
+    return out;
+  }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { sign } = U;
+    const tab = ['sector', 'tvt', 'map'].includes(st.tab) ? st.tab : 'sector';
+    const secs = U.sectors.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const tabs = [['sector', 'Sector'], ['tvt', 'Sector-TVT'], ['map', 'Full Map']].map(([k, label], i) => ({ label, go: () => this.setTab(k), bl: i ? '1px solid var(--ink)' : '0', bg: tab === k ? 'var(--ink)' : 'var(--paper)', fg: tab === k ? 'var(--paper)' : 'var(--ink)' }));
+    const LG = [[-4, '≤ -3.0'], [-1.5, '≤ -0.5'], [-0.2, '< 0.0'], [0, '0.0'], [0.2, '0.0 >'], [1.5, '0.5 ≥'], [4, '3.0 ≥']];
+    const legend = LG.map(([v, label]) => ({ label, bg: U.heat(v), fg: U.heatText(v) }));
+    const tiles = secs.map(s => ({ name: s.name, pct: sign(s.changePct) + '%', gain: s.gain, unch: s.unch, lose: s.lose, bg: U.heat(s.changePct), fg: U.heatText(s.changePct), href: U.href('Sector Share Price') }));
+    // Sector-TVT
+    const M = { value: ['Turnover', s => s.value, 'Turnover(%)'], volume: ['Volume', s => s.stocks.reduce((a, x) => a + x.volume, 0), 'Volume(%)'], trades: ['Trades', s => s.stocks.reduce((a, x) => a + x.trades, 0), 'Trades(%)'], mcap: ['Market Cap', s => s.stocks.reduce((a, x) => a + x.mcap, 0), 'Market Cap(%)'], mvt: ['MarketCap vs Turnover', null, 'Share(%)'] };
+    const mk = M[st.metric] ? st.metric : 'value';
+    const share = (fn) => { const t = secs.reduce((a, s) => a + fn(s), 0) || 1; return s => fn(s) / t * 100; };
+    const prevOf = (name, key, v) => v * (0.55 + U.rng(U.hash(name + key))() * 0.9);
+    let aName = 'Today', bName = 'PreviousDay', A, B;
+    if (mk === 'mvt') { aName = 'Market Cap'; bName = 'Turnover'; const fa = share(M.mcap[1]), fb = share(M.value[1]); A = s => fa(s); B = s => fb(s); }
+    else { const f = share(M[mk][1]); A = s => f(s); B = s => prevOf(s.name, mk, f(s)); }
+    const rowsT = secs.map(s => ({ name: s.name, a: A(s), b: B(s) })).sort((x, y) => y.a - x.a);
+    const mx = Math.max(...rowsT.map(r => Math.max(r.a, r.b)), 1);
+    const tvt = rowsT.map(r => ({ name: r.name, a: U.fmt(r.a) + '%', b: U.fmt(r.b) + '%', aw: Math.max(r.a / mx * 92, 0.4) + '%', bw: Math.max(r.b / mx * 92, 0.4) + '%' }));
+    const metrics = Object.keys(M).map(k => ({ label: M[k][0], go: () => this.setState({ metric: k }), bg: mk === k ? 'var(--ink)' : 'var(--paper)', fg: mk === k ? 'var(--paper)' : 'var(--ink)' }));
+    // Full map
+    const W = 1000, H = 560; const groups = [], cells = [];
+    const sec = this.squarify(secs.map(s => ({ s, v: s.stocks.reduce((a, x) => a + x.value, 0) })).sort((a, b) => b.v - a.v), 0, 0, W, H);
+    const px = (v, d) => Math.round(v / d * 10000) / 100;
+    sec.forEach(r => {
+      groups.push({ label: r.it.s.name, x: px(r.x, W), y: px(r.y, H), w: px(r.w, W), h: px(r.h, H) });
+      const inner = this.squarify(r.it.s.stocks.slice().sort((a, b) => b.value - a.value).map(t => ({ t, v: t.value })), r.x, r.y, r.w, r.h);
+      inner.forEach(q => { const t = q.it.t; const big = q.w > 52 && q.h > 40; cells.push({ x: px(q.x, W), y: px(q.y, H), w: px(q.w, W), h: px(q.h, H), bg: U.heat(t.changePct), fg: U.heatText(t.changePct), label: big ? t.code + ' ' + sign(t.changePct) + '%' : '', title: t.code + ' ' + sign(t.changePct) + '%', href: U.actions(t.code).stock }); });
+    });
+    const sub = tab === 'sector' ? 'Average price change and advance / decline count for every DSE sector.' : tab === 'tvt' ? 'Each sector’s share of turnover, volume, trades and market cap versus the previous day.' : 'Treemap of every share grouped by sector.';
+    return { tabs, isSector: tab === 'sector', isTvt: tab === 'tvt', isMap: tab === 'map', sub, legend, tiles, metrics, aName, bName, tvt, axis: M[mk][2], groups, cells };
+  }
+}
+</script>
+</body>
+</html>
