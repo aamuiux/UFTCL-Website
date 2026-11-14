@@ -89,13 +89,14 @@ a { color: inherit; text-decoration: none; }
   <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
     <div role="tablist" class="cc-seg"><sc-for list="{{ fTabs }}" as="t" hint-placeholder-count="4"><button role="tab" class="cc-s2" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div>
     <div role="group" aria-label="Period" class="cc-tog"><sc-for list="{{ perBtns }}" as="b" hint-placeholder-count="2"><button class="cc-tg" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for></div>
+    <div role="group" aria-label="View" class="cc-tog"><sc-for list="{{ viewBtns }}" as="b" hint-placeholder-count="2"><button class="cc-tg" aria-pressed="{{ b.sel }}" onClick="{{ b.onClick }}">{{ b.label }}</button></sc-for></div>
   </div>
 
   <sc-if value="{{ hasGroups }}"><div role="tablist" class="cc-chips"><sc-for list="{{ gTabs }}" as="t" hint-placeholder-count="4"><button role="tab" class="cc-chip" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div></sc-if>
   <sc-if value="{{ hasMetrics }}"><div role="tablist" class="cc-chips"><sc-for list="{{ mTabs }}" as="t" hint-placeholder-count="3"><button role="tab" class="cc-chip" aria-selected="{{ t.sel }}" onClick="{{ t.onClick }}">{{ t.label }}</button></sc-for></div></sc-if>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; align-items: start;">
-    <div style="border: 1px solid var(--ink); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0;">
+    <sc-if value="{{ showChart }}"><div style="border: 1px solid var(--ink); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0;">
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
         <div style="display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px;"><sc-for list="{{ legend }}" as="l" hint-placeholder-count="3"><span style="display: inline-flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: {{ l.c }}; border-radius: {{ l.r }};"></span>{{ l.name }}</span></sc-for></div>
         <sc-if value="{{ hasPick }}"><select class="cc-sel" aria-label="Chart metric" value="{{ pick }}" onChange="{{ onPick }}" style="height: 30px; font-size: 12px;"><sc-for list="{{ pickOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
@@ -112,14 +113,15 @@ a { color: inherit; text-decoration: none; }
       <sc-for list="{{ ch.y2 }}" as="t" hint-placeholder-count="3"><span style="position: absolute; left: {{ ch.rightPct }}; top: {{ t.top }}; transform: translate(4px, -50%); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); white-space: nowrap;">{{ t.label }}</span></sc-for>
       <sc-for list="{{ ch.xl }}" as="x" hint-placeholder-count="6"><span style="position: absolute; left: {{ x.left }}; top: 93%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); white-space: nowrap;">{{ x.label }}</span></sc-for>
       </div>
-    </div>
-    <div style="border: 1px solid var(--ink); min-width: 0;">
+    </div></sc-if>
+    <sc-if value="{{ showTable }}"><div style="border: 1px solid var(--ink); min-width: 0;">
       <div style="overflow: auto; max-height: 340px;"><table style="width: 100%; border-collapse: collapse; min-width: {{ tblMin }}px;">
         <thead><tr><sc-for list="{{ tbl.heads }}" as="h" hint-placeholder-count="4"><th class="cc-th" style="text-align: {{ h.al }}; position: sticky; top: 0; z-index: 1;">{{ h.l }}</th></sc-for></tr></thead>
         <tbody><sc-for list="{{ tbl.rows }}" as="r" hint-placeholder-count="6"><tr><sc-for list="{{ r.cells }}" as="c"><td class="cc-td {{ c.cls }}" style="text-align: {{ c.al }}; color: {{ c.color }}; font-weight: {{ c.fw }}; white-space: nowrap;">{{ c.v }}</td></sc-for></tr></sc-for></tbody>
       </table></div>
+      <sc-if value="{{ locked }}"><div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; padding: 14px 12px; border-top: 1px solid var(--ink); background: var(--neutral-50);"><span style="font-weight: 700;">To see more data please subscribe</span><a href="Trading%20Services.dc.html" style="height: 32px; padding: 0 16px; display: inline-flex; align-items: center; background: var(--ink); color: var(--paper); font-weight: 700;">Subscribe</a></div></sc-if>
       <div style="padding: 10px 12px; border-top: 1px solid var(--neutral-200); font-size: 12px; color: var(--text-muted);">{{ unitNote }}</div>
-    </div>
+    </div></sc-if>
   </div>
 </section></sc-if>
 
@@ -193,7 +195,7 @@ const FIN = {
   rat: { l: 'Finance ratio', m: { roe: 'ROE (%)', roa: 'ROA (%)', nm: 'Net margin (%)', de: 'Debt / equity' } }
 };
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, sym: null, tab: null, q: '', open: false, hi: 0, fsub: 'forecast', fgrp: 'inc', per: 'A', pick: {}, ist: 'ni', cst: 'ocf', asub: 'div', ntype: 'All', hview: 'chart' };
+  state = { ready: !!window.UFT, sym: null, tab: null, q: '', open: false, hi: 0, fsub: 'forecast', fgrp: 'inc', per: 'A', pick: {}, ist: 'ni', cst: 'ocf', asub: 'div', ntype: 'All', hview: 'chart', fview: 'chart' };
   componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
   componentWillUnmount() { clearInterval(this.p); clearTimeout(this.bt); }
   url(sym, tab) { try { history.replaceState(null, '', 'Company Corner.dc.html?tab=' + tab + '&symbol=' + encodeURIComponent(sym)); } catch (e) { /* no history */ } }
@@ -292,8 +294,10 @@ class Component extends DCLogic {
       }
       const mk = (obj, cur, set) => Object.keys(obj).map(k => ({ label: obj[k], sel: cur === k ? 'true' : 'false', bg: cur === k ? 'var(--ink)' : 'var(--paper)', fg: cur === k ? 'var(--paper)' : 'var(--ink)', bd: cur === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => set(k) }));
       const hasM = sub === 'income' || sub === 'cash';
+      const LIM = 4; const locked = !isF && tbl.rows.length > LIM; if (locked) tbl = { ...tbl, rows: tbl.rows.slice(0, LIM) };
       Object.assign(out, {
         fTabs: seg([['forecast', 'Financial forecast'], ['income', 'Income statement'], ['balance', 'Balance sheet'], ['cash', 'Cash flow']], sub, k => this.setState({ fsub: k })),
+        viewBtns: seg([['chart', 'Chart'], ['table', 'Table']], st.fview, k => this.setState({ fview: k })).map(b => ({ ...b, bd: undefined })), showChart: st.fview === 'chart', showTable: st.fview === 'table', locked: locked && st.fview === 'table',
         perBtns: seg([['Q', 'Quarterly'], ['A', 'Annual']], per, k => this.setState({ per: k })).map(b => ({ ...b, bd: undefined })),
         hasGroups: isF, gTabs: mk(Object.fromEntries(Object.keys(FIN).map(k => [k, FIN[k].l])), grp, k => this.setState({ fgrp: k })),
         hasMetrics: hasM, mTabs: hasM ? mk(sub === 'income' ? { ni: 'Net income', rev: 'Revenue', ebit: 'Operating income' } : { ocf: 'Operating', icf: 'Investing', fcf: 'Financing' }, sub === 'income' ? st.ist : st.cst, k => this.setState(sub === 'income' ? { ist: k } : { cst: k })) : [],

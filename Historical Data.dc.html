@@ -29,6 +29,9 @@ a { color: inherit; text-decoration: none; }
   <section data-screen-label="Symbol bar" style="border: 1px solid var(--ink); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px;">
     <div style="display: flex; flex-direction: column;"><span style="font-weight: 700; font-size: 18px;">Historical Data · {{ code }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ name }} · View or download daily, weekly and monthly history · {{ asOf }}</span></div>
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <select aria-label="Market or index" onChange="{{ onMkt }}" value="{{ mkt }}" style="font: inherit; font-weight: 700; height: 36px; min-width: 96px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
+        <sc-for list="{{ mktOptions }}" as="m"><option value="{{ m.v }}">{{ m.v }}</option></sc-for>
+      </select>
       <select onChange="{{ onSymbol }}" value="{{ code }}" style="font: inherit; font-weight: 700; height: 36px; min-width: 200px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer;">
         <sc-for list="{{ symbolOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.code }}">{{ o.code }}</option></sc-for>
       </select>
@@ -41,14 +44,23 @@ a { color: inherit; text-decoration: none; }
   <section data-screen-label="Price and volume chart" style="border: 1px solid var(--ink);">
     <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700; text-align: center;">Price &amp; Volume</div>
     <div style="display: grid; grid-template-columns: minmax(0, 1fr) 56px; padding: 8px 0 0 8px;">
-      <div style="position: relative; height: 300px; border-bottom: 1px solid var(--ink);">
-        <svg viewBox="0 0 1000 300" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+      <div ref="{{ chartRef }}" onMouseMove="{{ onMove }}" onMouseLeave="{{ onLeave }}" style="position: relative; height: 340px; border-bottom: 1px solid var(--ink); cursor: crosshair;">
+        <svg viewBox="0 0 1000 340" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%;">
           <sc-for list="{{ ch.grid }}" as="g"><line x1="0" x2="1000" y1="{{ g.y }}" y2="{{ g.y }}" stroke="var(--neutral-200)" vector-effect="non-scaling-stroke"></line></sc-for>
           <sc-for list="{{ ch.candles }}" as="c"><line x1="{{ c.cx }}" x2="{{ c.cx }}" y1="{{ c.hy }}" y2="{{ c.ly }}" stroke="{{ c.color }}" vector-effect="non-scaling-stroke"></line><rect x="{{ c.x }}" y="{{ c.y }}" width="{{ c.w }}" height="{{ c.h }}" fill="{{ c.color }}"></rect></sc-for>
           <sc-for list="{{ ch.vols }}" as="v"><rect x="{{ v.x }}" y="{{ v.y }}" width="{{ v.w }}" height="{{ v.h }}" fill="{{ v.color }}" opacity="0.45"></rect></sc-for>
+          <line x1="0" x2="1000" y1="{{ ch.lastY }}" y2="{{ ch.lastY }}" stroke="var(--ink)" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"></line>
         </svg>
+        <sc-if value="{{ hov.show }}">
+          <div style="position: absolute; top: 0; bottom: 0; left: {{ hov.left }}; width: 0; border-left: 1px dashed var(--ink); pointer-events: none;"></div>
+          <div style="position: absolute; top: 8px; left: {{ hov.boxLeft }}; transform: {{ hov.shift }}; background: var(--paper); border: 1px solid var(--ink); box-shadow: var(--shadow-offset); padding: 8px 10px; font-size: 12px; white-space: nowrap; display: flex; flex-direction: column; gap: 2px; pointer-events: none; z-index: 2;">
+            <sc-for list="{{ hov.lines }}" as="l"><span><span style="color: var(--text-muted);">{{ l.k }}</span> <b style="font-family: var(--font-mono); color: {{ l.c }};">{{ l.v }}</b></span></sc-for>
+          </div>
+        </sc-if>
       </div>
-      <div style="position: relative; height: 300px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ ch.grid }}" as="g"><span style="position: absolute; left: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for></div>
+      <div style="position: relative; height: 340px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ ch.grid }}" as="g"><span style="position: absolute; left: 8px; top: {{ g.pct }}; transform: translateY(-50%);">{{ g.label }}</span></sc-for>
+        <span style="position: absolute; left: 0; top: {{ ch.lastPct }}; transform: translateY(-50%); background: var(--ink); color: var(--paper); padding: 1px 4px; font-weight: 700;">{{ ch.lastLabel }}</span>
+        <span style="position: absolute; left: 0; bottom: 0; background: var(--neutral-200); color: var(--ink); padding: 1px 4px; font-weight: 700;">{{ ch.volLabel }}</span></div>
     </div>
     <div style="position: relative; height: 22px; margin: 0 56px 0 8px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);"><sc-for list="{{ ch.x }}" as="x"><span style="position: absolute; top: 4px; left: {{ x.left }}; transform: translateX(-50%);">{{ x.label }}</span></sc-for></div>
   </section>
@@ -92,7 +104,8 @@ a { color: inherit; text-decoration: none; }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, tf: new URLSearchParams(location.search).get('tf') || 'D', count: 0 };
+  chartRef = React.createRef();
+  state = { hov: null, ready: !!window.UFT, tf: new URLSearchParams(location.search).get('tf') || 'D', count: 0 };
   componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
   componentWillUnmount() { clearInterval(this.p); }
   build() {
@@ -114,12 +127,17 @@ class Component extends DCLogic {
     const col = v => v < 0 ? dn : v > 0 ? up : 'var(--ink)';
     const summary = [['Avg Price:', fmt(avgP, 2), 'var(--ink)'], ['Max Price:', fmt(hi, 2), 'var(--ink)'], ['Min Price:', fmt(lo, 2), 'var(--ink)'], ['Change', sgn(chg, 1), col(chg)], ['Avg Volume:', fmt(avgV, 2), 'var(--ink)'], ['Max Volume:', fmt(Math.max(...vols), 2), 'var(--ink)'], ['Min Volume:', fmt(Math.min(...vols), 2), 'var(--ink)'], ['Change(%):', sgn(pct, 2) + '%', col(pct)]].map(([label, value, c]) => ({ label, value, c }));
     // chart
-    const W = 1000, H = 300, VH = 70; const sc = U.scaleY([hi, lo], H - VH - 10, 8); const n = slice.length, bw = W / n; const vmax = Math.max(...vols) || 1;
+    const W = 1000, H = 340, VH = 80; const sc = U.scaleY([hi, lo], H - VH - 10, 8); const n = slice.length, bw = W / n; const vmax = Math.max(...vols) || 1;
     const candles = slice.map((b, i) => { const x = i * bw, upc = b.c >= b.o, color = upc ? GR : RD; const yo = sc.y(b.o), yc = sc.y(b.c); return { x: (x + bw * 0.15).toFixed(2), cx: (x + bw / 2).toFixed(2), w: Math.max(bw * 0.7, 1).toFixed(2), y: Math.min(yo, yc).toFixed(2), h: Math.max(Math.abs(yo - yc), 1).toFixed(2), hy: sc.y(b.h).toFixed(2), ly: sc.y(b.l).toFixed(2), color }; });
     const volBars = slice.map((b, i) => { const h = b.v / vmax * VH; return { x: (i * bw + bw * 0.15).toFixed(2), w: Math.max(bw * 0.7, 1).toFixed(2), y: (H - h).toFixed(2), h: h.toFixed(2), color: b.c >= b.o ? GR : RD }; });
     const grid = [0, 0.25, 0.5, 0.75, 1].map(f => { const v = sc.max - (sc.max - sc.min) * f; const y = sc.y(v); return { y: y.toFixed(1), pct: (y / H * 100) + '%', label: fmt(v, 1) }; });
     const step = Math.max(1, Math.round(n / 6));
     const x = slice.map((b, i) => i).filter(i => i % step === 0).map(i => ({ left: ((i + 0.5) / n * 100) + '%', label: slice[i].t }));
+    const lastB = slice[slice.length - 1]; const lastY = sc.y(lastB.c);
+    const kfmt = v => v >= 1e6 ? fmt(v / 1e6, 2) + 'M' : v >= 1e3 ? fmt(v / 1e3, 2) + 'K' : String(Math.round(v));
+    const hi_ = this.state.hov != null && this.state.hov < n ? this.state.hov : null; let hov = { show: false };
+    if (hi_ != null) { const b = slice[hi_]; const f = (hi_ + 0.5) / n; const cc = b.c >= b.o ? GR : RD; hov = { show: true, left: (f * 100) + '%', boxLeft: (f * 100) + '%', shift: f > 0.7 ? 'translateX(calc(-100% - 12px))' : 'translateX(12px)', lines: [['Date:', b.t, 'var(--ink)'], ['Open:', fmt(b.o, 2), cc], ['High:', fmt(b.h, 2), cc], ['Low:', fmt(b.l, 2), cc], ['Close:', fmt(b.c, 2), cc], ['Volume:', kfmt(b.v), cc]].map(([k, v, c]) => ({ k, v, c })) }; }
+    const onMove = e => { const el = this.chartRef.current; if (!el) return; const rc = el.getBoundingClientRect(); const i = Math.max(0, Math.min(n - 1, Math.floor((e.clientX - rc.left) / rc.width * n))); if (i !== this.state.hov) this.setState({ hov: i }); };
     const rows = slice.slice().reverse().map(b => ({ date: b.t, close: fmt(b.c, 1), vol: String(Math.round(b.v)), chg: sgn(b.chg, 1), pct: sgn(b.pct, 2) + '%', c: col(b.chg), value: fmt(b.value * 1e1, 2), trades: fmtInt(b.trades), open: fmt(b.o, 1), high: fmt(b.h, 1), low: fmt(b.l, 1) }));
     const TF = [['D', 'Daily'], ['W', 'Weekly'], ['M', 'Monthly']];
     const periods = TF.map(([k, label]) => ({ label, on: k === tf, bg: k === tf ? 'var(--ink)' : 'var(--paper)', fg: k === tf ? 'var(--paper)' : 'var(--ink)', onClick: () => this.setState({ tf: k, count: 0 }) }));
@@ -132,11 +150,15 @@ class Component extends DCLogic {
       const blob = new Blob([[head.join(','), ...body.reverse()].join('\n')], { type: 'text/csv' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${S.code}_${{ D: 'daily', W: 'weekly', M: 'monthly' }[tf]}_history.csv`; document.body.appendChild(a); a.click(); a.remove();
     };
-    return { code: S.code, name: U.company(S.code), ch: { candles, grid, x, vols: volBars }, summary, rows, cols, periods, unit, count, countOptions, onDownload,
+    const mkt = ['DSE', 'DSEX', 'DS30', 'DSES', 'SME'].includes(U.param('mkt', 'DSE')) ? U.param('mkt', 'DSE') : 'DSE';
+    const inU = U.universes[mkt]; const symList = U.symbols.filter(c => inU(U.bySym[c]) || c === S.code);
+    return { code: S.code, mkt, mktOptions: ['DSE', 'DSEX', 'DS30', 'DSES', 'SME'].map(v => ({ v })), hov, chartRef: this.chartRef, onMove, onLeave: () => this.setState({ hov: null }),
+      onMkt: e => { const m = e.target.value; const list = U.symbols.filter(c => U.universes[m](U.bySym[c])); const sym = list.includes(S.code) ? S.code : (list[0] || S.code); location.href = U.href('Historical Data', { symbol: sym, mkt: m, tf }); },
+      name: U.company(S.code), ch: { candles, grid, x, vols: volBars, lastY: lastY.toFixed(1), lastPct: (lastY / H * 100) + '%', lastLabel: fmt(lastB.c, 2), volLabel: kfmt(lastB.v) }, summary, rows, cols, periods, unit, count, countOptions, onDownload,
       asOf: 'As of ' + U.dateStr(new Date(2026, 10, 8)),
-      symbolOptions: U.symbols.map(code => ({ code, label: code + '.PUBLIC' })),
+      symbolOptions: symList.map(code => ({ code, label: code + '.PUBLIC' })),
       stockHref: U.actions(S.code).stock, chartHref: U.actions(S.code).chart, vpaHref: U.href('VPA Archive', { symbol: S.code }), depthHref: U.href('Market Depth', { symbol: S.code }),
-      onSymbol: e => { location.href = U.href('Historical Data', { symbol: e.target.value }); },
+      onSymbol: e => { location.href = U.href('Historical Data', { symbol: e.target.value, mkt, tf }); },
       onCount: e => this.setState({ count: +e.target.value }) };
   }
 }

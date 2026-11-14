@@ -37,6 +37,10 @@
       index: Math.round((r() - 0.45) * 9 * 100) / 100 };
   });
   stocks.forEach(s => { s.lower = round(s.ycp * (1 - s.breaker / 100), 1); s.upper = round(s.ycp * (1 + s.breaker / 100), 1); s.contrib = round(s.change * s.mcap / 2.2e5, 2); });
+  // index / board membership (mock): DS30 = 30 largest non-fund shares by market cap
+  const ds30set = new Set(stocks.filter(s => s.board !== 'Mutual Fund').slice().sort((a, b) => b.mcap - a.mcap).slice(0, 30).map(s => s.code));
+  stocks.forEach(s => { const h = hash(s.code) % 100; s.inDS30 = ds30set.has(s.code); s.inDSEX = s.board !== 'Mutual Fund' && s.cat !== 'Z'; s.inDSES = s.board !== 'Mutual Fund' && h < 48; s.inSME = !s.inDS30 && s.board !== 'Mutual Fund' && h >= 88; });
+  const UNIVERSES = { DSE: () => true, DSEX: s => s.inDSEX, DS30: s => s.inDS30, DSES: s => s.inDSES, SME: s => s.inSME };
   const bySym = Object.fromEntries(stocks.map(s => [s.code, s]));
   const top = (key, n = 10, asc = false) => stocks.slice().sort((a, b) => asc ? a[key] - b[key] : b[key] - a[key]).slice(0, n);
 
@@ -105,8 +109,8 @@
   const news = Array.from({ length: 24 }, (_, i) => { const r = rng(400 + i); const s = stocks[Math.floor(r() * stocks.length)]; const t = NEWS_T[Math.floor(r() * NEWS_T.length)]; const h = 9 + Math.floor(r() * 7); return { id: i, code: s.code, title: `${s.code}: ${t}`, short: t, time: `${String(h).padStart(2, '0')}:${String(Math.floor(r() * 60)).padStart(2, '0')}`, date: new Date(2026, 10, 5 - Math.floor(i / 4)), psi: r() < 0.35 }; });
   const blocks = stocks.slice().sort((a, b) => hash(a.code + 'b') - hash(b.code + 'b')).slice(0, 10).map(s => { const r = rng(hash(s.code) + 3); const q = Math.round((20 + r() * 400) * 1000); return { code: s.code, qty: q, value: round(q * s.ycp / 1e6, 2), trades: 1 + Math.round(r() * 6), max: round(s.ycp * 1.01, 1), min: round(s.ycp * 0.99, 1) }; });
   const blockPct = round(blocks.reduce((a, b) => a + b.value, 0) / totals.value * 100, 2);
-  const EV_T = ['AGM', 'EGM', 'Record date', 'Board meeting', 'Dividend disbursement', 'IPO lottery'];
-  const events = Array.from({ length: 30 }, (_, i) => { const r = rng(900 + i); const s = stocks[Math.floor(r() * stocks.length)]; let dd = 1 + Math.floor(r() * 29); if (dd === 6) dd = 7; const d = new Date(2026, 10, dd); return { code: s.code, type: EV_T[Math.floor(r() * EV_T.length)], date: d, time: ['10:30 AM', '11:00 AM', '3:00 PM', '4:30 PM'][Math.floor(r() * 4)], venue: r() < 0.5 ? 'Digital platform' : 'Company head office, Dhaka' }; }).sort((a, b) => a.date - b.date);
+  const EV_T = ['Board meeting', 'Dividend', 'Spot', 'Record date', 'AGM', 'EGM', 'Right subscription', 'Quarterly earnings'];
+  const events = Array.from({ length: 30 }, (_, i) => { const r = rng(900 + i); const s = stocks[Math.floor(r() * stocks.length)]; let dd = 1 + Math.floor(r() * 29); const d = new Date(2026, 10, dd); return { code: s.code, type: EV_T[Math.floor(r() * EV_T.length)], date: d, time: ['10:30 AM', '11:00 AM', '3:00 PM', '4:30 PM'][Math.floor(r() * 4)], venue: r() < 0.5 ? 'Digital platform' : 'Company head office, Dhaka' }; }).sort((a, b) => a.date - b.date);
   const ipos = [
     { company: 'Alpha Agro Industries PLC', code: 'ALPHAAGRO', board: 'Main', method: 'Fixed Price', status: 'open', subStart: '02 Nov 2026', subEnd: '09 Nov 2026', price: 10, size: 750, lot: 500, sector: 'Food & Allied' },
     { company: 'Meghna Green Energy PLC', code: 'MGEPL', board: 'Main', method: 'Book Building', status: 'open', subStart: '04 Nov 2026', subEnd: '11 Nov 2026', price: 32, size: 1500, lot: 200, sector: 'Fuel & Power' },
@@ -212,5 +216,5 @@
   const TS_FS = { lg: 15, sm: 13, xs: 12, xxs: 11 };
   function tsLoad(key) { try { const o = JSON.parse(localStorage.getItem('uftcl.tbl.' + key) || 'null'); if (o) return { hidden: Array.isArray(o.hidden) ? o.hidden : [], compact: !!o.compact, fs: TS_FS[o.fs] ? o.fs : 'sm' }; } catch (e) { /* storage unavailable */ } return { hidden: [], compact: false, fs: 'sm' }; }
   function tsView(t) { const fs = TS_FS[t.fs] || 13; const c = !!t.compact; return { fs, fsHead: Math.max(11, fs - 1), rowH: c ? 26 : 40, headH: c ? 30 : 42, padY: c ? 2 : 8, icon: c ? 20 : 24, spark: c ? 16 : 24, show: k => !t.hidden.includes(k) }; }
-  window.UFT = { tsLoad, tsView, sectorDaily, chartBars, rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
+  window.UFT = { universes: UNIVERSES, tsLoad, tsView, sectorDaily, chartBars, rng, hash, round, fmt, fmtInt, sign, tone, arrow, UP, DOWN, FLAT, stocks, bySym, top, breadth, totals, indices, times, sectors, daily, sma, rsiSeries, vpa, depth, news, blocks, blockPct, events, ipos, scaleY, linePath, bars, candles, heat, heatText, param, href, actions, dateStr, company, profile, pe: peModel, fmtIN, symbols: stocks.map(s => s.code).sort() };
 })();
