@@ -331,8 +331,8 @@ a:hover { color: var(--blue-700); }
   <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px;">
     <div data-screen-label="Event calendar" style="border: 1px solid var(--ink); min-width: 0; display: flex; flex-direction: column;">
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--ink);"><span style="font-weight: 700;">Events calendar</span><a href="Event%20Calendar.dc.html" style="font-size: 13px; text-decoration: underline;">Open calendar</a></div>
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--ink);">
-        <sc-for list="{{ evTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.onClick }}" style="font: inherit; border: 0; border-right: {{ t.br }}; padding: 10px 4px; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;"><span style="font-family: var(--font-mono); font-size: 21px; line-height: 26px;">{{ t.count }}</span><span style="font-size: 12px;">{{ t.label }}</span></button></sc-for>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--ink);">
+        <sc-for list="{{ evTabs }}" as="t" hint-placeholder-count="6"><button onClick="{{ t.onClick }}" style="font: inherit; border: 0; border-bottom: 1px solid var(--ink); border-right: {{ t.br }}; padding: 10px 4px; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;"><span style="font-family: var(--font-mono); font-size: 21px; line-height: 26px;">{{ t.count }}</span><span style="font-size: 12px;">{{ t.label }}</span></button></sc-for>
       </div>
       <div style="flex: 1; min-height: 300px; position: relative;"><div style="position: absolute; inset: 0; overflow: auto;">
         <sc-for list="{{ evRows }}" as="e" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--neutral-200); align-items: center;"><div style="display: flex; flex-direction: column; align-items: center; border: 1px solid var(--ink); padding: 2px 0;"><span style="font-family: var(--font-mono); font-size: 16px; line-height: 20px;">{{ e.day }}</span><span style="font-size: 10px;">{{ e.mon }}</span></div><div style="display: flex; flex-direction: column; min-width: 0;"><span><b>{{ e.code }}</b> · {{ e.type }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ e.time }} · {{ e.venue }}</span></div></div></sc-for>
@@ -448,8 +448,12 @@ class Component extends DCLogic {
     // events
     const inR = (d, a, b) => d >= new Date(2026, 10, a) && d <= new Date(2026, 10, b, 23);
     const EVR = { today: [6, 6], week: [1, 7], next: [8, 14], month: [1, 30] };
-    const evTabs = this.tabs('ev', [['today', 'Today'], ['week', 'This week'], ['next', 'Upcoming week'], ['month', 'This month']]).map((t, i) => { const br = i === 3 ? '0' : '1px solid var(--ink)'; const k = ['today', 'week', 'next', 'month'][i]; return { ...t, br, count: U.events.filter(e => inR(e.date, ...EVR[k])).length }; });
-    const evRows = U.events.filter(e => inR(e.date, ...EVR[st.ev])).map(e => ({ ...e, day: String(e.date.getDate()).padStart(2, '0'), mon: e.date.toLocaleDateString('en-GB', { month: 'short' }) }));
+    const DECL = /dividend|declared|bonus|record date/i, EARN = /EPS|earnings|NAV per share/i;
+    const nowRows = re => U.news.filter(n => re.test(n.short)).map(n => ({ code: n.code, type: re === DECL ? 'Declaration' : 'Earnings', time: n.time, venue: n.short, date: n.date, day: String(n.date.getDate()).padStart(2, '0'), mon: n.date.toLocaleDateString('en-GB', { month: 'short' }) }));
+    const evSets = { decl: nowRows(DECL), earn: nowRows(EARN) };
+    const evKeys = ['today', 'week', 'next', 'month', 'decl', 'earn'];
+    const evTabs = this.tabs('ev', [['today', 'Today'], ['week', 'This week'], ['next', 'Upcoming week'], ['month', 'This month'], ['decl', 'Latest declarations'], ['earn', 'Latest earnings']]).map((t, i) => { const k = evKeys[i]; return { ...t, br: i % 3 === 2 ? '0' : '1px solid var(--ink)', count: evSets[k] ? evSets[k].length : U.events.filter(e => inR(e.date, ...EVR[k])).length }; });
+    const evRows = evSets[st.ev] || U.events.filter(e => inR(e.date, ...EVR[st.ev])).map(e => ({ ...e, day: String(e.date.getDate()).padStart(2, '0'), mon: e.date.toLocaleDateString('en-GB', { month: 'short' }) }));
     const ipoRows = U.ipos.filter(i => i.status === st.ipo).slice(0, 3).map(i => ({ ...i, sub: `${i.subStart.slice(0, 6)} – ${i.subEnd}`, price: 'Tk ' + fmt(i.price, 0) }));
     return {
       sessionDate, indexCards, stats, chart, hover, chartRef: this.chartRef, onChartMove, onChartLeave: () => this.setState({ hover: null }),
@@ -463,8 +467,8 @@ class Component extends DCLogic {
       cbTabs: this.tabs('cb', [['upper', 'Upper'], ['lower', 'Lower']]), cbRows,
       indItems: Object.entries(IND).map(([value, v]) => ({ value, label: v[0] })), indKey: st.ind, setInd: v => this.setState({ ind: v }), indLabel: ind[0].replace(/^(Lowest|Highest) /, ''), indRows,
       evTabs, evRows, evEmpty: evRows.length === 0,
-      evEmptyTitle: { today: 'No events today', week: 'No events this week', next: 'No events next week', month: 'No events this month' }[st.ev],
-      evEmptyText: { today: 'Nothing is scheduled for today. Check the rest of the week for upcoming record dates, AGMs and disclosures.', week: 'Nothing is scheduled for this week.', next: 'Nothing is scheduled for the upcoming week.', month: 'Nothing is scheduled for this month.' }[st.ev],
+      evEmptyTitle: { today: 'No events today', week: 'No events this week', next: 'No events next week', month: 'No events this month', decl: 'No declarations', earn: 'No earnings' }[st.ev],
+      evEmptyText: { today: 'Nothing is scheduled for today. Check the rest of the week for upcoming record dates, AGMs and disclosures.', week: 'Nothing is scheduled for this week.', next: 'Nothing is scheduled for the upcoming week.', month: 'Nothing is scheduled for this month.', decl: 'No recent declarations.', earn: 'No recent earnings.' }[st.ev],
       evEmptyAction: st.ev === 'today' ? { label: 'View this week', onClick: () => this.setState({ ev: 'week' }) } : { label: 'View this month', onClick: () => this.setState({ ev: 'month' }) },
       ipoTabs: this.tabs('ipo', [['open', 'Subscription open'], ['upcoming', 'Forthcoming'], ['past', 'Archive']]).map((t, i, a) => ({ ...t, br: i === a.length - 1 ? '0' : '1px solid var(--ink)' })), ipoRows
     };
