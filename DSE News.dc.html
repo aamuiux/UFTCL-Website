@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>DSE News — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="news" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <section style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">DSE news</h1>
+      <div style="color: var(--text-muted);">{{ sub }}</div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; border: 1px solid var(--ink);">
+      <sc-for list="{{ tabs }}" as="t"><button onClick="{{ t.go }}" style="font: inherit; cursor: pointer; border: 0; border-left: {{ t.bl }}; height: 32px; padding: 0 14px; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button></sc-for>
+    </div>
+  </section>
+
+  <sc-if value="{{ isNews }}" hint-placeholder-val="{{ true }}">
+    <section style="border: 1px solid var(--ink);">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+        <div style="display: flex; border: 1px solid var(--ink);"><sc-for list="{{ newsFilters }}" as="f"><button onClick="{{ f.go }}" style="font: inherit; height: 30px; padding: 0 12px; border: 0; border-right: 1px solid var(--ink); cursor: pointer; background: {{ f.bg }}; color: {{ f.fg }};">{{ f.label }}</button></sc-for></div>
+        <input value="{{ q }}" onInput="{{ onQ }}" placeholder="Search news" style="font: inherit; width: 240px; height: 32px; padding: 0 10px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink);">
+      </div>
+      <div style="display: grid; grid-template-columns: 120px minmax(0, 1fr) 130px; background: var(--neutral-50); border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 700; color: var(--text-muted);"><span style="padding: 10px 16px;">Date</span><span style="padding: 10px;">Headline</span><span style="padding: 10px;">Type</span></div>
+      <sc-for list="{{ newsRows }}" as="n" hint-placeholder-count="10">
+        <div style="display: grid; grid-template-columns: 120px minmax(0, 1fr) 130px; align-items: center; border-bottom: 1px solid var(--neutral-200);" style-hover="background: var(--neutral-100);">
+          <span style="padding: 10px 16px; font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">{{ n.date }}</span>
+          <a href="{{ n.href }}" style="padding: 10px; font-weight: 700;">{{ n.title }}</a>
+          <span style="padding: 10px;"><span style="font-size: 12px; padding: 1px 6px; border: 1px solid var(--neutral-400);">{{ n.type }}</span></span>
+        </div>
+      </sc-for>
+      <sc-if value="{{ newsEmpty }}"><div style="padding: 32px 16px; color: var(--text-muted);">No news matches.</div></sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isPub }}">
+    <section style="border: 1px solid var(--ink);">
+      <div style="padding: 12px 16px; border-bottom: 1px solid var(--ink); font-weight: 700;">Publications</div>
+      <sc-for list="{{ pubs }}" as="p">
+        <div style="display: grid; grid-template-columns: 70px minmax(0, 1fr) 110px; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--neutral-200);">
+          <span style="font-family: var(--font-mono); color: var(--text-muted);">{{ p.year }}</span>
+          <div style="display: flex; flex-direction: column;"><span style="font-weight: 700;">{{ p.title }}</span><span style="font-size: 13px; color: var(--text-muted);">{{ p.note }}</span></div>
+          <a href="#" style="height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ink);" style-hover="background: var(--ink); color: var(--paper);">View PDF</a>
+        </div>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isRep }}">
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px;">
+      <sc-for list="{{ reps }}" as="r">
+        <div style="border: 1px solid var(--ink); padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-weight: 700; font-size: 16px;">{{ r.title }}</span>
+          <span style="font-size: 13px; color: var(--text-muted);">{{ r.note }}</span>
+          <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">{{ r.freq }} · {{ r.latest }}</span>
+          <div style="display: flex; gap: 8px; margin-top: 4px;"><a href="#" style="height: 30px; padding: 0 14px; display: flex; align-items: center; border: 1px solid var(--ink);" style-hover="background: var(--ink); color: var(--paper);">View</a><a href="#" style="height: 30px; padding: 0 14px; display: flex; align-items: center; border: 1px solid var(--ink);" style-hover="background: var(--ink); color: var(--paper);">Download</a></div>
+        </div>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isGal }}">
+    <section style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+      <sc-for list="{{ photos }}" as="g">
+        <div style="border: 1px solid var(--ink);">
+          <div style="aspect-ratio: 4 / 3; background: var(--neutral-100); display: flex; align-items: center; justify-content: center; color: var(--text-muted); border-bottom: 1px solid var(--ink);"><svg width="40" height="40" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><rect x="1.5" y="3" width="13" height="10"></rect><circle cx="5.5" cy="6.5" r="1.2"></circle><path d="M2 12l4-3.5 3 2.5 2-1.5 3 2.5"></path></svg></div>
+          <div style="padding: 10px 12px; display: flex; flex-direction: column;"><span style="font-weight: 700;">{{ g.title }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ g.date }}</span></div>
+        </div>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isEvt }}">
+    <section style="border: 1px solid var(--ink); padding: 8px 0;">
+      <sc-for list="{{ events }}" as="e">
+        <div style="display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 16px; padding: 12px 24px; border-bottom: 1px solid var(--neutral-200);">
+          <span style="font-family: var(--font-mono); font-weight: 700; font-size: 18px;">{{ e.year }}</span>
+          <div style="display: flex; flex-direction: column;"><span style="font-weight: 700;">{{ e.title }}</span><span style="font-size: 13px; color: var(--text-muted);">{{ e.note }}</span></div>
+        </div>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <div style="font-size: 12px; color: var(--text-muted);">Sample content for design review. The live site lists the Dhaka Stock Exchange’s own news, publications, reports, gallery and major events.</div>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, tab: (window.UFT && window.UFT.param('tab', 'news')) || 'news', nf: 'all', q: '' };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  setTab(t) { this.setState({ tab: t }); try { history.replaceState(null, '', '?tab=' + t); } catch (e) {} }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state;
+    const T = [['news', 'News'], ['publications', 'Publications'], ['reports', 'Reports'], ['gallery', 'Gallery'], ['events', 'Major events']];
+    const tab = T.some(t => t[0] === st.tab) ? st.tab : 'news';
+    const tabs = T.map(([k, label], i) => ({ label, go: () => this.setTab(k), bl: i ? '1px solid var(--ink)' : '0', bg: tab === k ? 'var(--ink)' : 'var(--paper)', fg: tab === k ? 'var(--paper)' : 'var(--ink)' }));
+    const SUB = { news: 'Official announcements from the Dhaka Stock Exchange.', publications: 'Annual reports, fact books and newsletters published by the exchange.', reports: 'Market statistics and periodic reports.', gallery: 'Photos from exchange events and ceremonies.', events: 'Milestones in the history of the Dhaka Stock Exchange.' };
+    const TYPES = ['Notice', 'Circular', 'Press release', 'Market update'];
+    const all = U.news.map((n, i) => ({ date: U.dateStr(n.date), title: n.short.replace(/^./, c => c.toUpperCase()) + ' — ' + n.code, type: TYPES[U.hash(n.code + i) % 4], href: U.href('News Effect Chart', { symbol: n.code }) }));
+    const newsFilters = [['all', 'All'], ...TYPES.map(t => [t, t])].map(([k, label]) => ({ label, go: () => this.setState({ nf: k }), bg: st.nf === k ? 'var(--ink)' : 'var(--paper)', fg: st.nf === k ? 'var(--paper)' : 'var(--ink)' }));
+    const newsRows = all.filter(n => (st.nf === 'all' || n.type === st.nf) && (!st.q || n.title.toLowerCase().includes(st.q.toLowerCase())));
+    const pubs = [['2026', 'DSE Monthly Review — October', 'Index, turnover and sector performance for the month.'], ['2026', 'DSE Newsletter — Q3', 'Quarterly news, listings and market developments.'], ['2025', 'DSE Annual Report 2025', 'Financial statements and the year in review.'], ['2025', 'DSE Fact Book 2025', 'Listed companies, indices and market statistics.'], ['2024', 'DSE Annual Report 2024', 'Financial statements and the year in review.'], ['2024', 'Investor Education Handbook', 'A guide to investing in the capital market.']].map(([year, title, note]) => ({ year, title, note }));
+    const reps = [['Daily market summary', 'Index values, turnover, volume, trades and advancers / decliners.', 'Daily', '05 Nov 2026'], ['Monthly review', 'Month-end statistics by sector and category.', 'Monthly', 'Oct 2026'], ['Sector wise turnover', 'Share of turnover and market cap for each sector.', 'Weekly', 'Week 44'], ['Investor account statistics', 'BO accounts opened and active accounts.', 'Monthly', 'Oct 2026'], ['Margin loan report', 'Margin loan outstanding across member brokers.', 'Monthly', 'Oct 2026'], ['Market capitalisation', 'Total and sector wise market capitalisation.', 'Monthly', 'Oct 2026']].map(([title, note, freq, latest]) => ({ title, note, freq, latest }));
+    const photos = ['Opening bell ceremony', 'Investor awareness programme', 'Annual general meeting', 'IPO listing ceremony', 'Market close ceremony', 'Visit by the regulator', 'Capital market seminar', 'Member brokers’ meeting', 'Technology launch event'].map((title, i) => ({ title, date: U.dateStr(new Date(2026, 9 - Math.floor(i / 3), 28 - i * 2)) }));
+    const events = [['1954', 'Stock exchange formed', 'Incorporated in Dhaka as the East Pakistan Stock Exchange Association.'], ['1964', 'Renamed Dhaka Stock Exchange', 'The exchange takes its current name.'], ['1976', 'Trading resumes', 'Trading restarts after independence with a handful of listed companies.'], ['1993', 'Regulator established', 'The Bangladesh Securities and Exchange Commission begins to oversee the market.'], ['1998', 'Automated trading', 'Screen based trading replaces open outcry.'], ['2013', 'Demutualisation and DSEX', 'Ownership separates from trading rights; the DSEX broad index is introduced.'], ['2018', 'Strategic partner', 'A foreign consortium becomes strategic partner of the exchange.']].map(([year, title, note]) => ({ year, title, note }));
+    return { tabs, sub: SUB[tab], isNews: tab === 'news', isPub: tab === 'publications', isRep: tab === 'reports', isGal: tab === 'gallery', isEvt: tab === 'events', newsFilters, newsRows, newsEmpty: newsRows.length === 0, q: st.q, onQ: e => this.setState({ q: e.target.value }), pubs, reps, photos, events };
+  }
+}
+</script>
+</body>
+</html>

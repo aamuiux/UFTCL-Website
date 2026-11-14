@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Stock Quotes / Price Board — UFTCL</title>
+<link rel="stylesheet" href="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/styles.css">
+<script src="_ds/base-ui-custom-design-system-2d907855-cead-4505-91ed-cb7b719e8388/_ds_bundle.js"></script>
+<script src="uftcl-data.js"></script>
+<style>
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); }
+a { color: inherit; text-decoration: none; }
+</style>
+</helmet>
+<div style="min-height: 100vh; font-family: var(--font-sans); font-size: 14px; color: var(--ink); background: var(--paper);">
+<dc-import name="Header" active="market" hint-size="100%,140px"></dc-import>
+<main style="padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+
+  <section style="display: flex; flex-direction: column; gap: 4px;">
+    <h1 style="margin: 0; font-family: var(--font-sans-b); font-size: 34px; line-height: 43px;">Stock quotes / price board</h1>
+    <div style="color: var(--text-muted);">Live share prices for every listed company: open, high, low, close, volume and change.</div>
+  </section>
+
+  <section style="border: 1px solid var(--ink);">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <sc-for list="{{ chips }}" as="c"><button onClick="{{ c.go }}" style="font: inherit; height: 32px; padding: 0 16px; cursor: pointer; border: 1px solid var(--ink); background: {{ c.bg }}; color: {{ c.fg }};">{{ c.label }} <span style="font-family: var(--font-mono); font-size: 12px; opacity: 0.7;">{{ c.n }}</span></button></sc-for>
+      </div>
+      <div style="display: flex; align-items: center; height: 32px; border: 1px solid var(--ink); width: 240px;">
+        <input value="{{ q }}" onInput="{{ onQ }}" placeholder="Search trading code" style="flex: 1; min-width: 0; height: 30px; padding: 0 10px; border: 0; outline: none; font: inherit; background: transparent; color: var(--ink);">
+      </div>
+    </div>
+    <div style="overflow-x: auto;">
+      <div style="min-width: 900px;">
+        <div style="display: grid; grid-template-columns: 52px minmax(140px, 1.3fr) 150px repeat(8, minmax(72px, 1fr)); background: var(--neutral-50); border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 700; color: var(--text-muted);">
+          <sc-for list="{{ heads }}" as="h"><span style="padding: 10px; text-align: {{ h.al }};">{{ h.label }}</span></sc-for>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="20">
+          <div style="display: grid; grid-template-columns: 52px minmax(140px, 1.3fr) 150px repeat(8, minmax(72px, 1fr)); align-items: center; min-height: 38px; border-bottom: 1px solid var(--neutral-200); background: {{ r.zebra }};" style-hover="background: var(--neutral-100);">
+            <span style="padding: 0 10px; font-family: var(--font-mono); color: var(--text-muted);">{{ r.no }}</span>
+            <a href="{{ r.href }}" style="padding: 0 10px; font-weight: 700; color: {{ r.c }};">{{ r.code }}</a>
+            <div style="padding: 0 10px; display: flex; gap: 2px;"><sc-for list="{{ r.acts }}" as="a"><a href="{{ a.href }}" title="{{ a.title }}" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--neutral-300);" style-hover="background: var(--ink); color: var(--paper); border-color: var(--ink);"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="square"><path d="{{ a.d }}"></path></svg></a></sc-for></div>
+            <sc-for list="{{ r.cells }}" as="v"><span style="padding: 0 10px; text-align: right; font-family: var(--font-mono); color: {{ v.c }};">{{ v.t }}</span></sc-for>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ empty }}"><div style="padding: 32px 16px; color: var(--text-muted);">No instruments match.</div></sc-if>
+    </div>
+  </section>
+</main>
+<dc-import name="Footer" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: !!window.UFT, f: (window.UFT && window.UFT.param('filter', 'all')) || 'all', q: '' };
+  componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
+  componentWillUnmount() { clearInterval(this.p); }
+  renderVals() {
+    const U = window.UFT; if (!U) return {};
+    const st = this.state; const { fmt, fmtInt, sign, tone } = U; const S = U.stocks;
+    const F = { all: () => true, gainers: s => s.change > 0, losers: s => s.change < 0, dsex: s => s.inDSEX, ds30: s => s.inDS30, sme: s => s.inSME };
+    const chips = [['all', 'All'], ['gainers', 'Gainers'], ['losers', 'Losers'], ['dsex', 'DSEX'], ['ds30', 'DS30'], ['sme', 'SME']].map(([k, label]) => ({ label, n: S.filter(F[k]).length, go: () => this.setState({ f: k }), bg: st.f === k ? 'var(--ink)' : 'var(--paper)', fg: st.f === k ? 'var(--paper)' : 'var(--ink)' }));
+    const D = { chart: ['Stock chart', 'M2 12l4-4 3 3 5-6'], vpa: ['VPA', 'M3 13V8M6.5 13V4M10 13V9M13.5 13V6'], archive: ['VPA archive', 'M2.5 3h11v3h-11zM3.5 6v7h9V6M6.5 9h3'], depth: ['Depth monitor', 'M8 2v12M3 4h5M5 7h3M2 10h6M8 5h5M8 8h3M8 11h6'], effect: ['News effect chart', 'M3 2.5h10v11H3zM5.5 5.5h5M5.5 8h5M5.5 10.5h3'] };
+    const list = S.filter(F[st.f] || F.all).filter(s => !st.q || s.code.includes(st.q.toUpperCase())).slice().sort((a, b) => a.code.localeCompare(b.code));
+    const rows = list.map((s, i) => { const A = U.actions(s.code), c = tone(s.change); return { no: i + 1, code: s.code, href: A.stock, c, zebra: i % 2 ? 'var(--neutral-50)' : 'transparent', acts: Object.keys(D).map(k => ({ href: A[k], title: D[k][0], d: D[k][1] })),
+      cells: [{ t: fmt(s.ltp, 1), c: 'var(--ink)' }, { t: sign(s.changePct) + '%', c }, { t: fmt(s.open, 1), c: 'var(--ink)' }, { t: fmt(s.high, 1), c: 'var(--ink)' }, { t: fmt(s.low, 1), c: 'var(--ink)' }, { t: fmt(s.close, 1), c: 'var(--ink)' }, { t: fmtInt(s.volume), c: 'var(--ink)' }, { t: sign(s.change, 1), c }] }; });
+    const heads = [['#', 'left'], ['Trading code', 'left'], ['Actions', 'left'], ['LTP', 'right'], ['%', 'right'], ['Open', 'right'], ['High', 'right'], ['Low', 'right'], ['Close', 'right'], ['Volume', 'right'], ['Change', 'right']].map(([label, al]) => ({ label, al }));
+    return { chips, rows, heads, empty: rows.length === 0, q: st.q, onQ: e => this.setState({ q: e.target.value }) };
+  }
+}
+</script>
+</body>
+</html>
