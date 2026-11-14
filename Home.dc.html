@@ -331,11 +331,8 @@ a:hover { color: var(--blue-700); }
   <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px;">
     <div data-screen-label="Event calendar" style="border: 1px solid var(--ink); min-width: 0; display: flex; flex-direction: column;">
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--ink);"><span style="font-weight: 700;">Events calendar</span><a href="Event%20Calendar.dc.html" style="font-size: 13px; text-decoration: underline;">Open calendar</a></div>
-      <div style="display: flex; flex-wrap: wrap; gap: 4px; padding: 12px 16px 0; border-bottom: 1px solid var(--ink);">
-        <sc-for list="{{ evTabs }}" as="t" hint-placeholder-count="6"><button onClick="{{ t.onClick }}" style="font: inherit; font-size: 13px; height: 34px; padding: 0 12px; border: 1px solid var(--ink); border-bottom: 0; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer;">{{ t.label }}</button></sc-for>
-      </div>
-      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--ink);">
-        <sc-for list="{{ evTiles }}" as="v" hint-placeholder-count="8"><button onClick="{{ v.onClick }}" style="font: inherit; cursor: pointer; border: 2px solid {{ v.bd }}; padding: 0; background: var(--paper); display: flex; flex-direction: column; text-align: center;"><span style="font-family: var(--font-mono); font-size: 22px; line-height: 34px; color: var(--ink);">{{ v.n }}</span><span style="background: {{ v.c }}; color: #fff; font-size: 12px; font-weight: 700; padding: 6px 4px;">{{ v.label }}</span></button></sc-for>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--ink);">
+        <sc-for list="{{ evTabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.onClick }}" style="font: inherit; border: 0; border-right: {{ t.br }}; padding: 10px 4px; background: {{ t.bg }}; color: {{ t.fg }}; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px;"><span style="font-family: var(--font-mono); font-size: 21px; line-height: 26px;">{{ t.count }}</span><span style="font-size: 12px;">{{ t.label }}</span></button></sc-for>
       </div>
       <div style="flex: 1; min-height: 300px; position: relative;"><div style="position: absolute; inset: 0; overflow: auto;">
         <sc-for list="{{ evRows }}" as="e" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--neutral-200); align-items: center;"><div style="display: flex; flex-direction: column; align-items: center; border: 1px solid var(--ink); padding: 2px 0;"><span style="font-family: var(--font-mono); font-size: 16px; line-height: 20px;">{{ e.day }}</span><span style="font-size: 10px;">{{ e.mon }}</span></div><div style="display: flex; flex-direction: column; min-width: 0;"><span><b>{{ e.code }}</b> · {{ e.type }}</span><span style="font-size: 12px; color: var(--text-muted);">{{ e.time }} · {{ e.venue }}</span></div></div></sc-for>
@@ -383,7 +380,7 @@ a:hover { color: var(--blue-700); }
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { ready: !!window.UFT, idx: 'DSEX', top: 'value', sector: 'value', mover: 'index', cb: 'upper', news: 'today', ev: 'today', evType: '', ipo: 'open', ind: 'rsiLow', hover: null };
+  state = { ready: !!window.UFT, idx: 'DSEX', top: 'value', sector: 'value', mover: 'index', cb: 'upper', news: 'today', ev: 'today', ipo: 'open', ind: 'rsiLow', hover: null };
   chartRef = React.createRef();
   componentDidMount() { if (!this.state.ready) this.p = setInterval(() => { if (window.UFT) { clearInterval(this.p); this.setState({ ready: true }); } }, 50); }
   componentWillUnmount() { clearInterval(this.p); }
@@ -451,14 +448,8 @@ class Component extends DCLogic {
     // events
     const inR = (d, a, b) => d >= new Date(2026, 10, a) && d <= new Date(2026, 10, b, 23);
     const EVR = { today: [6, 6], week: [1, 7], next: [8, 14], month: [1, 30] };
-    const evKeys = [['today', 'Today'], ['week', 'This week'], ['next', 'Upcoming week'], ['month', 'This month'], ['decl', 'Latest declarations'], ['earn', 'Latest earnings']];
-    const DECL = ['Dividend', 'Right subscription', 'Record date', 'AGM', 'EGM'];
-    const evIn = (e, k) => k === 'decl' ? DECL.includes(e.type) : k === 'earn' ? e.type === 'Quarterly earnings' : inR(e.date, ...EVR[k]);
-    const evTabs = this.tabs('ev', evKeys).map((x, i) => ({ ...x, onClick: () => this.setState({ ev: evKeys[i][0], evType: '' }) }));
-    const EVT = [['Board meeting', 'Board meetings', 'oklch(55% 0.2 27)'], ['Dividend', 'Dividend', 'oklch(52% 0.09 205)'], ['Spot', 'Spot', 'oklch(55% 0.14 150)'], ['Record date', 'Record date', 'oklch(62% 0.15 60)'], ['AGM', 'AGM', 'oklch(45% 0.09 150)'], ['EGM', 'EGM', 'oklch(60% 0.12 75)'], ['Right subscription', 'Right subscription', 'oklch(52% 0.06 110)'], ['Quarterly earnings', 'Quarterly earnings', 'oklch(48% 0.1 215)']];
-    const evBase = U.events.filter(e => evIn(e, st.ev));
-    const evTiles = EVT.map(([k, label, c]) => ({ label, c, n: evBase.filter(e => e.type === k).length, bd: st.evType === k ? 'var(--ink)' : 'var(--neutral-300)', onClick: () => this.setState({ evType: st.evType === k ? '' : k }) }));
-    const evRows = evBase.filter(e => !st.evType || e.type === st.evType).map(e => ({ ...e, day: String(e.date.getDate()).padStart(2, '0'), mon: e.date.toLocaleDateString('en-GB', { month: 'short' }) }));
+    const evTabs = this.tabs('ev', [['today', 'Today'], ['week', 'This week'], ['next', 'Upcoming week'], ['month', 'This month']]).map((t, i) => { const br = i === 3 ? '0' : '1px solid var(--ink)'; const k = ['today', 'week', 'next', 'month'][i]; return { ...t, br, count: U.events.filter(e => inR(e.date, ...EVR[k])).length }; });
+    const evRows = U.events.filter(e => inR(e.date, ...EVR[st.ev])).map(e => ({ ...e, day: String(e.date.getDate()).padStart(2, '0'), mon: e.date.toLocaleDateString('en-GB', { month: 'short' }) }));
     const ipoRows = U.ipos.filter(i => i.status === st.ipo).slice(0, 3).map(i => ({ ...i, sub: `${i.subStart.slice(0, 6)} – ${i.subEnd}`, price: 'Tk ' + fmt(i.price, 0) }));
     return {
       sessionDate, indexCards, stats, chart, hover, chartRef: this.chartRef, onChartMove, onChartLeave: () => this.setState({ hover: null }),
@@ -471,9 +462,9 @@ class Component extends DCLogic {
       legend, heatSectors, blocks, blockPct: U.blockPct + '%',
       cbTabs: this.tabs('cb', [['upper', 'Upper'], ['lower', 'Lower']]), cbRows,
       indItems: Object.entries(IND).map(([value, v]) => ({ value, label: v[0] })), indKey: st.ind, setInd: v => this.setState({ ind: v }), indLabel: ind[0].replace(/^(Lowest|Highest) /, ''), indRows,
-      evTabs, evTiles, evRows, evEmpty: evRows.length === 0,
-      evEmptyTitle: { today: 'No events today', week: 'No events this week', next: 'No events next week', month: 'No events this month', decl: 'No declarations', earn: 'No earnings' }[st.ev],
-      evEmptyText: { today: 'Nothing is scheduled for today. Check the rest of the week for upcoming record dates, AGMs and disclosures.', week: 'Nothing is scheduled for this week.', next: 'Nothing is scheduled for the upcoming week.', month: 'Nothing is scheduled for this month.', decl: 'No recent declarations.', earn: 'No recent earnings releases.' }[st.ev],
+      evTabs, evRows, evEmpty: evRows.length === 0,
+      evEmptyTitle: { today: 'No events today', week: 'No events this week', next: 'No events next week', month: 'No events this month' }[st.ev],
+      evEmptyText: { today: 'Nothing is scheduled for today. Check the rest of the week for upcoming record dates, AGMs and disclosures.', week: 'Nothing is scheduled for this week.', next: 'Nothing is scheduled for the upcoming week.', month: 'Nothing is scheduled for this month.' }[st.ev],
       evEmptyAction: st.ev === 'today' ? { label: 'View this week', onClick: () => this.setState({ ev: 'week' }) } : { label: 'View this month', onClick: () => this.setState({ ev: 'month' }) },
       ipoTabs: this.tabs('ipo', [['open', 'Subscription open'], ['upcoming', 'Forthcoming'], ['past', 'Archive']]).map((t, i, a) => ({ ...t, br: i === a.length - 1 ? '0' : '1px solid var(--ink)' })), ipoRows
     };
